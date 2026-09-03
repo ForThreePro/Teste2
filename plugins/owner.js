@@ -180,6 +180,5 @@ ${jsFiles || '│ No hay archivos.js'}
 handler.help = ['obtener <archivo>', 'edit <archivo> / <texto>', 'crear <archivo> / <codigo>', 'del <archivo>', 'ver1']
 handler.tags = ['owner']
 handler.command = ['obtener', 'edit', 'crear', 'del', 'ver1']
-handler.rowner = true
 
 export default handler
