@@ -135,7 +135,7 @@ ${fileContent}
   if (command === 'ver1') {
     try {
       await m.react('⏳')
-      const repo = 'Teste2'
+      const repo = 'ForThreePro/Teste2' // TU REPO
       const branch = 'main'
       const url = `https://api.github.com/repos/${repo}/contents/plugins?ref=${branch}`
 
@@ -156,7 +156,7 @@ ${jsFiles || '│ No hay archivos.js'}
       await m.react('✅')
     } catch (e) {
       await m.react('❌')
-      m.reply(`❌ Error al obtener lista: ${e.message}\n\n*Verifica el nombre del repo en el codigo*`)
+      m.reply(`❌ Error al obtener lista: ${e.message}\n\n*Verifica que el repo ForThreePro/Teste2 sea público*`)
     }
   }
 }
@@ -164,6 +164,5 @@ ${jsFiles || '│ No hay archivos.js'}
 handler.help = ['obtener <archivo>', 'edit <archivo> / <texto>', 'crear <archivo> / <codigo>', 'del <archivo>', 'ver1']
 handler.tags = ['tools']
 handler.command = ['obtener', 'edit', 'crear', 'del', 'ver1']
-// handler.rowner = true <- QUITADO
 
 export default handler
