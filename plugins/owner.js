@@ -2,14 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import axios from 'axios'
 
-const OWNER = '51927174359' // tu numero
-
-function isOwner(m) {
-  return m.sender.split('@')[0] === OWNER
-}
-
 let handler = async (m, { conn, args, command, text }) => {
-  if (!isOwner(m)) return m.reply('😿 *Marie dice: Solo Marie puede usar esto*')
+  // Solo owner puede usarlo
+  if (!global.owner?.some(([id]) => id === m.sender.split('@')[0]))
+    return m.reply('😿 *Marie dice: Solo Marie puede usar esto*')
 
   // 1..obtener + nombre.js
   if (command === 'obtener') {
@@ -29,7 +25,7 @@ let handler = async (m, { conn, args, command, text }) => {
           document: Buffer.from(fileContent),
           mimetype: 'text/javascript',
           fileName: fileName,
-          caption: `🐱 𓆩 𝗔𝗥𝗖𝗛𝗜𝗩𝗢 𝗘𝗡𝗩𝗜𝗔𝗗𝗢 𓆪 🐱\n\n💖 *Archivo:* ${fileName}\n*Owner:* @${OWNER}`
+          caption: `🐱 𓆩 𝗔𝗥𝗖𝗛𝗜𝗩𝗢 𝗘𝗡𝗩𝗜𝗔𝗗𝗢 𓆪 🐱\n\n💖 *Archivo:* ${fileName}`
         }, { quoted: m })
       } else {
         await m.reply(`🐱 𓆩 𝗖𝗢𝗡𝗧𝗘𝗡𝗜𝗗𝗢 𝗗𝗘 ${fileName.toUpperCase()} 𓆪 🐱
@@ -41,7 +37,6 @@ ${fileContent}
 \`\`
 
 ━━━━━━━━━━━
-*Owner:* @${OWNER}
 *Powered by*: ***COTTI BOTS x Marie*** 🌸`)
       }
       await m.react('✅')
@@ -74,7 +69,6 @@ ${fileContent}
 💚 ➛ *Editado por:* Marie
 
 ━━━━━━━━━━━
-*Owner:* @${OWNER}
 *Reinicia el bot para aplicar cambios*`)
       await m.react('✅')
     } catch (e) {
@@ -108,7 +102,6 @@ ${fileContent}
 💚 ➛ *Creado por:* Marie
 
 ━━━━━━━━━━━
-*Owner:* @${OWNER}
 *Reinicia el bot para cargar el plugin*`)
       await m.react('✅')
     } catch (e) {
@@ -136,8 +129,7 @@ ${fileContent}
 💚 ➛ *Archivo:* ${fileName}
 💚 ➛ *Estado:* Eliminado correctamente
 
-━━━━━━━━━━━
-*Owner:* @${OWNER}`)
+━━━━━━━━━━━`)
       await m.react('🗑️')
     } catch (e) {
       await m.react('❌')
@@ -150,7 +142,7 @@ ${fileContent}
     try {
       await m.react('⏳')
       // CAMBIA ESTO POR TU REPO
-      const repo = 'Teste2'
+      const repo = 'COTTI-BOTS'
       const branch = 'main'
       const url = `https://api.github.com/repos/${repo}/contents/plugins?ref=${branch}`
 
@@ -167,7 +159,6 @@ ${jsFiles || '│ No hay archivos.js'}
 ━━━━━━━━━━━
 *Total:* ${jsFiles.split('\n').length} archivos
 *Repo:* ${repo}
-*Owner:* @${OWNER}
 *Powered by*: ***COTTI BOTS x Marie*** 🌸`)
       await m.react('✅')
     } catch (e) {
@@ -180,5 +171,6 @@ ${jsFiles || '│ No hay archivos.js'}
 handler.help = ['obtener <archivo>', 'edit <archivo> / <texto>', 'crear <archivo> / <codigo>', 'del <archivo>', 'ver1']
 handler.tags = ['owner']
 handler.command = ['obtener', 'edit', 'crear', 'del', 'ver1']
+handler.rowner = false
 
 export default handler
