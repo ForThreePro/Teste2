@@ -135,7 +135,7 @@ ${fileContent}
   if (command === 'ver1') {
     try {
       await m.react('⏳')
-      const repo = 'COTTI-BOTS'
+      const repo = 'Teste2'
       const branch = 'main'
       const url = `https://api.github.com/repos/${repo}/contents/plugins?ref=${branch}`
 
