@@ -3,9 +3,6 @@ import path from 'path'
 import axios from 'axios'
 
 let handler = async (m, { conn, args, command, text }) => {
-  // Solo owner puede usarlo
-  if (!global.owner?.some(([id]) => id === m.sender.split('@')[0]))
-    return m.reply('😿 *Marie dice: Solo Marie puede usar esto*')
 
   // 1..obtener + nombre.js
   if (command === 'obtener') {
@@ -19,7 +16,6 @@ let handler = async (m, { conn, args, command, text }) => {
     try {
       let fileContent = fs.readFileSync(filePath, 'utf-8')
 
-      // Si es muy largo lo manda como documento
       if (fileContent.length > 3000) {
         await conn.sendMessage(m.chat, {
           document: Buffer.from(fileContent),
@@ -66,7 +62,6 @@ ${fileContent}
 ──🌸 *DATOS* ╏ 💚
 💚 ➛ *Archivo:* ${fileName}
 💚 ➛ *Estado:* Guardado correctamente
-💚 ➛ *Editado por:* Marie
 
 ━━━━━━━━━━━
 *Reinicia el bot para aplicar cambios*`)
@@ -99,7 +94,6 @@ ${fileContent}
 ──🌸 *DATOS* ╏ 💚
 💚 ➛ *Archivo:* ${fileName}
 💚 ➛ *Estado:* Creado correctamente
-💚 ➛ *Creado por:* Marie
 
 ━━━━━━━━━━━
 *Reinicia el bot para cargar el plugin*`)
@@ -141,7 +135,6 @@ ${fileContent}
   if (command === 'ver1') {
     try {
       await m.react('⏳')
-      // CAMBIA ESTO POR TU REPO
       const repo = 'COTTI-BOTS'
       const branch = 'main'
       const url = `https://api.github.com/repos/${repo}/contents/plugins?ref=${branch}`
@@ -169,8 +162,8 @@ ${jsFiles || '│ No hay archivos.js'}
 }
 
 handler.help = ['obtener <archivo>', 'edit <archivo> / <texto>', 'crear <archivo> / <codigo>', 'del <archivo>', 'ver1']
-handler.tags = ['owner']
+handler.tags = ['tools']
 handler.command = ['obtener', 'edit', 'crear', 'del', 'ver1']
-handler.rowner = false
+// handler.rowner = true <- QUITADO
 
 export default handler
