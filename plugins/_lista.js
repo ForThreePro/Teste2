@@ -1,10 +1,17 @@
 import fs from 'fs'
-let db = './src/database/lista.json'
+import path from 'path'
 
-if (!fs.existsSync('./src/database')) fs.mkdirSync('./src/database', { recursive: true })
-if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
+const DB_FOLDER = './src/database/listas'
+
+if (!fs.existsSync(DB_FOLDER)) fs.mkdirSync(DB_FOLDER, { recursive: true })
 
 let handler = async (m, { conn, text }) => {
+    const chatId = m.chat // ID del grupo para separar listas
+    const db = path.join(DB_FOLDER, `${chatId}.json`)
+
+    // Crear archivo del grupo si no existe
+    if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
+
     let data = JSON.parse(fs.readFileSync(db))
 
     // Fecha y día de Perú
