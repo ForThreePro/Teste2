@@ -1,10 +1,17 @@
 import fs from 'fs'
-let db = './src/database/lista.json'
+import path from 'path'
 
-if (!fs.existsSync('./src/database')) fs.mkdirSync('./src/database', { recursive: true })
-if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
+const DB_FOLDER = './src/database/listas'
+
+if (!fs.existsSync(DB_FOLDER)) fs.mkdirSync(DB_FOLDER, { recursive: true })
 
 let handler = async (m, { conn }) => {
+    const chatId = m.chat // ID del grupo
+    const db = path.join(DB_FOLDER, `${chatId}.json`)
+
+    // Si el archivo no existe, crearlo vacío
+    if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
+
     let data = JSON.parse(fs.readFileSync(db))
     let total = data.length
 
@@ -19,7 +26,7 @@ let handler = async (m, { conn }) => {
 .⃟𖥔 ݁. 𖦹˙— \`\`LISTA VACÍA\`\` —˙𖦹.🗑️꒷
 
 ── *📝 AVISO* ╏
-📭 ➛ La lista ya está vacía
+📭 ➛ La lista de este grupo ya está vacía
 📭 ➛ No hay registros para borrar
 
 ━━━━━━━━━━━`
@@ -40,7 +47,7 @@ let handler = async (m, { conn }) => {
 ⏰ ➛ Hora: *${hora}*
 
 ── *📦 ESTADO* ╏
-✅ ➛ Lista reiniciada correctamente
+✅ ➛ Lista de este grupo reiniciada
 
 ━━━━━━━━━━━`
 
