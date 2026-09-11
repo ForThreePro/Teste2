@@ -46,6 +46,7 @@ for (const plugin of Object.values(global.plugins || {})) {
 const userName = m.pushName || 'Usuario'
 const IMG_MENU = 'https://files.evogb.win/QFXQtu.jpg'
 const ping = Math.round(performance.now() - start)
+const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
 let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -58,7 +59,7 @@ let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 �
 
 ──愛 *INFORMACION* ╏ 🍕
 *Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
-*Owner*: @${global.owner?.[0]?.[0] || '51927174369'}
+*Owner*: @${ownerNum}
 *Ping*: ${ping}ms | *RAM*: ${ram}mb/${totalram}gb
 
  ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
@@ -86,10 +87,9 @@ for (const tag of tagsOrdenados) {
   menuTexto += ` ㅤ└──.✦ ── ⊰ ̟!!.✦. ˙\n\n`
 }
 
-// BOTONES RAPIDOS
 menuTexto += `━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
-*Owner*: @${global.owner?.[0]?.[0] || '51927174369'}
+*Owner*: @${ownerNum}
 *Version*: 2.1 PRO
 
 > "Dame lasaña o dame sueño" 😼
@@ -98,11 +98,9 @@ menuTexto += `━━━━━━━━━━━
 await conn.sendMessage(m.chat, {
   image: { url: IMG_MENU },
   caption: menuTexto.trim(),
-  footer: 'GARFIELD BOT',
+  footer: 'Siguenos para mas actualizaciones',
   buttons: [
-    {buttonId: '.nobg', buttonText: {displayText: '⚡ PING'}, type: 1},
-    {buttonId: '.owner', buttonText: {displayText: '👑 OWNER'}, type: 1},
-    {buttonId: '.s', buttonText: {displayText: 'ℹ️ INFO'}, type: 1}
+    {buttonId: 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z', buttonText: {displayText: '📢 VER CANAL'}, type: 1}
   ],
   headerType: 4,
   mentions: [m.sender]
