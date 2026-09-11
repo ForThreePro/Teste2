@@ -42,7 +42,7 @@ let handler = async (m, { conn }) => {
 }
 
 handler.help = ['del']
-handler.tags = ['grupos']
+handler.tags = ['grupo']
 handler.command = /^del(ete)?$/i
 handler.admin = true
 handler.botAdmin = true
