@@ -141,7 +141,7 @@ let handler = async (m, { conn, text }) => {
 }
 
 handler.help = ['lista nombre/numero/rol', 'verlista']
-handler.tags = ['grupo']
+handler.tags = ['sorteos']
 handler.command = /^(lista|verlista)$/i
 handler.group = true
 export default handler
