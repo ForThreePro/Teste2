@@ -1,14 +1,21 @@
-let handler = async (m, { conn, args }) => {
+import moment from 'moment-timezone'
+moment.locale('es')
+
+let handler = async (m, { conn, args, command }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+  const ownerNum = global.owner?.[0]?.[0] || '51927174369'
+
+  if (!global.db.data.chats) global.db.data.chats = {}
+  if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
   let chat = global.db.data.chats[m.chat]
-  if (!chat) global.db.data.chats[m.chat] = {}
 
-  let textoCmd = m.text.toLowerCase()
   let type = ''
-  if (textoCmd.includes('welcome')) type = 'welcome'
-  if (textoCmd.includes('bye')) type = 'bye'
-  if (textoCmd.includes('kick')) type = 'kick'
+  if (command.includes('welcome')) type = 'welcome'
+  else if (command.includes('bye')) type = 'bye'
+  else if (command.includes('kick')) type = 'kick'
+  else return m.reply('❌ Comando no válido')
 
-  let text = args.join(' ')
+  let text = args.join(' ').trim()
   let key = `custom${type.charAt(0).toUpperCase() + type.slice(1)}`
 
   const react = async (text) => {
@@ -16,67 +23,87 @@ let handler = async (m, { conn, args }) => {
   }
 
   // SET
-  if (textoCmd.startsWith('set')) {
+  if (command.startsWith('set')) {
     await react('📝')
     if (!text) {
-      let uso = `𐔌 ꒱ ***MENSAJE ${type.toUpperCase()}*** 𐔌 ꒱ 📝
+      let uso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.✏️꒷
+⤷ ┇ 𝐌𝐄𝐍𝐒𝐀𝐉𝐄 ﹒ ${type.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
-➛ Envía: <texto del mensaje>
+.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` ✏️ —˙𖦹.꒷
 
-── *💡 VARIABLES* ╏
+── *📖 USO* ╏ 🍕
+➛.${command} <texto del mensaje>
+
+── *💡 VARIABLES* ╏ 🍕
 👤 ➛ @user = Menciona al usuario
 👥 ➛ @group = Nombre del grupo
 📄 ➛ @desc = Descripción del grupo
 
-── *💡 EJEMPLO* ╏
-➛ Bienvenido @user a @group
+── *💡 EJEMPLO* ╏ 🍕
+➛.${command} Bienvenido @user a @group
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
     }
 
     chat[key] = text
-    let ok = `𐔌 ꒱ ***MENSAJE ${type.toUpperCase()}*** 𐔌 ꒱ ✅
+    let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`GUARDADO\`\` —˙𖦹.📝꒷
+⤷ ┇ 𝐆𝐔𝐀𝐑𝐃𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`GUARDADO\`\` ✅ —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 ✅ ➛ Mensaje de *${type}* guardado
 
-── *📝 VISTA PREVIA* ╏
+── *📝 VISTA PREVIA* ╏ 🍕
 💬 ➛ ${text}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   }
 
   // DEL
-  if (textoCmd.startsWith('del')) {
+  if (command.startsWith('del')) {
     await react('🗑️')
     if (!chat[key]) {
-      let vacio = `𐔌 ꒱ ***MENSAJE ${type.toUpperCase()}*** 𐔌 ꒱ 📭
+      let vacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`NO CONFIGURADO\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐍𝐎 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`AVISO\`\` 📭 —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 📭 ➛ No hay un mensaje de *${type}* personalizado
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
     }
 
     delete chat[key]
-    let del = `𐔌 ꒱ ***MENSAJE ${type.toUpperCase()}*** 𐔌 ꒱ ✅
+    let del = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` —˙𖦹.🗑️꒷
+⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` 🗑️ —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Mensaje de *${type}* eliminado
 ✅ ➛ Volverá al mensaje por defecto
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: del }, { quoted: m })
   }
