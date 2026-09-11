@@ -118,7 +118,7 @@ const handler = async (m, { conn }) => {
 }
 
 handler.help = ['audivd', 'audio']
-handler.tags = ['herramienta']
+handler.tags = ['tools']
 handler.command = ['audivd', 'audio']
 handler.limit = true
 export default handler
