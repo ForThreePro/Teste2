@@ -109,6 +109,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 }
 
 handler.help = ['hd', 'upscale']
-handler.tags = ['herramientas', 'ia']
+handler.tags = ['tools']
 handler.command = ['hd', 'upscale', 'remini']
 export default handler
