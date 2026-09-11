@@ -232,7 +232,7 @@ handler.before = async (m, { conn, command }) => {
 }
 
 handler.help = ['temporizador 30d', 'tempcancel', 'templist'];
-handler.tags = ['group'];
+handler.tags = ['grupo'];
 handler.command = ['temporizador', 'temp', 'tempcancel', 'templist'];
 handler.admin = false
 
