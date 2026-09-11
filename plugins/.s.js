@@ -1,4 +1,6 @@
 import fs from 'fs'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const dbPath = './libre.json'
 const loadDB = () => {
@@ -20,6 +22,8 @@ let handler = async (m, { conn, text, command }) => {
     if (!db[chatId]) db[chatId] = {}
 
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
     try {
         // =====.set =====
@@ -29,29 +33,39 @@ let handler = async (m, { conn, text, command }) => {
             contenido = contenido.join(' ')
 
             if (!nombre) {
-                let menu = `𐔌 ꒱ ***.set*** 𐔌 ꒱ 📌
+                let menu = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` —˙𖦹.💾꒷
+⤷ ┇ 𝐇𝐄𝐑𝐀𝐌𝐈𝐄𝐍𝐓𝐀 ﹒ SET ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+💾 ࣪ ꕀ.set ˚. ᵎᵎ
+> *"Guardo hasta las migas de lasaña"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` 💾 —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 💾 ➛ Guarda textos, imágenes, videos, audios y stickers
 💾 ➛ Para usarlos después con.nombre
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 1️⃣ ➛ *Texto:*.set nombre Tu texto aquí
 2️⃣ ➛ *Media:* Responde a una imagen/video/etc.set nombre
 
-── *💡 EJEMPLOS* ╏
+── *💡 EJEMPLOS* ╏ 🍕
 📌 ➛.set pago Yape +51 927 174 369
 📌 ➛ Responde a imagen +.set menu
 
-── *⚠️ NOTAS* ╏
+── *⚠️ NOTAS* ╏ 🍕
 🔒 ➛ Solo admins
 📦 ➛ Máx: Imagen/Video 15MB | Audio 10MB | Texto 4000 chars
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}
 ━━━━━━━━━━━`
                 await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-                return conn.sendMessage(m.chat, { text: menu }, { quoted: m })
+                return conn.sendMessage(m.chat, { text: menu, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
             }
 
             if (nombre.length < 2) return m.reply('⚠️ Nombre muy corto')
@@ -101,19 +115,24 @@ let handler = async (m, { conn, text, command }) => {
             await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
 
             let size = dataToSave.content? formatBytes(Buffer.from(dataToSave.content,'base64').length) : formatBytes(contenido.length)
-            let menuOk = `𐔌 ꒱ ***.set*** 𐔌 ꒱ ✅
+            let menuOk = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`CREADO\`\` —˙𖦹.💎꒷
+⤷ ┇ 𝐂𝐑𝐄𝐀𝐃𝐎 ﹒ SET ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 DATOS* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`CREADO\`\` ${emojiType[type]} —˙𖦹.꒷
+
+── *📊 DATOS* ╏ 🍕
 📌 ➛ Comando: *.*${nombre}
 ${emojiType[type]} ➛ Tipo: *${type.toUpperCase()}*
 📦 ➛ Peso: *${size}*
 📅 ➛ Creado: *${new Date().toLocaleString('es-PE')}*
 
-── *📖 USAR* ╏
+── *📖 USAR* ╏ 🍕
 ➛ Ahora usa: *.*${nombre}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: menuOk }, { quoted: m })
         }
@@ -123,32 +142,42 @@ ${emojiType[type]} ➛ Tipo: *${type.toUpperCase()}*
             let nombre = text?.toLowerCase().replace(/[^a-z0-9_]/g, '')
             if (!nombre ||!db[chatId][nombre]) {
                 await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-                let menuDel = `𐔌 ꒱ ***.del*** 𐔌 ꒱ 🗑️
+                let menuDel = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐇𝐄𝐑𝐀𝐌𝐈𝐄𝐍𝐓𝐀 ﹒ DEL ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` 🗑️ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 🗑️ ➛ Elimina un comando guardado
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 ➛.del nombre
 
-── *📊 RESULTADO* ╏
+── *📊 RESULTADO* ╏ 🍕
 ❌ ➛ Ese comando no existe
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
                 return conn.sendMessage(m.chat, { text: menuDel }, { quoted: m })
             }
             delete db[chatId][nombre]
             saveDB(db)
             await conn.sendMessage(m.chat, { react: { text: '🗑️', key: m.key } })
-            let menuDelOk = `𐔌 ꒱ ***.del*** 𐔌 ꒱ ✅
+            let menuDelOk = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` —˙𖦹.🗑️꒷
+⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ DEL ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 RESULTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` 🗑️ —˙𖦹.꒷
+
+── *📊 RESULTADO* ╏ 🍕
 🗑️ ➛ Comando eliminado: *.*${nombre}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: menuDelOk }, { quoted: m })
         }
@@ -157,32 +186,42 @@ ${emojiType[type]} ➛ Tipo: *${type.toUpperCase()}*
         if (command === 'listset') {
             let lista = Object.keys(db[chatId])
             if (lista.length === 0) {
-                let menuVacio = `𐔌 ꒱ ***.listset*** 𐔌 ꒱ 📭
+                let menuVacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`LISTA\`\` —˙𖦹.📋꒷
+⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ LISTSET ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 RESULTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`LISTA\`\` 📭 —˙𖦹.꒷
+
+── *📊 RESULTADO* ╏ 🍕
 📭 ➛ No hay comandos guardados en este grupo
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
                 return conn.sendMessage(m.chat, { text: menuVacio }, { quoted: m })
             }
 
-            let txt = `𐔌 ꒱ ***.listset*** 𐔌 ꒱ 📋
+            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`LISTA\`\` —˙𖦹.📋꒷
+⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ LISTSET ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 TOTAL* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`LISTA\`\` [${lista.length}] 📋 —˙𖦹.꒷
+
+── *📊 TOTAL* ╏ 🍕
 📦 ➛ ${lista.length} comandos guardados
 
-── *📜 COMANDOS* ╏\n`
+── *📜 COMANDOS* ╏ 🍕\n`
             lista.forEach((v,i) => {
                 txt += `${i+1} ➛.*${v}* ${emojiType[db[chatId][v].type]} [${db[chatId][v].type}]\n`
             })
             txt += `
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 ➛ Usa.*nombre* para ejecutar
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             await conn.sendMessage(m.chat, { react: { text: '📋', key: m.key } })
             return conn.sendMessage(m.chat, { text: txt }, { quoted: m })
@@ -226,7 +265,6 @@ function formatBytes(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`
 }
-
 
 handler.help = ['set + Texto ', 'del + texto', 'listset - Ver Menu Set']
 handler.tags = ['ventas']
