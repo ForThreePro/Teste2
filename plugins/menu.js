@@ -1,110 +1,119 @@
+import moment from 'moment-timezone'
 import os from 'os'
+moment.locale('es')
 
-// TU IMAGEN FIJA
-const GARFIELD_IMG = 'https://files.evogb.win/QFXQtu.jpg'
+const CATEGORY_META = {
+config: 'CONFIG', main: 'MAIN', tools: 'TOOLS', owner: 'OWNER',
+fun: 'FUN', buscadores: 'SEARCH', descargas: 'DOWNLOADER', grupo: 'GRUPOS',
+group: 'GRUPO', ia: 'IA', info: 'INFO', sticker: 'STICKER',
+}
 
-let handler = async (m, { conn, usedPrefix }) => {
-  const react = async (text) => {
-    try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
+// ICONOS POR CATEGORIA
+const ICONOS_CATEGORIA = {
+config: '⚙️', owner: '👑', fun: '😂', buscadores: '🔍',
+descargas: '⬇️', grupo: '👥', grupos: '👥', ia: '🤖',
+info: 'ℹ️', sticker: '🧩', main: '📁', tools: '🛠️',
+}
+
+let handler = async (m, { conn }) => {
+try {
+await conn.sendMessage(m.chat, { react: { text: '🍕', key: m.key } })
+
+const fecha = moment.tz('America/Lima').format('dddd')
+const fecha2 = moment.tz('America/Lima').format('DD [de] MMMM [de] YYYY')
+const hora = moment.tz('America/Lima').format('hh:mm:ss a')
+const uptime = process.uptime()
+const horas = Math.floor(uptime / 3600)
+const minutos = Math.floor((uptime % 3600) / 60)
+const segundos = Math.floor(uptime % 60)
+const ram = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)
+const totalram = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2)
+const pluginsCount = Object.values(global.plugins || {}).filter(p =>!p?.disabled).length
+const totalUsers = Object.keys(global.db.data.users || {}).length
+
+const byTag = {}
+for (const plugin of Object.values(global.plugins || {})) {
+  if (plugin.disabled) continue
+  const tags = Array.isArray(plugin.tags)? plugin.tags : (plugin.tags? [plugin.tags] : [])
+  const helps = Array.isArray(plugin.help)? plugin.help : (plugin.help? [plugin.help] : [])
+  for (const tag of tags) {
+    const t = tag.toLowerCase()
+    if (!byTag[t]) byTag[t] = new Set()
+    for (const h of helps) if (typeof h === 'string' && h.trim()) byTag[t].add(h.trim())
   }
+}
 
-  await react('⏳')
+const userName = m.pushName || 'Usuario'
+const IMG_MENU = 'https://files.evogb.win/QFXQtu.jpg' // TU IMAGEN DE GARFIELD
 
-  let taguser = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
-  let img = { url: GARFIELD_IMG }
+let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-  let uptime = process.uptime() * 1000
-  let _uptime = clockString(uptime)
-  let totalreg = Object.keys(global.db.data.users).length
-  let totalcmd = Object.values(global.plugins).filter(p => p.help &&!p.disabled).length
+⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.0 ：✿ 。
+꒰ ◞⁺⊹ ．estado: *EN LINEA* • ${horas}h ${minutos}m
 
-  let owner = global.owner?.[0]?.[0] || '51927174369'
-  let ownerTag = `@${owner}`
-  let numBot = conn.user.jid.split('@')[0]
+  ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
+😼 ࣪ ꕀ @${userName}. ˚. ᵎᵎ
+> *"Odio los lunes... y las dietas"*
 
-  let help = Object.values(global.plugins).filter(p => p.help &&!p.disabled)
-  let groups = {}
-  for (let plugin of help) {
-    let category = plugin.tags? plugin.tags[0] : 'otros'
-    if (!groups[category]) groups[category] = []
-    if (Array.isArray(plugin.help)) groups[category].push(...plugin.help)
-    else groups[category].push(plugin.help)
-  }
+──愛 *INFORMACION DEL BOT* ╏ 🍕
+*Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
+*Owner*: @${global.owner?.[0]?.[0] || '51927174369'}
+*Numero*: +${conn.user.jid.split('@')[0]}
 
-  // ICONOS POR CATEGORIA
-  const icons = {
-    search: '🔍', download: '⬇️', game: '🎮', rpg: '⚔️', config: '⚙️',
-    group: '👥', owner: '👑', info: 'ℹ️', fun: '😂', anime: '🌸',
-    sticker: '🧩', tools: '🛠️', nsfw: '🔞', audio: '🎵', prem: '💎', otros: '📁'
-  }
+ ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
+> ﹒ RAM: ${ram}mb / ${totalram}gb
+      ᶻz　*${fecha}* ─ ${fecha2} ─ ${hora}　⋌
 
-  const categoryNames = {
-    search: 'BÚSQUEDA', download: 'DESCARGAS', game: 'JUEGOS', rpg: 'RPG',
-    config: 'CONFIGURACIÓN', group: 'GRUPOS', owner: 'OWNER', info: 'INFORMACIÓN',
-    fun: 'DIVERSIÓN', anime: 'ANIME', sticker: 'STICKERS', tools: 'HERRAMIENTAS',
-    nsfw: 'NSFW', audio: 'AUDIO', prem: 'PREMIUM', otros: 'OTROS'
-  }
+© ❛ *ping*. ${Math.round(performance.now())}ms
+名 ─ *modo:* public﹔
 
-  let fecha = new Date().toLocaleDateString('es-PE', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Lima'})
-  let hora = new Date().toLocaleTimeString('es-PE', {hour: '2-digit', minute: '2-digit', timeZone: 'America/Lima'})
+> ❍ 𝖴𝗌𝖺. 𝖺𝗇𝗍𝖾𝗌 𝖽𝖾 𝖼𝖺𝖽𝖺 𝖼𝗈𝗆𝖺𝗇𝖽𝗈
 
-  let menu = `𓂃 𓈒𓏸 𓂃 𓈒𓏸
-     *𐔌 ꒱ GARFIELD BOT 𐔌 ꒱* 🍕
-     _"Mejorando como lasaña"_ 😼
-𓂃 𓈒𓏸 𓂃 𓈒𓏸
-
-𓂃 𓈒𓏸 *PERFIL* 𓂃 𓈒𓏸
-🍼 *Usuario:* @${taguser.split('@')[0]}
-👑 *Owner:* ${ownerTag}
-📱 *Bot:* \`+${numBot}\`
-
-𓂃 𓈒𓏸 *ESTADÍSTICAS* 𓂃 𓈒𓏸
-⏱️ *Actividad:* \`${_uptime}\`
-👥 *Usuarios:* \`${totalreg}\`
-📜 *Comandos:* \`${totalcmd}\`
-
-𓂃 𓈒𓏸 *SISTEMA* 𓂃 𓈒𓏸
-💾 *RAM:* \`${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}mb / ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)}gb\`
-📅 *Fecha:* ${fecha}
-🕐 *Hora:* ${hora}
-
-𓂃 𓈒𓏸 *LISTA DE COMANDOS* 𓂃 𓈒𓏸
 `
 
-  for (let category in groups) {
-    let icon = icons[category] || '📁'
-    let catName = categoryNames[category] || category.toUpperCase()
-    menu += `\n*${icon} ${catName}*\n`
-    for (let cmd of groups[category]) {
-      menu += `> \`\`${usedPrefix}${cmd}\`\n` // Arreglo 1: Solo 1 icono
-    }
+const tagsOrdenados = Object.keys(byTag).sort((a, b) => {
+  const aIn = CATEGORY_META[a]? 0 : 1
+  const bIn = CATEGORY_META[b]? 0 : 1
+  return aIn - bIn
+})
+
+for (const tag of tagsOrdenados) {
+  const set = byTag[tag]
+  if (!set || set.size === 0) continue
+  const cmds = [...set].sort()
+
+  const icono = ICONOS_CATEGORIA[tag] || '📁'
+  const nombreCat = CATEGORY_META[tag] || tag.toUpperCase()
+
+  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono}꒷\n` // CAMBIO: Ya no dice PREM
+  for (const c of cmds) {
+    menuTexto += ` ${icono} ➛.${c}\n`
   }
-
-  menu += `
-𓂃 𓈒𓏸 *AYUDA* 𓂃 𓈒𓏸
-💡 *Usa:* \`${usedPrefix}\` antes de cada comando
-💡 *Ejemplo:* \`\`\`${usedPrefix}sticker\`\`\`
-
-━━━ *Andreitap Ventas* 💗 ━━━`
-
-  await conn.sendMessage(m.chat, {
-    image: img,
-    caption: menu,
-    mentions: [taguser, owner]
-  }, { quoted: m })
-
-  await react('✅')
+  menuTexto += ` ㅤ└──.✦ ── ⊰ ̟!!.✦. ˙\n\n`
 }
 
-handler.help = ['menu', 'help', 'menú']
+menuTexto += `━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${global.owner?.[0]?.[0] || '51927174369'}
+*Version*: 2.0
+*Frase*: "Mejorando como lasaña"
+
+> "Dame lasaña o dame sueño" 😼
+━━━━━━━━━━━`
+
+await conn.sendMessage(m.chat, {
+  image: { url: IMG_MENU },
+  caption: menuTexto.trim(),
+  mentions: [m.sender]
+}, { quoted: m })
+
+} catch (e) {
+await conn.sendMessage(m.chat, { text: `*❌ ERROR*: ${e.message}` }, { quoted: m })
+}
+}
+
+handler.help = ['menu']
 handler.tags = ['info']
-handler.command = /^(menu|help|menú)$/i
+handler.command = ['menu', 'help', 'menú']
 
 export default handler
-
-function clockString(ms) {
-  let h = isNaN(ms)? '--' : Math.floor(ms / 3600000)
-  let m = isNaN(ms)? '--' : Math.floor(ms / 60000) % 60
-  let s = isNaN(ms)? '--' : Math.floor(ms / 1000) % 60
-  return `${h}h ${m}m ${s}s`
-}
