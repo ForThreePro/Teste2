@@ -2,6 +2,8 @@ import { join } from 'path'
 import { promises as fs } from 'fs'
 import { execFile } from 'child_process'
 import { promisify } from 'util'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const execFileAsync = promisify(execFile)
 
@@ -11,42 +13,59 @@ const react = async (conn, m, text) => {
 }
 
 const handler = async (m, { conn }) => {
-    const q = m.quoted ? m.quoted : m
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    const ownerNum = global.owner?.[0]?.[0] || '51927174369'
+    const q = m.quoted? q : m
     const mime = (q.msg || q).mimetype || ''
 
     if (!/video/.test(mime)) {
-        let menuUso = `𐔌 ꒱ ***.audivd*** 𐔌 ꒱ 🎵
+        let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` —˙𖦹.⚙️꒷
+⤷ ┇ 𝐇𝐄𝐑𝐀𝐌𝐈𝐄𝐍𝐓𝐀 ﹒ AUDIVD ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🎵 ࣪ ꕀ.audivd ˚. ᵎᵎ
+> *"Sacando el audio como Garfield saca lasaña"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` ⚙️ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 🎵 ➛ Extrae el audio de un video
 🎵 ➛ Convierte a MP3 192kbps
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 1️⃣ ➛ Responde a un video con:.*audivd*
 2️⃣ ➛ O usa el alias:.*audio*
 
-── *📦 FORMATO* ╏
+── *📦 FORMATO* ╏ 🍕
 ⬇️ ➛ Salida: *MP3 44.1kHz Stereo*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}
 ━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
+        return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
     let tempVideo
     let tempAudio
     try {
         await react(conn, m, "⏳")
-        await m.reply(`𐔌 ꒱ ***.audivd*** 𐔌 ꒱ ⏳
+        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.⚙️꒷
+⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ AUDIVD ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ⚙️ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
 📥 ➛ Descargando video...
 🎵 ➛ Extrayendo audio...
 ⚙️ ➛ Convirtiendo a MP3...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
 
         const videoBuffer = await q.download()
@@ -80,35 +99,46 @@ const handler = async (m, { conn }) => {
         }, { quoted: m })
 
         await react(conn, m, "✅")
-        let menuOk = `𐔌 ꒱ ***.audivd*** 𐔌 ꒱ ✅
+        let menuOk = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.🎵꒷
+⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ AUDIVD ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 RESULTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎵 —˙𖦹.꒷
+
+── *📊 RESULTADO* ╏ 🍕
 ✅ ➛ Audio extraído correctamente
 📌 ➛ Formato: *MP3 192kbps*
 📌 ➛ Calidad: *44.1kHz Stereo*
 
-── *📥 DESCARGA* ╏
+── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Archivo enviado arriba
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuOk }, { quoted: m })
 
     } catch (e) {
         console.error(e)
         await react(conn, m, "❌")
-        let menuErr = `𐔌 ꒱ ***.audivd*** 𐔌 ꒱ ⚠️
+        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+        let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ AUDIVD ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${e.message}
 
-── *💡 SOLUCIÓN* ╏
+── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa un video válido
 🔧 ➛ Máx 2 minutos recomendado
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
     } finally {
