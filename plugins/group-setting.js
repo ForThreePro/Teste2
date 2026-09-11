@@ -56,7 +56,7 @@ ${command === 'cerrar'
 }
 
 handler.help = ['abrir', 'cerrar']
-handler.tags = ['grupos']
+handler.tags = ['grupo']
 handler.command = ['abrir', 'cerrar']
 handler.admin = true
 handler.botAdmin = true
