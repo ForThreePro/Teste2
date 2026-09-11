@@ -47,6 +47,7 @@ const userName = m.pushName || 'Usuario'
 const IMG_MENU = 'https://files.evogb.win/QFXQtu.jpg'
 const ping = Math.round(performance.now() - start)
 const ownerNum = global.owner?.[0]?.[0] || '51927174369'
+const CANAL_LINK = 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z'
 
 let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -56,6 +57,10 @@ let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 �
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
 😼 ࣪ ꕀ @${userName}. ˚. ᵎᵎ
 > *"Odio los lunes... y las dietas"*
+
+📢 *CANAL OFICIAL*
+${CANAL_LINK}
+> _Únete para recibir actualizaciones_
 
 ──愛 *INFORMACION* ╏ 🍕
 *Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
@@ -91,6 +96,7 @@ menuTexto += `━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 *Owner*: @${ownerNum}
 *Version*: 2.1 PRO
+*${CANAL_LINK}*
 
 > "Dame lasaña o dame sueño" 😼
 ━━━━━━━━━━━`
@@ -98,11 +104,6 @@ menuTexto += `━━━━━━━━━━━
 await conn.sendMessage(m.chat, {
   image: { url: IMG_MENU },
   caption: menuTexto.trim(),
-  footer: 'Siguenos para mas actualizaciones',
-  buttons: [
-    {buttonId: 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z', buttonText: {displayText: '📢 VER CANAL'}, type: 1}
-  ],
-  headerType: 4,
   mentions: [m.sender]
 }, { quoted: m })
 
