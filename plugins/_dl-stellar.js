@@ -1,3 +1,19 @@
+import fetch from "node-fetch"
+
+const api = { url: 'https://api.stellarwa.xyz', key: 'proyectsV2' }
+
+// ESTA FUNCION FALTABA
+const react = async (conn, m, text) => {
+  try { 
+    await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) 
+  } catch {}
+}
+
+const getBuffer = async (url) => {
+    const res = await fetch(url)
+    return Buffer.from(await res.arrayBuffer())
+}
+
 let handler = async (m, { conn, command }) => {
     let text = m.text || m.message?.conversation || m.message?.extendedTextMessage?.text || ''
     text = text.replace(`.${command}`, '').trim()
@@ -9,10 +25,7 @@ let handler = async (m, { conn, command }) => {
         if (command === 'ig' || command === 'instagram') {
             await m.reply(`𐔌 ꒱ ***.ig*** 𐔌 ꒱ ⏳\nDescargando de Instagram...`)
 
-            // 1. Encodea el link 1 sola vez
             const igUrl = encodeURIComponent(text)
-            
-            // 2. Arma bien la URL de la API
             const apiUrl = `${api.url}/dl/instagram?url=${igUrl}&key=${api.key}`
 
             const res = await fetch(apiUrl)
@@ -21,7 +34,7 @@ let handler = async (m, { conn, command }) => {
             if (!json.status || !json.result) throw new Error(json.message || 'No se pudo descargar')
 
             let data = json.result
-            let buffer = await getBuffer(data.url) // asume que la API devuelve data.url
+            let buffer = await getBuffer(data.url)
 
             await conn.sendFile(m.chat, buffer, 'instagram.mp4', `Listo ✅`, m)
             await react(conn, m, '✅')
