@@ -2,7 +2,6 @@ import fetch from "node-fetch"
 
 const api = { url: 'https://api.stellarwa.xyz', key: 'proyectsV2' }
 
-// ESTA FUNCION FALTABA
 const react = async (conn, m, text) => {
   try { 
     await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) 
@@ -10,7 +9,9 @@ const react = async (conn, m, text) => {
 }
 
 const getBuffer = async (url) => {
+    if (!url) throw new Error('URL vacia')
     const res = await fetch(url)
+    if (!res.ok) throw new Error(`Error al descargar: ${res.status}`)
     return Buffer.from(await res.arrayBuffer())
 }
 
@@ -31,19 +32,31 @@ let handler = async (m, { conn, command }) => {
             const res = await fetch(apiUrl)
             const json = await res.json()
 
-            if (!json.status || !json.result) throw new Error(json.message || 'No se pudo descargar')
+            // DEBUG: Para ver en logs qué devuelve la API
+            console.log('Resp Stellar:', JSON.stringify(json))
 
-            let data = json.result
-            let buffer = await getBuffer(data.url)
+            if (!json.status) throw new Error(json.message || 'La API fallo')
+            if (!json.result) throw new Error('No se encontro resultado')
 
-            await conn.sendFile(m.chat, buffer, 'instagram.mp4', `Listo ✅`, m)
+            // Busca el link en varios campos por si la API cambia
+            let dlUrl = json.result.url || json.result.data || json.result.media || json.result.video || json.result.download || json.result.dl_link
+            
+            if (!dlUrl) throw new Error('La API no devolvio link de descarga')
+
+            let buffer = await getBuffer(dlUrl)
+            let caption = json.result.title || json.result.caption || 'Descargado de Instagram ✅'
+
+            await conn.sendFile(m.chat, buffer, 'instagram.mp4', caption, m)
             await react(conn, m, '✅')
         }
     } catch (e) {
+        console.error(e)
         await react(conn, m, '❌')
         await m.reply(`Error: ${e.message}`)
     }
 }
 
 handler.command = ['ig', 'instagram']
+handler.help = ['ig <link>']
+handler.tags = ['downloader']
 export default handler
