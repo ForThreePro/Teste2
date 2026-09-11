@@ -41,7 +41,7 @@ https://chat.whatsapp.com/${link}
 }
 
 handler.help = ['link']
-handler.tags = ['grupos']
+handler.tags = ['grupo']
 handler.command = ['link', 'linkgroup', 'grouplink']
 handler.group = true
 handler.admin = true
