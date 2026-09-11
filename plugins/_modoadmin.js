@@ -4,7 +4,6 @@ moment.locale('es')
 const handler = async (m, { conn, args, isAdmin, isOwner }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
-  // Validación de permisos para el comando
   if (!isAdmin &&!isOwner) {
     let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -67,25 +66,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
     return conn.sendMessage(m.chat, { text: off }, { quoted: m })
   } else {
     await react('❌')
-    let uso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
-
-⤷ ┇ 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ MODO ADMIN ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` ⚙️ —˙𖦹.꒷
-
-── *📖 USO* ╏ 🍕
-➛.modoadmin on
-➛.modoadmin off
-
-── *📝 DESCRIPCIÓN* ╏ 🍕
-🟢 ➛ on = Solo admins usan el bot
-🔴 ➛ off = Todos usan el bot
-
-━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
-━━━━━━━━━━━`
-    return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `📌 Uso: *.modoadmin on/off*` }, { quoted: m })
   }
 }
 
@@ -93,31 +74,31 @@ handler.help = ['modoadmin <on/off>']
 handler.tags = ['configuración']
 handler.command = /^(modoadmin|adminmode)$/i
 handler.group = true
-handler.admin = true
+handler.admin = true // SOLO ADMIN PUEDE ACTIVAR/DESACTIVAR
 
 handler.before = async function (m, { conn, isAdmin, isOwner, isROwner, isPrems }) {
     if (m.isBaileys || m.fromMe) return!0
+    if (!m.isGroup) return!0
 
     let chat = global.db.data.chats[m.chat]
-    if (!chat) return!0
+    if (!chat ||!chat.modoadmin) return!0
 
-    // Si estamos en un grupo
-    if (m.isGroup) {
-        // Si el modo admin está activo y el que escribe NO es admin/owner/premium
-        if (chat.modoadmin &&!isAdmin &&!isOwner &&!isROwner &&!isPrems) {
-            // Si el usuario intenta usar un comando, lo bloqueamos
-            if (m.text && /^[./#]/.test(m.text)) {
+    // SI MODO ADMIN ESTA ACTIVO Y NO ES ADMIN/OWNER/PREMIUM
+    if (!isAdmin &&!isOwner &&!isROwner &&!isPrems) {
+        // BLOQUEAR SI USA CUALQUIER COMANDO
+        if (m.text && /^[./#]/.test(m.text)) {
+            // No dejar pasar NINGUN comando
+            if (!/^modoadmin$/i.test(m.text.split(' ')[0].slice(1))) { // excepto si intenta activar modoadmin
                 try {
-                  await conn.sendMessage(m.chat, {
-                    react: { text: '🔒', key: m.key }
-                  })
+                  await conn.sendMessage(m.chat, { react: { text: '🔒', key: m.key } })
                 } catch {}
-                return false // Detiene la ejecución de otros plugins
+                return false // DETIENE TODO
             }
         }
     }
-
     return!0
 }
 
+// PRIORIDAD ALTA PARA QUE SE EJECUTE PRIMERO
+handler.priority = 0
 export default handler
