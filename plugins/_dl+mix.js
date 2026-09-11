@@ -1,6 +1,8 @@
 import axios from 'axios'
 import FormData from 'form-data'
 import { downloadContentFromMessage } from "@whiskeysockets/baileys"
+import moment from 'moment-timezone'
+moment.locale('es')
 
 // ===== CONFIG API STELLAR =====
 const api = {
@@ -42,57 +44,79 @@ async function removeBgFromUrl(url) {
 }
 
 let handler = async (m, { conn, usedPrefix, command }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    const ownerNum = global.owner?.[0]?.[0] || '51927174369'
     const q = m.quoted || m
     const mime = (q.msg || q).mimetype || ''
 
     if (!mime) {
-        let menuUso = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ 🖼️
+        let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`IA\`\` —˙𖦹.✨꒷
+⤷ ┇ 𝐇𝐄𝐑𝐀𝐌𝐈𝐄𝐍𝐓𝐀 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🖼️ ࣪ ꕀ.${command} ˚. ᵎᵎ
+> *"Hasta Garfield quiere su foto pro"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`IA\`\` ✨ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 🖼️ ➛ Mejora la calidad de una imagen a HD 2x
 🖼️ ➛ Elimina el fondo automáticamente
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 1️⃣ ➛ Responde a una imagen con:.*${command}*
 2️⃣ ➛ Envía formatos: JPG o PNG
 
-── *⚙️ PROCESO* ╏
+── *⚙️ PROCESO* ╏ 🍕
 ⬆️ ➛ Paso 1: Mejora a HD 2x
 🗑️ ➛ Paso 2: Quita el fondo
 📤 ➛ Paso 3: Envía imagen + documento
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}
 ━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
+        return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
     if (!/image\/(jpe?g|png)/.test(mime)) {
-        let menuError = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⚠️
+        let menuError = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ Solo se aceptan imágenes JPG/PNG
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 ➛ Responde a una imagen con:.*${command}*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
     }
 
     try {
         await m.react('⏳')
-        await m.reply(`𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⏳
+        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.⚙️꒷
+⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ⚙️ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
 ⬆️ ➛ Mejorando calidad a HD 2x...
 🗑️ ➛ Eliminando fondo...
 📤 ➛ Subiendo resultado...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
 
         // Proceso completo
@@ -105,18 +129,23 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         // Mensaje 1: Imagen
         await conn.sendMessage(m.chat, {
             image: finalBuffer,
-            caption: `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ✅
+            caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.✨꒷
+⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 RESULTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` ✨ —˙𖦹.꒷
+
+── *📊 RESULTADO* ╏ 🍕
 📌 ➛ Calidad: *HD 2x*
 📌 ➛ Fondo: *Eliminado*
 📌 ➛ Formato: *PNG Transparente*
 
-── *📥 DESCARGA* ╏
+── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ También se envió como documento
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         }, { quoted: m })
 
@@ -125,14 +154,19 @@ let handler = async (m, { conn, usedPrefix, command }) => {
             document: finalBuffer,
             fileName: 'image-nobg.png',
             mimetype: 'image/png',
-            caption: `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ 📄
+            caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DOCUMENTO\`\` —˙𖦹.📄꒷
+⤷ ┇ 𝐃𝐎𝐂𝐔𝐌𝐄𝐍𝐓𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`DOCUMENTO\`\` 📄 —˙𖦹.꒷
+
+── *📊 INFO* ╏ 🍕
 📄 ➛ Imagen PNG sin fondo
 ✨ ➛ Lista para usar en diseños
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         }, { quoted: m })
 
@@ -140,17 +174,23 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     } catch (err) {
         await m.react('❌')
-        let menuErr = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⚠️
+        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+        let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${err.message || err}
 
-── *💡 SOLUCIÓN* ╏
+── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa una imagen clara JPG/PNG
 🔧 ➛ Máx 10MB recomendado
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
     }
