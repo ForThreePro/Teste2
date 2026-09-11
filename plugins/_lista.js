@@ -1,5 +1,7 @@
 import fs from 'fs'
 import path from 'path'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const DB_FOLDER = './src/database/listas'
 
@@ -8,6 +10,8 @@ if (!fs.existsSync(DB_FOLDER)) fs.mkdirSync(DB_FOLDER, { recursive: true })
 let handler = async (m, { conn, text }) => {
     const chatId = m.chat // ID del grupo para separar listas
     const db = path.join(DB_FOLDER, `${chatId}.json`)
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
     // Crear archivo del grupo si no existe
     if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
@@ -15,9 +19,9 @@ let handler = async (m, { conn, text }) => {
     let data = JSON.parse(fs.readFileSync(db))
 
     // Fecha y día de Perú
-    let now = new Date()
-    let fecha = now.toLocaleDateString('es-PE', { timeZone: 'America/Lima', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })
-    let diaSemana = now.toLocaleDateString('es-PE', { timeZone: 'America/Lima', weekday: 'long' }).toLowerCase()
+    let now = moment.tz('America/Lima')
+    let fechaFormato = now.format('dddd, DD/MM/YYYY')
+    let diaSemana = now.format('dddd').toLowerCase()
 
     let diasSemana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
 
@@ -28,20 +32,23 @@ let handler = async (m, { conn, text }) => {
     //.verlista = MOSTRAR TODOS LOS DÍAS LUNES A SÁBADO
     if (m.message?.extendedTextMessage?.text?.includes('verlista') || m.text?.includes('verlista')) {
         await react('📋')
-        let tabla = `𐔌 ꒱ ***LISTA SEMANAL*** 𐔌 ꒱ 📋
+        let tabla = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`REGISTROS\`\` —˙𖦹.📅꒷
+⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 𝐒𝐄𝐌𝐀𝐍𝐀𝐋 ﹒ LISTA ：✿ 。
+꒰ ◞⁺⊹ ．${fechaFormato}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`REGISTROS\`\` 📅 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 📅 ➛ Periodo: *Lunes a Sábado*
-🕒 ➛ Actualizado: *${fecha}*
+🕒 ➛ Actualizado: *${fechaFormato}*
 
 ━━━━━━━━━━━
 `
 
         diasSemana.forEach(dia => {
             let anotadosDelDia = data.filter(v => v.dia.toLowerCase().includes(dia))
-            tabla += `── *${dia.toUpperCase()}* ╏\n`
+            tabla += `── *${dia.toUpperCase()}* ╏ 🍕\n`
 
             if (anotadosDelDia.length === 0) {
                 tabla += `📭 ➛ Sin anotados\n\n`
@@ -53,38 +60,52 @@ let handler = async (m, { conn, text }) => {
                 })
             }
         })
-        tabla += `━━━━━━━━━━━\n📦 ➛ Total: *${data.length}* registro${data.length !== 1 ? 's' : ''}`
-        return conn.sendMessage(m.chat, { text: tabla.trim() }, { quoted: m })
+        tabla += `━━━━━━━━━━━
+📦 ➛ Total: *${data.length}* registro${data.length !== 1 ? 's' : ''}
+
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}`
+        return conn.sendMessage(m.chat, { text: tabla.trim(), mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
     //.lista = ANOTAR
     if (m.message?.extendedTextMessage?.text?.includes('lista') || m.text?.includes('lista')) {
         if (!diasSemana.includes(diaSemana)) {
             await react('⛔')
-            let fueraHorario = `𐔌 ꒱ ***LISTA*** 𐔌 ꒱ ⛔
+            let fueraHorario = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FUERA DE HORARIO\`\` —˙𖦹.📅꒷
+⤷ ┇ 𝐅𝐔𝐄𝐑𝐀 𝐃𝐄 𝐇𝐎𝐑𝐀𝐑𝐈𝐎 ﹒ LISTA ：✿ 。
+꒰ ◞⁺⊹ ．${fechaFormato}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`AVISO\`\` ⛔ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ Solo se puede anotar de
 ❌ ➛ *Lunes a Sábado*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: fueraHorario }, { quoted: m })
         }
 
         if (!text) {
             await react('❌')
-            let formato = `𐔌 ꒱ ***LISTA*** 𐔌 ꒱ 📝
+            let formato = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.📋꒷
+⤷ ┇ 𝐅𝐎𝐑𝐌𝐀𝐓𝐎 ﹒ LISTA ：✿ 。
+꒰ ◞⁺⊹ ．${fechaFormato}
 
-── *📖 USO* ╏
-➛ Envía: Nombre/Numero/Rol
+.⃟𖥔 ݁. 𖦹˙— \`\`USO\`\` 📝 —˙𖦹.꒷
 
-── *💡 EJEMPLO* ╏
-➛ fetsy/618282/bot
+── *📖 USO* ╏ 🍕
+➛ Envía: .lista Nombre/Numero/Premio
 
+── *💡 EJEMPLO* ╏ 🍕
+➛ .lista Garfield/+51 927 174 369/Bot
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: formato }, { quoted: m })
         }
@@ -92,55 +113,70 @@ let handler = async (m, { conn, text }) => {
         let [nombre, numero, rol] = text.split('/').map(v => v.trim())
         if (!nombre ||!numero ||!rol) {
             await react('❌')
-            let faltan = `𐔌 ꒱ ***LISTA*** 𐔌 ꒱ ⚠️
+            let faltan = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FALTAN DATOS\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐅𝐀𝐋𝐓𝐀𝐍 𝐃𝐀𝐓𝐎𝐒 ﹒ LISTA ：✿ 。
+꒰ ◞⁺⊹ ．${fechaFormato}
 
-── *📖 FORMATO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📖 FORMATO* ╏ 🍕
 ➛ Nombre/Numero/Rol
 
-── *💡 EJEMPLO* ╏
+── *💡 EJEMPLO* ╏ 🍕
 ➛ fetsy/618282/bot
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: faltan }, { quoted: m })
         }
 
-        let yaAnotado = data.find(v => v.numero === numero && v.dia === fecha)
+        let yaAnotado = data.find(v => v.numero === numero && v.dia === fechaFormato)
         if (yaAnotado) {
             await react('⚠️')
-            let duplicado = `𐔌 ꒱ ***LISTA*** 𐔌 ꒱ ⚠️
+            let duplicado = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`YA ANOTADO\`\` —˙𖦹.📋꒷
+⤷ ┇ 𝐘𝐀 𝐀𝐍𝐎𝐓𝐀𝐃𝐎 ﹒ LISTA ：✿ 。
+꒰ ◞⁺⊹ ．${fechaFormato}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`AVISO\`\` ⚠️ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ⚠️ ➛ ${nombre} ya fue anotado hoy
-📅 ➛ *${fecha}*
+📅 ➛ *${fechaFormato}*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: duplicado }, { quoted: m })
         }
 
-        data.push({ nombre, numero, rol, dia: fecha })
+        data.push({ nombre, numero, rol, dia: fechaFormato })
         fs.writeFileSync(db, JSON.stringify(data, null, 2))
         await react('✅')
 
-        let ok = `𐔌 ꒱ ***LISTA*** 𐔌 ꒱ ✅
+        let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ANOTADO\`\` —˙𖦹.📋꒷
+⤷ ┇ 𝐀𝐍𝐎𝐓𝐀𝐃𝐎 ﹒ LISTA ：✿ 。
+꒰ ◞⁺⊹ ．${fechaFormato}
 
-── *📊 DATOS* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`REGISTRO\`\` ✅ —˙𖦹.꒷
+
+── *📊 DATOS* ╏ 🍕
 👤 ➛ Nombre: *${nombre}*
 📱 ➛ Número: *${numero}*
 💼 ➛ Rol: *${rol}*
-📅 ➛ Día: *${fecha}*
+📅 ➛ Día: *${fechaFormato}*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
     }
 }
 
-handler.help = ['lista nombre/numero/rol', 'verlista']
+handler.help = ['lista nombre/numero/premio', 'verlista']
 handler.tags = ['sorteos']
 handler.command = /^(lista|verlista)$/i
 handler.group = true
