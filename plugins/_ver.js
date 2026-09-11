@@ -7,53 +7,47 @@ let handler = async (m, { conn }) => {
 
     if (!m.quoted) {
         await react('❌')
-        let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
+        return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
 
 ── *📝 AVISO* ╏
 ❌ ➛ Responde a una imagen o video ViewOnce
 
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: error }, { quoted: m })
+━━━━━━━━━━━` }, { quoted: m })
     }
 
     let quoted = m.quoted
     let msg = quoted.msg || quoted
 
-    // ARREGLO: quitar el viewOnceMessageV2
-    if (msg.viewOnceMessageV2) {
-        msg = msg.viewOnceMessageV2.message
-    } else if (msg.viewOnceMessageV2Extension) {
-        msg = msg.viewOnceMessageV2Extension.message
-    }
+    // Sacar el contenido de dentro del viewOnce
+    if (msg.viewOnceMessageV2) msg = msg.viewOnceMessageV2.message
+    if (msg.viewOnceMessageV2Extension) msg = msg.viewOnceMessageV2Extension.message
 
     if (!msg) {
         await react('❌')
-        let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
+        return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
 
 ── *📝 AVISO* ╏
 ❌ ➛ No se pudo leer el mensaje
-❌ ➛ Tal vez ya fue visto o está corrupto
+❌ ➛ Ya fue visto o expiró
 
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: error }, { quoted: m })
+━━━━━━━━━━━` }, { quoted: m })
     }
 
     let type = getContentType(msg)
-    if (!type ||!['imageMessage', 'videoMessage'].includes(type)) {
+    if (!['imageMessage', 'videoMessage'].includes(type)) {
         await react('❌')
-        let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
+        return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
 
 ── *📝 AVISO* ╏
 ❌ ➛ Solo soporta imagen y video ViewOnce
 
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: error }, { quoted: m })
+━━━━━━━━━━━` }, { quoted: m })
     }
 
     await react('⏳')
@@ -67,6 +61,7 @@ let handler = async (m, { conn }) => {
 
 ━━━━━━━━━━━`)
 
+    // Descargar
     let buffer = Buffer.from([])
     let stream = await downloadContentFromMessage(msg[type], type.replace('Message', ''))
     for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
@@ -84,7 +79,7 @@ let handler = async (m, { conn }) => {
 📝 ➛ ${caption}
 
 ━━━━━━━━━━━`, m)
-    } else if (type === 'imageMessage') {
+    } else {
         await react('🖼️')
         await conn.sendFile(m.chat, buffer, 'media.jpg', `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ✅
 
@@ -100,5 +95,5 @@ let handler = async (m, { conn }) => {
 
 handler.help = ['ver']
 handler.tags = ['herramientas']
-handler.command = ['readviewonce', 'read', 'ver']
+handler.command = ['ver', 'readviewonce', 'read']
 export default handler
