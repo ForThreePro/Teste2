@@ -17,10 +17,8 @@ config: '⚙️', owner: '👑', main: '📋', game: '🎮',
 rpg: '⚔️', anime: '🍥', internet: '🌐', image: '🖼️'
 }
 
-// TOP 5 COMANDOS MAS USADOS - EDITAS AQUI
 const TOP_COMANDOS = ['.play', '.sticker', '.ia', '.menu', '.ytmp4']
 
-// FRASES DE GARFIELD RANDOM
 const FRASES_GARFIELD = [
 "Odio los lunes... y las dietas",
 "Dame lasaña o dame sueño",
@@ -65,12 +63,9 @@ const ping = Math.round(performance.now() - start)
 const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 const CANAL_LINK = 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z'
 
-// 4. SALUDO SEGUN HORA
 const hourNow = moment.tz('America/Lima').hour()
 let saludo = hourNow < 12? 'Buenos días' : hourNow < 18? 'Buenas tardes' : 'Buenas noches'
 const fraseRandom = FRASES_GARFIELD[Math.floor(Math.random() * FRASES_GARFIELD.length)]
-
-// 3. ESTADO EN VIVO
 const estadoBot = dias > 0? `Estable • ${dias}d ${horas}h` : `Estable • ${horas}h ${minutos}m`
 
 const EMOJIS_EXTRA = ['📌', '🎯', '🎨', '💎', '🔮', '🚀', '💡', '🎪', '🎭', '🏆']
@@ -78,7 +73,7 @@ let emojiIndex = 0
 
 let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.5 PRO ：✿ 。
+⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.6 PRO ：✿ 。
 ꒰ ◞⁺⊹ ．estado: *${estadoBot}* • Ping: ${ping}ms
 
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
@@ -115,7 +110,8 @@ for (const tag of tagsOrdenados) {
   const icono = ICONOS_CATEGORIA[tag] || EMOJIS_EXTRA[emojiIndex++ % EMOJIS_EXTRA.length]
   const nombreCat = CATEGORY_META[tag] || tag.toUpperCase()
 
-  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono} [${cmds.length}]꒷\n`
+  // CAMBIO: NOMBRE + CONTADOR + EMOJI
+  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` [${cmds.length}] ${icono} —˙𖦹.꒷\n`
   for (const c of cmds) {
     menuTexto += ` ${icono} ➛.${c}\n`
   }
@@ -125,7 +121,7 @@ for (const tag of tagsOrdenados) {
 menuTexto += `━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 *Owner*: @${ownerNum}
-*Version*: 2.5 PRO
+*Version*: 2.6 PRO
 *${CANAL_LINK}*
 
 > "Dame lasaña o dame sueño" 😼
