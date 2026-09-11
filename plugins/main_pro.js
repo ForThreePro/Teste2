@@ -219,7 +219,7 @@ function clockString(ms) {
 }
 
 handler.help = ['owner', 'ping', 'cleartmp', 'cpu', 'ram', 'uptime', 'info', 'tts <texto>']
-handler.tags = ['main', 'tools', 'info']
+handler.tags = ['main']
 handler.command = /^(owner|creator|ping|p|cleartmp|cpu|ram|uptime|info|g?tts|ttss)$/i
 handler.rowner = false
 
