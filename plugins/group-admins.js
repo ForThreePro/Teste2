@@ -1,25 +1,34 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 const handler = async (m, { conn, command }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
   if (!m.mentionedJid[0] &&!m.quoted) {
     await react('❌')
-    let texto = `𐔌 ꒱ ***ADMINISTRACIÓN*** 𐔌 ꒱ ⚠️
+    let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.👑꒷
+⤷ ┇ 𝐀𝐃𝐌𝐈𝐍𝐈𝐒𝐓𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ PROMOTE ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` 👑 —˙𖦹.꒷
+
+── *📖 USO* ╏ 🍕
 ➛ Menciona a un usuario
 ➛ Responde al mensaje del usuario
 
-── *💡 EJEMPLOS* ╏
-➛ promote @user
-➛ demote @user
+── *💡 EJEMPLOS* ╏ 🍕
+➛.promote @user
+➛.demote @user
 
-── *📝 AVISO* ╏
+── *📝 AVISO* ╏ 🍕
 🔒 ➛ Solo admins
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
   }
@@ -33,36 +42,51 @@ const handler = async (m, { conn, command }) => {
     await conn.groupParticipantsUpdate(m.chat, [user], action)
   } catch {
     await react('❌')
-    let error = `𐔌 ꒱ ***ADMINISTRACIÓN*** 𐔌 ꒱ ⚠️
+    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ADMIN ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ No se pudo completar la acción
 🔒 ➛ Verifica permisos del bot
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
 
   let msgAccion = action === 'promote'
-? `𐔌 ꒱ ***ADMINISTRACIÓN*** 𐔌 ꒱ ✅
+? `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROMOVIDO\`\` —˙𖦹.👑꒷
+⤷ ┇ 𝐏𝐑𝐎𝐌𝐎𝐕𝐈𝐃𝐎 ﹒ NUEVO ADMIN ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 👑 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 👑 ➛ Nuevo Admin: @${user.split('@')[0]}
 👤 ➛ Por: @${m.sender.split('@')[0]}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
-    : `𐔌 ꒱ ***ADMINISTRACIÓN*** 𐔌 ꒱ ✅
+    : `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DEGRADADO\`\` —˙𖦹.📉꒷
+⤷ ┇ 𝐃𝐄𝐆𝐑𝐀𝐃𝐀𝐃𝐎 ﹒ QUITAR ADMIN ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 📉 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 📉 ➛ Ya no es Admin: @${user.split('@')[0]}
 👤 ➛ Por: @${m.sender.split('@')[0]}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
 
   await conn.sendMessage(m.chat, { text: msgAccion, mentions: [user, m.sender] }, { quoted: m })
