@@ -69,7 +69,7 @@ const handler = async (m, { conn, command }) => {
 }
 
 handler.help = ['promote @user', 'demote @user']
-handler.tags = ['grupos']
+handler.tags = ['grupo']
 handler.command = /^(promote|promover|daradmin|demote|degradar|quitaradmin)$/i
 handler.group = true
 handler.admin = true
