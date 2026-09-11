@@ -3,7 +3,6 @@ import fetch from "node-fetch"
 
 const api = { url: 'https://api.stellarwa.xyz', key: 'proyectsV2' }
 
-// FUNCION PARA REACCIONES
 const react = async (conn, m, text) => {
   try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
 }
@@ -23,21 +22,11 @@ let handler = async (m, { conn, text, command }) => {
 
 .⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` —˙𖦹.📥꒷
 
-── *📝 DESCRIPCIÓN* ╏
-🎵 ➛ Descarga YT, TikTok, FB e IG
-🎵 ➛ Envía video y audio en MP3/MP4
-
 ── *📖 USO* ╏
-1️⃣ ➛.*play1* <nombre de canción>
-2️⃣ ➛.*ttmp3* <link de tiktok>
-3️⃣ ➛.*fb* <link de facebook>
-4️⃣ ➛.*ig* <link de instagram>
-
-── *💡 EJEMPLOS* ╏
-➛.*play1* blinding lights
-➛.*ttmp3* https://tiktok.com/xxx
-➛.*fb* https://facebook.com/share/xxx
-➛.*ig* https://instagram.com/reel/xxx
+1️⃣ ➛.*play1* <nombre>
+2️⃣ ➛.*ttmp3* <link tiktok>
+3️⃣ ➛.*fb* <link facebook>
+4️⃣ ➛.*ig* <link instagram>
 
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
@@ -47,198 +36,107 @@ let handler = async (m, { conn, text, command }) => {
     try {
         // ===== YOUTUBE =====
         if (command === 'play1') {
-            await m.reply(`𐔌 ꒱ ***.play1*** 𐔌 ꒱ ⏳
-
-.⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` —˙𖦹.🔍꒷
-
-── *📊 ESTADO* ╏
-🔍 ➛ Buscando en YouTube...
-📥 ➛ Obteniendo audio...
-⬇️ ➛ Preparando descarga...
-
-━━━━━━━━━━━`)
-
             const searchResult = await ytsearch(text)
-            if (!searchResult.videos ||!searchResult.videos.length) throw new Error("No se encontró la canción.")
+            if (!searchResult.videos.length) throw new Error("No se encontró la canción.")
             const video = searchResult.videos[0]
             const { title, author, timestamp: duration, views, url, image } = video
-            const vistas = (views || 0).toLocaleString()
-            const canal = author?.name || author || "Desconocido"
             const thumbBuffer = await getBuffer(image)
 
-            await conn.sendMessage(m.chat, {
-                image: thumbBuffer,
-                caption: `𐔌 ꒱ ***.play1*** 𐔌 ꒱ ✅
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ENCONTRADO\`\` —˙𖦹.🎵꒷
-
-── *📊 INFORMACIÓN* ╏
-📌 ➛ Título: *${title}*
-👤 ➛ Canal: *${canal}*
-⏱️ ➛ Duración: *${duration || '0:00'}*
-👁️ ➛ Vistas: *${vistas}*
-🔗 ➛ Link: ${url}
-
-── *📥 DESCARGA* ╏
-⬇️ ➛ Enviando audio...
-
-━━━━━━━━━━━`
-            }, { quoted: m })
+            await conn.sendMessage(m.chat, { image: thumbBuffer, caption: `📌 ${title}\n👤 ${author.name}\n⏱️ ${duration}` }, { quoted: m })
 
             const dlEndpoint = `${api.url}/dl/ytmp3?url=${encodeURIComponent(url)}&key=${api.key}`
             const resDl = await fetch(dlEndpoint).then(r => r.json())
             const dl = resDl?.data?.dl || resDl?.data?.download
             if (!dl) throw new Error('No se pudo descargar el audio de YT')
             const audioBuffer = await getBuffer(dl)
-
             await react(conn, m, '📥')
-            await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3`, ptt: false }, { quoted: m })
+            await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3` }, { quoted: m })
         }
 
         // ===== TIKTOK =====
-        if (command === 'ttmp3' || command === 'tomp3' || command === 'tt') {
-            await m.reply(`𐔌 ꒱ ***.ttmp3*** 𐔌 ꒱ ⏳
-
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.📱꒷
-
-── *📊 ESTADO* ╏
-🔍 ➛ Analizando link de TikTok...
-📥 ➛ Extrayendo audio...
-⬇️ ➛ Preparando descarga...
-
-━━━━━━━━━━━`)
-
+        if (command === 'ttmp3' || command === 'tt') {
             const apiUrl = `${api.url}/dl/tiktokmp3?url=${encodeURIComponent(text)}&key=${api.key}`
             const res = await fetch(apiUrl).then(r => r.json())
             const data = res?.data || res?.result || res
-            let dl = data?.download || data?.dl || data?.music || data?.play
-            const title = data?.title || data?.desc || 'tiktok'
-            const author = data?.author?.nickname || data?.author || 'Desconocido'
-            const thumb = data?.cover || data?.thumbnail
+            let dl = data?.download || data?.dl || data?.music
+            const title = data?.title || 'tiktok'
             if (!dl) throw new Error('No se pudo descargar. Link mal o privado')
-
             const audioBuffer = await getBuffer(dl)
-            const caption = `𐔌 ꒱ ***.ttmp3*** 𐔌 ꒱ ✅
+            await react(conn, m, '📥')
+            await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3` }, { quoted: m })
+        }
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ENCONTRADO\`\` —˙𖦹.📱꒷
+        // ===== FACEBOOK ARREGLADO =====
+        if (command === 'fb' || command === 'facebook') {
+            await m.reply(`𐔌 ꒱ ***.fb*** 𐔌 ꒱ ⏳\nDescargando de Facebook...`)
 
-── *📊 INFORMACIÓN* ╏
-📌 ➛ Título: *${title}*
-👤 ➛ Autor: *${author}*
-🔗 ➛ Link: ${text}
+            const apiUrl = `${api.url}/dl/facebook?url=${encodeURIComponent(text)}&key=${api.key}`
+            const res = await fetch(apiUrl)
+            const contentType = res.headers.get('content-type')
 
-── *📥 DESCARGA* ╏
-⬇️ ➛ Enviando audio...
+            let videoBuffer
+            let title = "Video de Facebook"
 
-━━━━━━━━━━━`
-
-            if (thumb) {
-                const thumbBuffer = await getBuffer(thumb)
-                await conn.sendMessage(m.chat, { image: thumbBuffer, caption }, { quoted: m })
-            } else {
-                await conn.sendMessage(m.chat, { text: caption }, { quoted: m })
+            // Si devuelve JSON
+            if(contentType && contentType.includes('application/json')){
+                const data = await res.json()
+                const result = data?.result || data?.data
+                let dl = result?.url
+                title = result?.title || title
+                if (!dl) throw new Error('No se pudo obtener el link')
+                videoBuffer = await getBuffer(dl)
+            }
+            // Si devuelve directo el video/mp4
+            else {
+                videoBuffer = Buffer.from(await res.arrayBuffer())
             }
 
             await react(conn, m, '📥')
-            await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3`, ptt: false }, { quoted: m })
+            await conn.sendMessage(m.chat, {
+                video: videoBuffer,
+                caption: `𐔌 ꒱ ***.fb*** 𐔌 ꒱ ✅\n📌 ${title}\n⬇️ Enviado por Andreitap Ventas 💗`
+            }, { quoted: m })
         }
 
-        // ===== FACEBOOK ===== NUEVO
-        if (command === 'fb' || command === 'facebook') {
-            await m.reply(`𐔌 ꒱ ***.fb*** 𐔌 ꒱ ⏳
-
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.📘꒷
-
-── *📊 ESTADO* ╏
-🔍 ➛ Analizando link de Facebook...
-📥 ➛ Descargando video...
-⬇️ ➛ Preparando envío...
-
-━━━━━━━━━━━`)
-
-            const apiUrl = `${api.url}/dl/facebook?url=${encodeURIComponent(text)}&key=${api.key}`
-            const res = await fetch(apiUrl).then(r => r.json())
-            const data = res?.result || res?.data
-            let dl = data?.url || data?.download
-            const title = data?.title || 'Video de Facebook'
-            const thumb = data?.thumb || data?.thumbnail
-            
-            if (!dl) throw new Error('No se pudo descargar. Link mal o privado')
-
-            const videoBuffer = await getBuffer(dl)
-            const caption = `𐔌 ꒱ ***.fb*** 𐔌 ꒱ ✅
-
-.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGADO\`\` —˙𖦹.📘꒷
-
-── *📊 INFORMACIÓN* ╏
-📌 ➛ Título: *${title}*
-🔗 ➛ Link: ${text}
-
-── *📥 DESCARGA* ╏
-⬇️ ➛ Enviado por Andreitap Ventas 💗
-
-━━━━━━━━━━━`
-
-            await react(conn, m, '📥')
-            await conn.sendMessage(m.chat, { video: videoBuffer, caption }, { quoted: m })
-        }
-
-        // ===== INSTAGRAM ===== NUEVO
+        // ===== INSTAGRAM ARREGLADO =====
         if (command === 'ig' || command === 'instagram') {
-            await m.reply(`𐔌 ꒱ ***.ig*** 𐔌 ꒱ ⏳
+            await m.reply(`𐔌 ꒱ ***.ig*** 𐔌 ꒱ ⏳\nDescargando de Instagram...`)
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.📷꒷
+            // Limpiar el link por si trae?stkn=
+            let cleanUrl = text.split('?')[0]
 
-── *📊 ESTADO* ╏
-🔍 ➛ Analizando link de Instagram...
-📥 ➛ Descargando reel/video...
-⬇️ ➛ Preparando envío...
+            const apiUrl = `${api.url}/dl/instagram?url=${encodeURIComponent(cleanUrl)}&key=${api.key}`
+            const res = await fetch(apiUrl)
+            const contentType = res.headers.get('content-type')
 
-━━━━━━━━━━━`)
+            let videoBuffer
+            let title = "Reel de Instagram"
 
-            const apiUrl = `${api.url}/dl/instagram?url=${encodeURIComponent(text)}&key=${api.key}`
-            const res = await fetch(apiUrl).then(r => r.json())
-            const data = res?.result || res?.data
-            let dl = data?.url || data?.download
-            const title = data?.title || 'Reel de Instagram'
-            const thumb = data?.thumb || data?.thumbnail
-            
-            if (!dl) throw new Error('No se pudo descargar. Link mal o privado')
-
-            const videoBuffer = await getBuffer(dl)
-            const caption = `𐔌 ꒱ ***.ig*** 𐔌 ꒱ ✅
-
-.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGADO\`\` —˙𖦹.📷꒷
-
-── *📊 INFORMACIÓN* ╏
-📌 ➛ Título: *${title}*
-🔗 ➛ Link: ${text}
-
-── *📥 DESCARGA* ╏
-⬇️ ➛ Enviado por Andreitap Ventas 💗
-
-━━━━━━━━━━━`
+            if(contentType && contentType.includes('application/json')){
+                const data = await res.json()
+                const result = data?.result || data?.data
+                let dl = result?.url
+                title = result?.title || title
+                if (!dl) throw new Error('No se pudo obtener el link. Video privado?')
+                videoBuffer = await getBuffer(dl)
+            }
+            else {
+                videoBuffer = Buffer.from(await res.arrayBuffer())
+            }
 
             await react(conn, m, '📥')
-            await conn.sendMessage(m.chat, { video: videoBuffer, caption }, { quoted: m })
+            await conn.sendMessage(m.chat, {
+                video: videoBuffer,
+                caption: `𐔌 ꒱ ***.ig*** 𐔌 ꒱ ✅\n📌 ${title}\n⬇️ Enviado por Andreitap Ventas 💗`
+            }, { quoted: m })
         }
 
         await react(conn, m, '✅')
     } catch (e) {
         await react(conn, m, '❌')
-        let menuErr = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⚠️
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
-
-── *📝 DESCRIPCIÓN* ╏
-❌ ➛ ${e.message}
-
-── *💡 SOLUCIÓN* ╏
-🔧 ➛ Verifica el nombre o link
-🔧 ➛ El video debe ser público
-
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
+        return conn.sendMessage(m.chat, {
+            text: `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⚠️\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷\n\n── *📝 DESCRIPCIÓN* ╏\n❌ ➛ ${e.message}\n\n── *💡 SOLUCIÓN* ╏\n🔧 ➛ Verifica que el link sea público\n🔧 ➛ Prueba quitar?stkn= del link de IG\n\n━━━━━━━━━━━`
+        }, { quoted: m })
     }
 }
 
