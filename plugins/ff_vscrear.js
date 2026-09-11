@@ -8,7 +8,7 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
     if (args.length < 2) {
       let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VS ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ VS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
@@ -31,7 +31,7 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
     if (!(pais in diferenciasHorarias)) {
       let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ PAIS ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ PAIS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ⚠️ —˙𖦹.꒷
