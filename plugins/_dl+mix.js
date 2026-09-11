@@ -30,9 +30,10 @@ async function uploadToUguu(buffer, mime) {
 }
 
 async function upscaleImage(url) {
-  const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&key=${api.key}`
-  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 60000 })
-  if (!res.data) throw new Error('Stellar HD no devolvió imagen')
+  // CAMBIO: scale=4 para HDx4
+  const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&scale=4&key=${api.key}`
+  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 90000 }) // +30s por el HDx4
+  if (!res.data) throw new Error('Stellar HDx4 no devolvió imagen')
   return Buffer.from(res.data)
 }
 
@@ -57,12 +58,12 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🖼️ ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Hasta Garfield quiere su foto pro"*
+> *"HDx4: Para que se vea pro como Garfield"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`IA\`\` ✨ —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
-🖼️ ➛ Mejora la calidad de una imagen a HD 2x
+🖼️ ➛ Mejora la calidad de una imagen a *HD 4x*
 🖼️ ➛ Elimina el fondo automáticamente
 
 ── *📖 USO* ╏ 🍕
@@ -70,9 +71,12 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 2️⃣ ➛ Envía formatos: JPG o PNG
 
 ── *⚙️ PROCESO* ╏ 🍕
-⬆️ ➛ Paso 1: Mejora a HD 2x
+⬆️ ➛ Paso 1: Mejora a HD 4x
 🗑️ ➛ Paso 2: Quita el fondo
 📤 ➛ Paso 3: Envía imagen + documento
+
+── *⚠️ NOTA* ╏ 🍕
+⏱️ ➛ HDx4 tarda un poco más pero vale la pena
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
@@ -111,9 +115,10 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 .⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ⚙️ —˙𖦹.꒷
 
 ── *📊 ESTADO* ╏ 🍕
-⬆️ ➛ Mejorando calidad a HD 2x...
+⬆️ ➛ Mejorando calidad a *HD 4x*...
 🗑️ ➛ Eliminando fondo...
 📤 ➛ Subiendo resultado...
+⏱️ ➛ Esto puede tardar 20-40s
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
@@ -122,7 +127,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         // Proceso completo
         const buffer = await q.download()
         const uploadedUrl = await uploadToUguu(buffer, mime)
-        const hdBuffer = await upscaleImage(uploadedUrl)
+        const hdBuffer = await upscaleImage(uploadedUrl) // HDx4
         const hdUrl = await uploadToUguu(hdBuffer, 'image/png')
         const finalBuffer = await removeBgFromUrl(hdUrl)
 
@@ -137,7 +142,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 .⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` ✨ —˙𖦹.꒷
 
 ── *📊 RESULTADO* ╏ 🍕
-📌 ➛ Calidad: *HD 2x*
+📌 ➛ Calidad: *HD 4x*
 📌 ➛ Fondo: *Eliminado*
 📌 ➛ Formato: *PNG Transparente*
 
@@ -152,7 +157,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         // Mensaje 2: Documento
         await conn.sendMessage(m.chat, {
             document: finalBuffer,
-            fileName: 'image-nobg.png',
+            fileName: 'image-hdx4-nobg.png',
             mimetype: 'image/png',
             caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -162,7 +167,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 .⃟𖥔 ݁. 𖦹˙— \`\`DOCUMENTO\`\` 📄 —˙𖦹.꒷
 
 ── *📊 INFO* ╏ 🍕
-📄 ➛ Imagen PNG sin fondo
+📄 ➛ Imagen PNG sin fondo HDx4
 ✨ ➛ Lista para usar en diseños
 
 ━━━━━━━━━━━
@@ -187,7 +192,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
 ── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa una imagen clara JPG/PNG
-🔧 ➛ Máx 10MB recomendado
+🔧 ➛ Máx 5MB recomendado para HDx4
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
