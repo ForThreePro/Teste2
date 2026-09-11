@@ -1,44 +1,60 @@
-let handler = async (m, { conn }) => {
-  const react = async (text) => {
-    try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
-  }
+let handler = async (m, { conn, usedPrefix, command }) => {
 
-  if (!m.quoted) {
-    await react('❌')
-    let error = `𐔌 ꒱ ***ELIMINAR MENSAJE*** 𐔌 ꒱ ⚠️
+if (!m.quoted) {
+    await m.react('❌')
+    return conn.reply(m.chat, `💗 𓆩 ***𝗘𝗟𝗜𝗠𝗜𝗡𝗔𝗥 𝗠𝗘𝗡𝗦𝗔𝗝𝗘*** 𓆪 💗
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`USO\`\` —˙𖦹.📌꒷
 
-── *📝 AVISO* ╏
-❌ ➛ Responde al mensaje que deseas eliminar
+── *📝 INSTRUCCIONES* ╏
+🍓 ➛ Responde al mensaje que deseas eliminar con *${usedPrefix + command}*
+☁️ ➛ Debes ser admin
 
-── *💡 EJEMPLO* ╏
-➛ Responde a un mensaje + comando
+━━━━━━━━━━━`, m)
+}
 
-━━━━━━━━━━━`
-    return conn.sendMessage(m.chat, { text: error }, { quoted: m })
-  }
-
-  await react('🗑️')
-  
-  try {
-    let delet = m.message.extendedTextMessage.contextInfo.participant
-    let bang = m.message.extendedTextMessage.contextInfo.stanzaId
-    return conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }})
-  } catch {
-    await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
-  }
-
-  let ok = `𐔌 ꒱ ***ELIMINAR MENSAJE*** 𐔌 ꒱ ✅
+try {
+    await m.react('🗑️')
+    let delet = m.message.extendedTextMessage?.contextInfo?.participant
+    let bang = m.message.extendedTextMessage?.contextInfo?.stanzaId
+    
+    if (delet && bang) {
+        // Para mensajes de otros
+        await conn.sendMessage(m.chat, { 
+            delete: { 
+                remoteJid: m.chat, 
+                fromMe: false, 
+                id: bang, 
+                participant: delet 
+            }
+        })
+    } else {
+        // Para mensajes del bot
+        await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
+    }
+    
+    await m.reply(`💗 𓆩 ***𝗠𝗘𝗡𝗦𝗔𝗝𝗘 𝗘𝗟𝗜𝗠𝗜𝗡𝗔𝗗𝗢*** 𓆪 💗
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` —˙𖦹.🗑️꒷
 
-── *📊 INFORMACIÓN* ╏
-🗑️ ➛ Mensaje eliminado
-👤 ➛ Por: @${m.sender.split('@')[0]}
+── *📊 DETALLES* ╏
+🍓 *Mensaje borrado exitosamente*
+☁️ *Por:* @${m.sender.split('@')[0]}
 
-━━━━━━━━━━━`
-  conn.sendMessage(m.chat, { text: ok, mentions: [m.sender] }, { quoted: m })
+━━━━━━━━━━━`, m, { mentions: [m.sender] })
+
+} catch (e) {
+    await m.react('❌')
+    return conn.reply(m.chat, `💗 𓆩 ***𝗘𝗥𝗢𝗥*** 𓆪 💗
+
+.⃟𖥔 ݁. 𖦹˙— \`\`FALLO\`\` —˙𖦹.❌꒷
+
+── *📝 AVISO* ╏
+❌ ➛ No se pudo eliminar el mensaje
+❌ ➛ *Motivo:* ${e.message}
+
+━━━━━━━━━━━`, m)
+}
 }
 
 handler.help = ['del']
