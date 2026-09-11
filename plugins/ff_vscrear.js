@@ -1,7 +1,26 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 let vs = global.vsData = global.vsData || {}
 
 const crear = async (m, { conn, args, usedPrefix, command }) => {
-    if (args.length < 2) return conn.reply(m.chat, `*❌ Ejemplo:* ${usedPrefix + command} 14 pe Apos`, m);
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    if (args.length < 2) {
+      let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VS ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 USO* ╏ 🍕
+➛${usedPrefix + command} 14 PE APOS
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
+      return conn.reply(m.chat, error, m);
+    }
 
     let horaRaw = args[0];
     let hora, minutos;
@@ -9,7 +28,22 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 
     const pais = args[1].toUpperCase();
     const diferenciasHorarias = { CL: 2, AR: 2, PE: 0, BO: 2 };
-    if (!(pais in diferenciasHorarias)) return conn.reply(m.chat, '*⚠️ Usa PE, CL, AR o BO*', m);
+    if (!(pais in diferenciasHorarias)) {
+      let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ PAIS ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ⚠️ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+⚠️ ➛ Usa PE, CL, AR o BO
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
+      return conn.reply(m.chat, error, m);
+    }
 
     const diferenciaHoraria = diferenciasHorarias[pais];
     const formatTime = (date) => date.toLocaleTimeString('es', { hour12: false, hour: '2-digit', minute: '2-digit' });
@@ -30,16 +64,16 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
     let cantidad = command.includes('6')? 6 : 4
     let tipo = command.includes('fem')? 'FEM' : command.includes('masc')? 'MASC' : 'MIXTO'
 
-    // DISEÑOS
+    // DISEÑOS GARFIELD
     let diseño = {}
-    if(tipo === 'FEM'){ // KAWAI
-        diseño = { header: `ㅤ ㅤㅤ ˗ˏˋ ꒰ ♡ ꒱ ˎˊ˗\n🩷⃝☁️🍭̊${groupName}.🍭🩷⃝☁️`, icon: '🍭', suplente: '🧁' }
+    if(tipo === 'FEM'){ // KAWAII GARFIELD
+        diseño = { header: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n🌸⃟💕 ${groupName} 💕⃟🌸\nㅤ ˗ˏˋ ꒰ 😻 ꒱ ˎˊ˗`, icon: '😻', suplente: '🧁' }
     }
-    if(tipo === 'MASC'){ // LUXURY
-        diseño = { header: `ㅤ👑˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗👑\n✧･ﾟ: *✧･ﾟ:* 🥂 *:･ﾟ✧*:･ﾟ✧`, icon: '🥥', suplente: '🥂' }
+    if(tipo === 'MASC'){ // LUXURY GARFIELD
+        diseño = { header: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n👑˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗👑\n✧･ﾟ: *✧･ﾟ:* 🍗 *:･ﾟ✧*:･ﾟ✧`, icon: '🍗', suplente: '🥂' }
     }
-    if(tipo === 'MIXTO'){ // GALAXY
-        diseño = { header: `.　☆\n　　★彡\n🌌⃟✨ ${groupName} ✨⃟🌌`, icon: '🍁', suplente: '☄️' }
+    if(tipo === 'MIXTO'){ // GALAXY GARFIELD
+        diseño = { header: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n🌌⃟✨ ${groupName} ✨⃟🌌\n　★彡.　☆`, icon: '🍕', suplente: '☄️' }
     }
 
     vs[m.chat] = vs[m.chat] || { salas: [], tipo, diseño, groupName }
@@ -60,30 +94,35 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 }
 
 const anotar = async (m, { conn, args, usedPrefix, command }) => {
-    if (!vs[m.chat] ||!vs[m.chat].salas.length) return conn.reply(m.chat, `*❌ No hay VS activa*`, m)
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    if (!vs[m.chat] ||!vs[m.chat].salas.length) {
+      return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ ➛ No hay VS activa\n━━━━━━━━━━━`, m)
+    }
     let salaNum = parseInt(args[0]) - 1
     if(isNaN(salaNum)) salaNum = 0
 
     let sala = vs[m.chat].salas[salaNum]
-    if(!sala) return conn.reply(m.chat, `*❌ Sala ${args[0]} no existe*`, m)
+    if(!sala) return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ ➛ Sala ${args[0]} no existe\n━━━━━━━━━━━`, m)
 
     let users = m.mentionedJid || []
-    if(users.length === 0) return conn.reply(m.chat, `*❌ Menciona a alguien*\nEj:.anotar 1 @pepito @juana`, m)
+    if(users.length === 0) {
+      return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ ➛ Menciona a alguien\nEj:.anotar 1 @pepito @juana\n━━━━━━━━━━━`, m)
+    }
 
     for(let user of users){
         sala.jugadores = sala.jugadores.filter(v => v!== user)
         sala.suplentes = sala.suplentes.filter(v => v!== user)
 
         if (command === 'anotar') {
-            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `*⚠️ Sala ${salaNum+1} llena*`, m)
+            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⚠️ ➛ Sala ${salaNum+1} llena\n━━━━━━━━━━━`, m)
             sala.jugadores.push(user)
         }
         if (command === 'suplente') {
-            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `*⚠️ Suplentes sala ${salaNum+1} llenos*`, m)
+            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⚠️ ➛ Suplentes sala ${salaNum+1} llenos\n━━━━━━━━━━━`, m)
             sala.suplentes.push(user)
         }
         if (command === 'salir') {
-            await conn.reply(m.chat, `❌ @${user.split('@')[0]} salió`, m, { mentions: [user] })
+            await conn.reply(m.chat, `🍕 ➛ @${user.split('@')[0]} salió de la sala ${salaNum+1}`, m, { mentions: [user] })
         }
     }
     await actualizarLista(m.chat, conn, usedPrefix)
@@ -92,6 +131,7 @@ const anotar = async (m, { conn, args, usedPrefix, command }) => {
 const actualizarLista = async (chat, conn, usedPrefix) => {
     let data = vs[chat]
     let d = data.diseño
+    const fecha = moment.tz('America/Lima').format('DD/MM HH:mm')
     let todasSalas = ''
 
     data.salas.forEach((sala) => {
@@ -102,21 +142,24 @@ const actualizarLista = async (chat, conn, usedPrefix) => {
         for(let j = sala.suplentes.length; j < 2; j++){ listaSup += `\n┆ ⋆${sala.icons2[0]} ` }
 
         todasSalas += `┆ *${sala.icons2[0]}MODO : ${sala.modalidad}${sala.icons2[0]}*\n`
-        todasSalas += `┆⋆.˚ּ ֶָ ${sala.horasEnPais.PE} 🇵🇪${sala.horasEnPais.CL}🇨🇱🇧🇴 ${sala.horasEnPais.AR}🇦🇷\n`
-        todasSalas += `┆⋆𝗥𝗶𝘃𝗮𝗹:\n${listaJug}\n`
-        todasSalas += `┆ *Suplentes:*\n${listaSup}\n`
+        todasSalas += `┆⋆.˚ּ ֶָ ${sala.horasEnPais.PE} 🇵🇪 | ${sala.horasEnPais.CL}🇨🇱 | ${sala.horasEnPais.AR}🇦🇷\n`
+        todasSalas += `┆⋆𝗝𝗨𝗚𝗔𝗗𝗢𝗥𝗘𝗦:\n${listaJug}\n`
+        todasSalas += `┆ *SUPLENTES:*\n${listaSup}\n`
         todasSalas += `╰────────────⁀➴\n\n`
     })
 
-    const message = `${d.header}\n\n${todasSalas}
+    const message = `${d.header}
+꒰ ◞⁺⊹ ．${fecha}
+
+${todasSalas}
 ╭─「 COMO ANOTARSE 」
-│ Admin: *.anotar 1 @user1 @user2*
-│ Admin: *.suplente 2 @user*
-│ Admin: *.salir 1 @user*
+│ Admin: ${usedPrefix}anotar 1 @user1 @user2
+│ Admin: ${usedPrefix}suplente 2 @user
+│ Admin: ${usedPrefix}salir 1 @user
 │
-│ Players:
-│ 😎 = Quiero JUGAR ❤️
-│ 🌸 = Quiero SUPLENTE 🤖
+│ React:
+│ ${d.icon} = Quiero JUGAR
+│ ${d.suplente} = Quiero SUPLENTE
 ╰───────────────────`;
 
     let mentions = []
