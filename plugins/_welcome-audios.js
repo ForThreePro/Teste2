@@ -41,6 +41,9 @@ let handler = async (m, { conn, command }) => {
 ➛ Envía o reenvía un audio
 ➛ Responde al audio con:.${command}
 
+── *💡 EJEMPLO* ╏ 🍕
+➛ Manda un audio → responde → .${command}
+
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
@@ -53,7 +56,7 @@ let handler = async (m, { conn, command }) => {
     }
 
     let buffer = await q.download()
-    chat[`audio${type}`] = buffer.toString('base64')
+    chat[`audio${type}`] = buffer.toString('base64') // guardamos en base64
 
     let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -74,8 +77,8 @@ let handler = async (m, { conn, command }) => {
 
   // DEL AUDIO
   if (command.startsWith('delaudio')) {
+    await react('🗑️')
     if (!chat[`audio${type}`]) {
-      await react('📭')
       let vacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
 ⤷ ┇ 𝐍𝐎 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
@@ -93,13 +96,12 @@ let handler = async (m, { conn, command }) => {
     }
 
     delete chat[`audio${type}`]
-    await react('🗑️')
     let del = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` 🗑️ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`AUDIO ELIMINADO\`\` 🗑️ —˙𖦹.꒷
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Audio de *${type}* eliminado
