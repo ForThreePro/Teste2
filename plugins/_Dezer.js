@@ -41,7 +41,6 @@ const handler = async (m, { conn, command }) => {
 ── *📖 USO* ╏ 🍕
 1️⃣ ➛ Responde a un audio con:.*${command}*
 2️⃣ ➛ Responde a un video con:.*${command}*
-3️⃣ ➛ Responde a un estado de WhatsApp
 
 ── *⏱️ NOTA* ╏ 🍕
 📦 ➛ Analiza los primeros *${CLIP_SECONDS}s* de audio
