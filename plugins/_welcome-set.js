@@ -3,7 +3,6 @@ moment.locale('es')
 
 let handler = async (m, { conn, args, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-  const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
   if (!global.db.data.chats) global.db.data.chats = {}
   if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
@@ -22,7 +21,7 @@ let handler = async (m, { conn, args, command }) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
-  // SET
+  // SET - SOLO GUARDA TEXTO
   if (command.startsWith('set')) {
     await react('📝')
     if (!text) {
@@ -41,8 +40,10 @@ let handler = async (m, { conn, args, command }) => {
 👥 ➛ @group = Nombre del grupo
 📄 ➛ @desc = Descripción del grupo
 
-── *💡 EJEMPLO* ╏ 🍕
-➛.${command} Bienvenido @user a @group
+── *💡 EJEMPLOS* ╏ 🍕
+➛.setwelcome Bienvenido @user a @group
+➛.setbye Se fue @user de @group
+➛.setkick @user fue kickeado de @group
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
@@ -56,7 +57,7 @@ let handler = async (m, { conn, args, command }) => {
 ⤷ ┇ 𝐆𝐔𝐀𝐑𝐃𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`GUARDADO\`\` ✅ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`TEXTO GUARDADO\`\` ✅ —˙𖦹.꒷
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 ✅ ➛ Mensaje de *${type}* guardado
@@ -70,7 +71,7 @@ let handler = async (m, { conn, args, command }) => {
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   }
 
-  // DEL
+  // DEL - SOLO BORRA TEXTO
   if (command.startsWith('del')) {
     await react('🗑️')
     if (!chat[key]) {
@@ -96,7 +97,7 @@ let handler = async (m, { conn, args, command }) => {
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` 🗑️ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`TEXTO ELIMINADO\`\` 🗑️ —˙𖦹.꒷
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Mensaje de *${type}* eliminado
