@@ -7,6 +7,8 @@ import crypto from 'crypto'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const SONGFINDER_API = 'https://songfinder.gg/api/recognize/url'
 const UGUU_UPLOAD = 'https://uguu.se/upload'
@@ -14,44 +16,61 @@ const CLIP_SECONDS = 30
 
 const handler = async (m, { conn, command }) => {
     try {
+        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+        const ownerNum = global.owner?.[0]?.[0] || '51927174369'
         let q = m.quoted? m.quoted : m
         let mime = (q.msg || q).mimetype || ''
 
         if (!mime ||!/audio|video/.test(mime)) {
-            let menuUso = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ 🎵
+            let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`BUSCADOR\`\` —˙𖦹.🔍꒷
+⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐃𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🎵 ࣪ ꕀ.${command} ˚. ᵎᵎ
+> *"Hasta Garfield reconoce música"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`BUSCADOR\`\` 🔍 —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 🎵 ➛ Identifica canciones respondiendo a audios o videos
 🎵 ➛.song = Descarga el audio
 🎵 ➛.letra = Muestra la letra + descarga el audio
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 1️⃣ ➛ Responde a un audio con:.*${command}*
 2️⃣ ➛ Responde a un video con:.*${command}*
 3️⃣ ➛ Responde a un estado de WhatsApp
 
-── *⏱️ NOTA* ╏
+── *⏱️ NOTA* ╏ 🍕
 📦 ➛ Analiza los primeros *${CLIP_SECONDS}s* de audio
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}
 ━━━━━━━━━━━`
-            return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
         }
 
         await m.react('🔍')
         let buffer = await q.download()
         if (!buffer) throw new Error('Error al descargar el archivo')
 
-        await m.reply(`𐔌 ꒱ ***.${command}*** 𐔌 ꒱ 🔍
+        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DETECTANDO\`\` —˙𖦹.🎶꒷
+⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 PROCESO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` 🎶 —˙𖦹.꒷
+
+── *📊 PROCESO* ╏ 🍕
 🔍 ➛ Analizando ${CLIP_SECONDS}s de audio...
 📤 ➛ Subiendo a servidor temporal...
 🎶 ➛ Buscando coincidencia...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
 
         let clip = await prepareClip(buffer, CLIP_SECONDS)
@@ -78,20 +97,25 @@ const handler = async (m, { conn, command }) => {
         if(command === 'song'){
             await conn.sendMessage(m.chat, {
                 image: thumb,
-                caption: `𐔌 ꒱ ***.song*** 𐔌 ꒱ ✅
+                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ENCONTRADO\`\` —˙𖦹.🎵꒷
+⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎵 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 📌 ➛ Título: *${title}*
 👤 ➛ Artista: *${author.name}*
 👁️ ➛ Vistas: *${vistas}*
 ⏱️ ➛ Duración: *${timestamp}*
 🔗 ➛ Link: ${shortUrl}
 
-── *📥 DESCARGA* ╏
+── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Enviando audio...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             }, { quoted: m })
 
@@ -110,19 +134,24 @@ const handler = async (m, { conn, command }) => {
             if(lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga'
 
             await conn.sendMessage(m.chat, {
-                text: `𐔌 ꒱ ***.letra*** 𐔌 ꒱ 📝
+                text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`LETRA\`\` —˙𖦹.🎤꒷
+⤷ ┇ 𝐋𝐄𝐓𝐑𝐀 ﹒ LETRA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 CANCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`LETRA\`\` 🎤 —˙𖦹.꒷
+
+── *📊 CANCIÓN* ╏ 🍕
 📌 ➛ *${title}* - *${author.name}*
 
-── *📜 LETRA* ╏
+── *📜 LETRA* ╏ 🍕
 \`\`${lyrics}\`\`
 
-── *📥 DESCARGA* ╏
+── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Enviando audio...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             }, { quoted: m })
 
@@ -137,17 +166,23 @@ const handler = async (m, { conn, command }) => {
 
     } catch(e) {
         await m.react('❌')
-        let menuError = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⚠️
+        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+        let menuError = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${e.message}
 
-── *💡 SOLUCIÓN* ╏
+── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa un audio/video más claro
 🔧 ➛ Asegúrate que tenga música con voz
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
     }
