@@ -17,12 +17,13 @@ let handler = async (m, { conn }) => {
 ━━━━━━━━━━━` }, { quoted: m })
     }
 
-    let quoted = m.quoted
-    let msg = quoted.msg || quoted
+    let q = m.quoted
+    let msg = q.msg || q.message || q
 
-    // Sacar el contenido de dentro del viewOnce
+    // ARREGLO: sacar el mensaje real del viewonce
     if (msg.viewOnceMessageV2) msg = msg.viewOnceMessageV2.message
-    if (msg.viewOnceMessageV2Extension) msg = msg.viewOnceMessageV2Extension.message
+    else if (msg.viewOnceMessageV2Extension) msg = msg.viewOnceMessageV2Extension.message
+    else if (msg.viewOnceMessage) msg = msg.viewOnceMessage.message
 
     if (!msg) {
         await react('❌')
@@ -38,6 +39,20 @@ let handler = async (m, { conn }) => {
     }
 
     let type = getContentType(msg)
+    console.log(type) // para debug
+
+    if (!type) {
+        await react('❌')
+        return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+
+── *📝 AVISO* ╏
+❌ ➛ Tipo de archivo no reconocido
+
+━━━━━━━━━━━` }, { quoted: m })
+    }
+
     if (!['imageMessage', 'videoMessage'].includes(type)) {
         await react('❌')
         return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
@@ -46,6 +61,7 @@ let handler = async (m, { conn }) => {
 
 ── *📝 AVISO* ╏
 ❌ ➛ Solo soporta imagen y video ViewOnce
+❌ ➛ Detectado: ${type}
 
 ━━━━━━━━━━━` }, { quoted: m })
     }
@@ -61,7 +77,6 @@ let handler = async (m, { conn }) => {
 
 ━━━━━━━━━━━`)
 
-    // Descargar
     let buffer = Buffer.from([])
     let stream = await downloadContentFromMessage(msg[type], type.replace('Message', ''))
     for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
