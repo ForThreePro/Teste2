@@ -1,5 +1,7 @@
 import fetch from 'node-fetch'
 import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@whiskeysockets/baileys'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 // FUNCION PARA REACCIONES
 const react = async (conn, m, text) => {
@@ -7,58 +9,82 @@ const react = async (conn, m, text) => {
 }
 
 var handler = async (m, { conn, args }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+  const ownerNum = global.owner?.[0]?.[0] || '51927174369'
+
   if (!args[0]) {
-    let menuUso = `𐔌 ꒱ ***TIKTOK DOWNLOADER*** 𐔌 ꒱ 📱
+    let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` —˙𖦹.📥꒷
+⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ TIKTOK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+📱 ࣪ ꕀ.tiktok ˚. ᵎᵎ
+> *"Bajando videos como Garfield baja lasaña"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 📱 ➛ Descarga videos de TikTok sin marca de agua
 📱 ➛ Con botones interactivos
 
-── *📖 USO* ╏
-➛ Envía: <link de tiktok>
+── *📖 USO* ╏ 🍕
+➛.*tiktok* <link de tiktok>
+➛.*tt* <link de tiktok>
 
-── *💡 EJEMPLO* ╏
+── *💡 EJEMPLO* ╏ 🍕
 ➛ https://vm.tiktok.com/ZMkcmTCa6/
 
-── *🔗 SOPORTE* ╏
+── *🔗 SOPORTE* ╏ 🍕
 📱 ➛ vm.tiktok.com
 📱 ➛ vt.tiktok.com
 📱 ➛ www.tiktok.com
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}
 ━━━━━━━━━━━`
-    return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
   }
 
   const url = args[0]
   if (!url.match(/(https?:\/\/)?(www\.)?(vm\.|vt\.|www\.)?tiktok\.com\//)) {
     await react(conn, m, '❌')
-    let menuError = `𐔌 ꒱ ***TIKTOK DOWNLOADER*** 𐔌 ꒱ ⚠️
+    let menuError = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ El enlace no es válido
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 ➛ Solo links de: *tiktok.com*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
   }
 
   try {
     await react(conn, m, "⏳")
-    await m.reply(`𐔌 ꒱ ***TIKTOK DOWNLOADER*** 𐔌 ꒱ ⏳
+    await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.⚙️꒷
+⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ TIKTOK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ⚙️ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
 🔍 ➛ Analizando link de TikTok...
 📥 ➛ Obteniendo video HD...
 ⬇️ ➛ Preparando descarga sin marca de agua...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
 
     const tiktokData = await tiktokdl(url)
@@ -74,7 +100,7 @@ var handler = async (m, { conn, args }) => {
       key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false },
       message: {
         locationMessage: {
-          name: `TikTok Downloader`,
+          name: `🍕 GARFIELD BOT`,
           jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer())
         }
       }
@@ -87,20 +113,23 @@ var handler = async (m, { conn, args }) => {
         message: {
           interactiveMessage: proto.Message.InteractiveMessage.fromObject({
             body: {
-              text: `𐔌 ꒱ ***TIKTOK DOWNLOADER*** 𐔌 ꒱ ✅
+              text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.📥꒷
+⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ TIKTOK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 📥 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 📌 ➛ Título: *${title}*
 👤 ➛ Autor: *@${author}*
 ❤️ ➛ Likes: *${likes}*
 💬 ➛ Comentarios: *${comments}*
 
-── *📥 DESCARGA* ╏
+── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Video sin marca de agua`
             },
-            footer: { text: 'Descarga sin marca de agua ✨' },
+            footer: { text: 'Descarga sin marca de agua ✨ | GARFIELD BOT' },
             header: { hasMediaAttachment: true, videoMessage: media.videoMessage },
             nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
               buttons: [
@@ -118,17 +147,23 @@ var handler = async (m, { conn, args }) => {
 
   } catch (error) {
     await react(conn, m, "❌")
-    let menuErr = `𐔌 ꒱ ***TIKTOK DOWNLOADER*** 𐔌 ꒱ ⚠️
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${error.message}
 
-── *💡 SOLUCIÓN* ╏
+── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Verifica que el video sea público
 🔧 ➛ Intenta con otro link
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
   }
