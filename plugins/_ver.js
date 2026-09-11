@@ -1,14 +1,65 @@
-let { downloadContentFromMessage } = (await import('@whiskeysockets/baileys'));
+import moment from 'moment-timezone'
+moment.locale('es')
 
 let handler = async (m, { conn }) => {
-if (!m.quoted) return conn.reply(m.chat, `《✧》 Responde a una imagen ViewOnce.`, m)
-if (!m?.quoted || !m?.quoted?.viewOnce) return conn.reply(m.chat, `《✧》 Responde a una imagen ViewOnce.`, m)
+const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+
+if (!m.quoted) {
+  let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VER ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+❌ ➛ Responde a una imagen/video ViewOnce
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
+  return conn.reply(m.chat, error, m)
+}
+
+if (!m?.quoted || !m?.quoted?.viewOnce) {
+  let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VER ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+❌ ➛ El mensaje no es ViewOnce
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
+  return conn.reply(m.chat, error, m)
+}
+
 let buffer = await m.quoted.download(false);
+
+let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐃𝐄𝐒𝐁𝐋𝐎𝐐𝐔𝐄𝐀𝐃𝐎 ﹒ VIEWONCE ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` ✅ —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
+✅ ➛ Imagen/Video desbloqueado
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
+
 if (/videoMessage/.test(m.quoted.mtype)) {
-return conn.sendFile(m.chat, buffer, 'media.mp4', m.quoted.caption || '', m)
+  await conn.sendFile(m.chat, buffer, 'media.mp4', m.quoted.caption || ok, m)
 } else if (/imageMessage/.test(m.quoted.mtype)) {
-return conn.sendFile(m.chat, buffer, 'media.jpg', m.quoted?.caption || '', m)
+  await conn.sendFile(m.chat, buffer, 'media.jpg', m.quoted?.caption || ok, m)
 }}
+
 handler.help = ['ver']
 handler.tags = ['tools']
 handler.command = ['readviewonce', 'read', 'ver'] 
