@@ -55,7 +55,7 @@ let handler = async (m, { conn }) => {
 }
 
 handler.help = ['borrarlista']
-handler.tags = ['grupo']
+handler.tags = ['sorteos']
 handler.command = /^(borrarlista)$/i
 handler.group = true
 handler.admin = true
