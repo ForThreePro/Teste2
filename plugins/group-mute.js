@@ -90,7 +90,7 @@ handler.before = async (m, { conn }) => {
 }
 
 handler.help = ['mute @user', 'unmute @user']
-handler.tags = ['grupos']
+handler.tags = ['grupo']
 handler.command = /^(mute|unmute)$/i
 handler.group = true
 handler.admin = true
