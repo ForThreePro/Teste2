@@ -10,13 +10,25 @@ owner: 'OWNER', main: 'GENERAL', game: 'JUEGOS', rpg: 'RPG',
 anime: 'ANIME', internet: 'INTERNET', image: 'IMÁGENES'
 }
 
-// EMOJIS UNICOS POR CATEGORIA - YA NO SE REPITEN
 const ICONOS_CATEGORIA = {
 info: 'ℹ️', descargas: '⬇️', buscadores: '🔍', grupo: '👥',
 fun: '😂', ia: '🤖', tools: '🛠️', sticker: '🧩',
 config: '⚙️', owner: '👑', main: '📋', game: '🎮',
 rpg: '⚔️', anime: '🍥', internet: '🌐', image: '🖼️'
 }
+
+// TOP 5 COMANDOS MAS USADOS - EDITAS AQUI
+const TOP_COMANDOS = ['.play', '.sticker', '.ia', '.menu', '.ytmp4']
+
+// FRASES DE GARFIELD RANDOM
+const FRASES_GARFIELD = [
+"Odio los lunes... y las dietas",
+"Dame lasaña o dame sueño",
+"5 minutos más durmiendo",
+"Hoy toca comer hasta explotar",
+"Si no hay lasaña, me voy",
+"La pereza es mi superpoder"
+]
 
 let handler = async (m, { conn }) => {
 try {
@@ -27,16 +39,17 @@ const fecha = moment.tz('America/Lima').format('dddd')
 const fecha2 = moment.tz('America/Lima').format('DD [de] MMMM [de] YYYY')
 const hora = moment.tz('America/Lima').format('hh:mm:ss a')
 const uptime = process.uptime()
-const horas = Math.floor(uptime / 3600)
+const dias = Math.floor(uptime / 86400)
+const horas = Math.floor((uptime % 86400) / 3600)
 const minutos = Math.floor((uptime % 3600) / 60)
 const ram = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)
 const totalram = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2)
-const pluginsCount = Object.values(global.plugins || {}).filter(p =>!p?.disabled).length
+const plugins = Object.values(global.plugins || {}).filter(p =>!p?.disabled)
+const pluginsCount = plugins.length
 const totalUsers = Object.keys(global.db.data.users || {}).length
 
 const byTag = {}
-for (const plugin of Object.values(global.plugins || {})) {
-  if (plugin.disabled) continue
+for (const plugin of plugins) {
   const tags = Array.isArray(plugin.tags)? plugin.tags : (plugin.tags? [plugin.tags] : [])
   const helps = Array.isArray(plugin.help)? plugin.help : (plugin.help? [plugin.help] : [])
   for (const tag of tags) {
@@ -52,27 +65,37 @@ const ping = Math.round(performance.now() - start)
 const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 const CANAL_LINK = 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z'
 
-// ARRAY DE EMOJIS EXTRA POR SI HAY CATEGORIAS NUEVAS
+// 4. SALUDO SEGUN HORA
+const hourNow = moment.tz('America/Lima').hour()
+let saludo = hourNow < 12? 'Buenos días' : hourNow < 18? 'Buenas tardes' : 'Buenas noches'
+const fraseRandom = FRASES_GARFIELD[Math.floor(Math.random() * FRASES_GARFIELD.length)]
+
+// 3. ESTADO EN VIVO
+const estadoBot = dias > 0? `Estable • ${dias}d ${horas}h` : `Estable • ${horas}h ${minutos}m`
+
 const EMOJIS_EXTRA = ['📌', '🎯', '🎨', '💎', '🔮', '🚀', '💡', '🎪', '🎭', '🏆']
 let emojiIndex = 0
 
 let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.2 ：✿ 。
-꒰ ◞⁺⊹ ．estado: *EN LINEA* • ${horas}h ${minutos}m
+⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.5 PRO ：✿ 。
+꒰ ◞⁺⊹ ．estado: *${estadoBot}* • Ping: ${ping}ms
 
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
-😼 ࣪ ꕀ @${userName}. ˚. ᵎᵎ
-> *"Odio los lunes... y las dietas"*
+😼 ࣪ ꕀ ${saludo} @${userName}. ˚. ᵎᵎ
+> *"${fraseRandom}"*
 
 📢 *CANAL OFICIAL*
 ${CANAL_LINK}
 > _Únete para recibir actualizaciones_
 
+──🔥 *TOP COMANDOS* ╏ Más usados
+${TOP_COMANDOS.map((c,i) => `${i+1}. ${c}`).join(' | ')}
+
 ──愛 *INFORMACION* ╏ 🍕
 *Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
 *Owner*: @${ownerNum}
-*Ping*: ${ping}ms | *RAM*: ${ram}mb/${totalram}gb
+*RAM*: ${ram}mb/${totalram}gb
 
  ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
 *${fecha}* ─ ${fecha2} ─ ${hora}
@@ -89,11 +112,10 @@ for (const tag of tagsOrdenados) {
   if (!set || set.size === 0) continue
   const cmds = [...set].sort()
 
-  // SI NO TIENE ICONO ASIGNADO, LE TOCA UNO UNICO
   const icono = ICONOS_CATEGORIA[tag] || EMOJIS_EXTRA[emojiIndex++ % EMOJIS_EXTRA.length]
   const nombreCat = CATEGORY_META[tag] || tag.toUpperCase()
 
-  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono}꒷\n`
+  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono} [${cmds.length}]꒷\n`
   for (const c of cmds) {
     menuTexto += ` ${icono} ➛.${c}\n`
   }
@@ -103,7 +125,7 @@ for (const tag of tagsOrdenados) {
 menuTexto += `━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 *Owner*: @${ownerNum}
-*Version*: 2.2
+*Version*: 2.5 PRO
 *${CANAL_LINK}*
 
 > "Dame lasaña o dame sueño" 😼
