@@ -18,7 +18,7 @@ let handler = async (m, { conn }) => {
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
-    if (!m?.quoted || !m?.quoted?.viewOnce) {
+    if (!m?.quoted ||!m?.quoted?.viewOnce) {
         await react('❌')
         let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
 
@@ -43,31 +43,17 @@ let handler = async (m, { conn }) => {
 
 ━━━━━━━━━━━`)
 
-    let buffer = await m.quoted.download(false)
-    let caption = m.quoted.caption || 'Sin descripción'
+    // ARREGLO: descargar con downloadContentFromMessage
+    let msg = m.quoted
+    let type = Object.keys(msg.message)[0]
+    let buffer = Buffer.from([])
 
-    if (/videoMessage/.test(m.quoted.mtype)) {
-        await react('🎥')
-        await conn.sendFile(m.chat, buffer, 'media.mp4', `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ✅
-
-.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.🎥꒷
-
-── *📊 INFORMACIÓN* ╏
-🎥 ➛ Tipo: *Video ViewOnce*
-📝 ➛ ${caption}
-
-━━━━━━━━━━━`, m)
-    } else if (/imageMessage/.test(m.quoted.mtype)) {
-        await react('🖼️')
-        await conn.sendFile(m.chat, buffer, 'media.jpg', `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ✅
-
-.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.🖼️꒷
-
-── *📊 INFORMACIÓN* ╏
-🖼️ ➛ Tipo: *Imagen ViewOnce*
-📝 ➛ ${caption}
-
-━━━━━━━━━━━`, m)
+    if (type === 'imageMessage') {
+        const stream = await downloadContentFromMessage(msg.message.imageMessage, 'image')
+        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
+    } else if (type === 'videoMessage') {
+        const stream = await downloadContentFromMessage(msg.message.videoMessage, 'video')
+        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
     } else {
         await react('❌')
         let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
@@ -80,9 +66,35 @@ let handler = async (m, { conn }) => {
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
+
+    let caption = msg.message[type].caption || 'Sin descripción'
+
+    if (type === 'videoMessage') {
+        await react('🎥')
+        await conn.sendFile(m.chat, buffer, 'media.mp4', `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ✅
+
+.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.🎥꒷
+
+── *📊 INFORMACIÓN* ╏
+🎥 ➛ Tipo: *Video ViewOnce*
+📝 ➛ ${caption}
+
+━━━━━━━━━━━`, m)
+    } else if (type === 'imageMessage') {
+        await react('🖼️')
+        await conn.sendFile(m.chat, buffer, 'media.jpg', `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ✅
+
+.⃟𖥔 ݁. 𖦹˙— \`\`COMPLETADO\`\` —˙𖦹.🖼️꒷
+
+── *📊 INFORMACIÓN* ╏
+🖼️ ➛ Tipo: *Imagen ViewOnce*
+📝 ➛ ${caption}
+
+━━━━━━━━━━━`, m)
+    }
 }
 
 handler.help = ['ver']
 handler.tags = ['herramientas']
-handler.command = ['readviewonce', 'read', 'ver'] 
+handler.command = ['readviewonce', 'read', 'ver']
 export default handler
