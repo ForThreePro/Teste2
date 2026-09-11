@@ -31,7 +31,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     else groups[category].push(plugin.help)
   }
 
-  // ICONOS POR CATEGORIA - YA NO TODO 📂
+  // ICONOS POR CATEGORIA
   const icons = {
     search: '🔍', download: '⬇️', game: '🎮', rpg: '⚔️', config: '⚙️',
     group: '👥', owner: '👑', info: 'ℹ️', fun: '😂', anime: '🌸',
@@ -48,44 +48,44 @@ let handler = async (m, { conn, usedPrefix }) => {
   let fecha = new Date().toLocaleDateString('es-PE', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Lima'})
   let hora = new Date().toLocaleTimeString('es-PE', {hour: '2-digit', minute: '2-digit', timeZone: 'America/Lima'})
 
-  let menu = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ 🍕
+  let menu = `𓂃 𓈒𓏸 𓂃 𓈒𓏸
+     *𐔌 ꒱ GARFIELD BOT 𐔌 ꒱* 🍕
+     _"Mejorando como lasaña"_ 😼
+𓂃 𓈒𓏸 𓂃 𓈒𓏸
 
-.⃟𖥔 ݁. 𖦹˙— \`\`MENÚ PRINCIPAL\`\` —˙𖦹.🍕꒷
+𓂃 𓈒𓏸 *PERFIL* 𓂃 𓈒𓏸
+🍼 *Usuario:* @${taguser.split('@')[0]}
+👑 *Owner:* ${ownerTag}
+📱 *Bot:* \`+${numBot}\`
 
-── *👤 PERFIL* ╏
-👤 ➛ Usuario: @${taguser.split('@')[0]}
-👑 ➛ Owner: ${ownerTag}
-📱 ➛ Bot: +${numBot}
+𓂃 𓈒𓏸 *ESTADÍSTICAS* 𓂃 𓈒𓏸
+⏱️ *Actividad:* \`${_uptime}\`
+👥 *Usuarios:* \`${totalreg}\`
+📜 *Comandos:* \`${totalcmd}\`
 
-── *📊 ESTADÍSTICAS* ╏
-⏱️ ➛ Actividad: ${_uptime}
-👥 ➛ Usuarios: ${totalreg}
-📜 ➛ Comandos: ${totalcmd}
+𓂃 𓈒𓏸 *SISTEMA* 𓂃 𓈒𓏸
+💾 *RAM:* \`${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}mb / ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)}gb\`
+📅 *Fecha:* ${fecha}
+🕐 *Hora:* ${hora}
 
-── *💻 SISTEMA* ╏
-💾 ➛ RAM: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}mb / ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)}gb
-📅 ➛ ${fecha}
-🕐 ➛ ${hora}
-
-── *📖 LISTA DE COMANDOS* ╏
+𓂃 𓈒𓏸 *LISTA DE COMANDOS* 𓂃 𓈒𓏸
 `
 
   for (let category in groups) {
-    let icon = icons[category] || '📁' // Ahora cada categoria tiene su icono
+    let icon = icons[category] || '📁'
     let catName = categoryNames[category] || category.toUpperCase()
-    menu += `\n.⃟𖥔 ݁. 𖦹˙— \`\`${catName}\`\` —˙𖦹.${icon}꒷\n`
+    menu += `\n*${icon} ${catName}*\n`
     for (let cmd of groups[category]) {
-      menu += `│ ${icon} ${usedPrefix}${cmd}\n`
+      menu += `> \`\`${usedPrefix}${cmd}\`\n` // Arreglo 1: Solo 1 icono
     }
   }
 
   menu += `
-── *📝 AYUDA* ╏
-💡 ➛ Usa ${usedPrefix} antes de cada comando
-💡 ➛ Ejemplo: ${usedPrefix}sticker
-> _"Mejorando como lasaña"_ 😼
+𓂃 𓈒𓏸 *AYUDA* 𓂃 𓈒𓏸
+💡 *Usa:* \`${usedPrefix}\` antes de cada comando
+💡 *Ejemplo:* \`\`\`${usedPrefix}sticker\`\`\`
 
-━━━━━━━━━━━`
+━━━ *Andreitap Ventas* 💗 ━━━`
 
   await conn.sendMessage(m.chat, {
     image: img,
