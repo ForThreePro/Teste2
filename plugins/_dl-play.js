@@ -1,5 +1,7 @@
 import fetch from "node-fetch"
 import yts from 'yt-search'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 // FUNCION PARA REACCIONES
 const react = async (conn, m, text) => {
@@ -7,41 +9,59 @@ const react = async (conn, m, text) => {
 }
 
 const handler = async (m, { conn, text, usedPrefix, command }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    const ownerNum = global.owner?.[0]?.[0] || '51927174369'
+
     try {
         if (!text.trim()) {
-            let menuUso = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ 🎵
+            let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` —˙𖦹.📥꒷
+⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🎵 ࣪ ꕀ.${command} ˚. ᵎᵎ
+> *"Buscando música como Garfield busca lasaña"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 🎵 ➛ Busca y descarga música de YouTube
 🎵 ➛ Envía el audio en MP3
 
-── *📖 USO* ╏
+── *📖 USO* ╏ 🍕
 ➛.*${command}* <nombre de canción>
 ➛.*${command}* <link de YouTube>
 
-── *💡 EJEMPLOS* ╏
+── *💡 EJEMPLOS* ╏ 🍕
 ➛.*play* despacito
 ➛.*play* https://youtu.be/dQw4w9WgXcQ
 
-── *⏱️ LÍMITE* ╏
+── *⏱️ LÍMITE* ╏ 🍕
 📦 ➛ Máx duración: *30 minutos*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+*Owner*: @${ownerNum}
 ━━━━━━━━━━━`
-            return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
         }
 
         await react(conn, m, '🔍')
-        await m.reply(`𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⏳
+        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` —˙𖦹.🔍꒷
+⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` 🔍 —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
 🔍 ➛ Buscando canción...
 📥 ➛ Obteniendo información...
 ⬇️ ➛ Preparando descarga...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
 
         const videoMatch = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/))([a-zA-Z0-9_-]{11})/)
@@ -62,20 +82,25 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         const [_, mediaUrl] = await Promise.all([
             conn.sendMessage(m.chat, {
                 image: thumb,
-                caption: `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ✅
+                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ENCONTRADO\`\` —˙𖦹.🎵꒷
+⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎵 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 📌 ➛ Título: *${title}*
 👤 ➛ Canal: *${canal}*
 👁️ ➛ Vistas: *${vistas}*
 ⏱️ ➛ Duración: *${timestamp}*
 🔗 ➛ Link: ${shortUrl}
 
-── *📥 DESCARGA* ╏
+── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Enviando audio...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
             }, { quoted: m }),
             getMediaUrl(shortUrl)
@@ -94,17 +119,23 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     } catch (e) {
         await react(conn, m, '❌')
-        let menuErr = `𐔌 ꒱ ***.${command}*** 𐔌 ꒱ ⚠️
+        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+        let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 DESCRIPCIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${e.message}
 
-── *💡 SOLUCIÓN* ╏
+── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa un nombre o link válido
 🔧 ➛ Máx 30 minutos de duración
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
     }
