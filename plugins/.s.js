@@ -227,6 +227,9 @@ function formatBytes(bytes) {
     return `${(bytes / 1024 ** i).toFixed(2)} ${sizes[i]}`
 }
 
+
+handler.help = ['set + Texto ', 'del + texto', 'listset - Ver Menu Set']
+handler.tags = ['ventas']
 handler.command = ['set', 'del', 'listset']
 handler.admin = true
 handler.group = true
