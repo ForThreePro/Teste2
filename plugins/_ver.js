@@ -1,4 +1,4 @@
-let { downloadContentFromMessage } = (await import('@whiskeysockets/baileys'));
+let { downloadContentFromMessage, getContentType } = (await import('@whiskeysockets/baileys'));
 
 let handler = async (m, { conn }) => {
     const react = async (text) => {
@@ -18,15 +18,39 @@ let handler = async (m, { conn }) => {
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
-    if (!m?.quoted ||!m?.quoted?.viewOnce) {
+    let quoted = m.quoted
+    let msg = quoted.msg || quoted
+
+    // ARREGLO: quitar el viewOnceMessageV2
+    if (msg.viewOnceMessageV2) {
+        msg = msg.viewOnceMessageV2.message
+    } else if (msg.viewOnceMessageV2Extension) {
+        msg = msg.viewOnceMessageV2Extension.message
+    }
+
+    if (!msg) {
         await react('❌')
         let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
 
 ── *📝 AVISO* ╏
-❌ ➛ El mensaje no es ViewOnce
-❌ ➛ Responde a una foto/video que se ve 1 vez
+❌ ➛ No se pudo leer el mensaje
+❌ ➛ Tal vez ya fue visto o está corrupto
+
+━━━━━━━━━━━`
+        return conn.sendMessage(m.chat, { text: error }, { quoted: m })
+    }
+
+    let type = getContentType(msg)
+    if (!type ||!['imageMessage', 'videoMessage'].includes(type)) {
+        await react('❌')
+        let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+
+── *📝 AVISO* ╏
+❌ ➛ Solo soporta imagen y video ViewOnce
 
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
@@ -43,31 +67,11 @@ let handler = async (m, { conn }) => {
 
 ━━━━━━━━━━━`)
 
-    // ARREGLO: descargar con downloadContentFromMessage
-    let msg = m.quoted
-    let type = Object.keys(msg.message)[0]
     let buffer = Buffer.from([])
+    let stream = await downloadContentFromMessage(msg[type], type.replace('Message', ''))
+    for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
 
-    if (type === 'imageMessage') {
-        const stream = await downloadContentFromMessage(msg.message.imageMessage, 'image')
-        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
-    } else if (type === 'videoMessage') {
-        const stream = await downloadContentFromMessage(msg.message.videoMessage, 'video')
-        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk])
-    } else {
-        await react('❌')
-        let error = `𐔌 ꒱ ***VER VIEWONCE*** 𐔌 ꒱ ⚠️
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
-
-── *📝 AVISO* ╏
-❌ ➛ Solo soporta imagen y video ViewOnce
-
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: error }, { quoted: m })
-    }
-
-    let caption = msg.message[type].caption || 'Sin descripción'
+    let caption = msg[type].caption || 'Sin descripción'
 
     if (type === 'videoMessage') {
         await react('🎥')
