@@ -3,20 +3,21 @@ import os from 'os'
 moment.locale('es')
 
 const CATEGORY_META = {
-config: 'CONFIG', main: 'MAIN', tools: 'TOOLS', owner: 'OWNER',
-fun: 'FUN', buscadores: 'SEARCH', descargas: 'DOWNLOADER', grupo: 'GRUPOS',
-group: 'GRUPO', ia: 'IA', info: 'INFO', sticker: 'STICKER',
+info: 'INFO', descargas: 'DESCARGAS', buscadores: 'BÚSQUEDA',
+grupo: 'GRUPOS', fun: 'DIVERSIÓN', ia: 'INTELIGENCIA',
+tools: 'HERRAMIENTAS', sticker: 'STICKERS', config: 'CONFIG',
+owner: 'OWNER', main: 'GENERAL'
 }
 
-// ICONOS POR CATEGORIA
 const ICONOS_CATEGORIA = {
-config: '⚙️', owner: '👑', fun: '😂', buscadores: '🔍',
-descargas: '⬇️', grupo: '👥', grupos: '👥', ia: '🤖',
-info: 'ℹ️', sticker: '🧩', main: '📁', tools: '🛠️',
+info: 'ℹ️', descargas: '⬇️', buscadores: '🔍', grupo: '👥',
+fun: '😂', ia: '🤖', tools: '🛠️', sticker: '🧩',
+config: '⚙️', owner: '👑', main: '📁'
 }
 
 let handler = async (m, { conn }) => {
 try {
+let start = performance.now()
 await conn.sendMessage(m.chat, { react: { text: '🍕', key: m.key } })
 
 const fecha = moment.tz('America/Lima').format('dddd')
@@ -25,7 +26,6 @@ const hora = moment.tz('America/Lima').format('hh:mm:ss a')
 const uptime = process.uptime()
 const horas = Math.floor(uptime / 3600)
 const minutos = Math.floor((uptime % 3600) / 60)
-const segundos = Math.floor(uptime % 60)
 const ram = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)
 const totalram = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2)
 const pluginsCount = Object.values(global.plugins || {}).filter(p =>!p?.disabled).length
@@ -44,38 +44,32 @@ for (const plugin of Object.values(global.plugins || {})) {
 }
 
 const userName = m.pushName || 'Usuario'
-const IMG_MENU = 'https://files.evogb.win/QFXQtu.jpg' // TU IMAGEN DE GARFIELD
+const IMG_MENU = 'https://files.evogb.win/QFXQtu.jpg'
+const ping = Math.round(performance.now() - start)
 
 let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.0 ：✿ 。
+⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.1 PRO ：✿ 。
 ꒰ ◞⁺⊹ ．estado: *EN LINEA* • ${horas}h ${minutos}m
 
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
 😼 ࣪ ꕀ @${userName}. ˚. ᵎᵎ
 > *"Odio los lunes... y las dietas"*
 
-──愛 *INFORMACION DEL BOT* ╏ 🍕
+──愛 *INFORMACION* ╏ 🍕
 *Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
 *Owner*: @${global.owner?.[0]?.[0] || '51927174369'}
-*Numero*: +${conn.user.jid.split('@')[0]}
+*Ping*: ${ping}ms | *RAM*: ${ram}mb/${totalram}gb
 
  ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
-> ﹒ RAM: ${ram}mb / ${totalram}gb
-      ᶻz　*${fecha}* ─ ${fecha2} ─ ${hora}　⋌
-
-© ❛ *ping*. ${Math.round(performance.now())}ms
-名 ─ *modo:* public﹔
+*${fecha}* ─ ${fecha2} ─ ${hora}
 
 > ❍ 𝖴𝗌𝖺. 𝖺𝗇𝗍𝖾𝗌 𝖽𝖾 𝖼𝖺𝖽𝖺 𝖼𝗈𝗆𝖺𝗇𝖽𝗈
 
 `
 
-const tagsOrdenados = Object.keys(byTag).sort((a, b) => {
-  const aIn = CATEGORY_META[a]? 0 : 1
-  const bIn = CATEGORY_META[b]? 0 : 1
-  return aIn - bIn
-})
+const ordenPrioridad = ['info', 'descargas', 'buscadores', 'grupo', 'fun', 'ia', 'tools', 'sticker', 'config', 'owner', 'main']
+const tagsOrdenados = [...new Set([...ordenPrioridad,...Object.keys(byTag)])].filter(t => byTag[t])
 
 for (const tag of tagsOrdenados) {
   const set = byTag[tag]
@@ -85,18 +79,18 @@ for (const tag of tagsOrdenados) {
   const icono = ICONOS_CATEGORIA[tag] || '📁'
   const nombreCat = CATEGORY_META[tag] || tag.toUpperCase()
 
-  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono}꒷\n` // CAMBIO: Ya no dice PREM
+  menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono}꒷\n`
   for (const c of cmds) {
     menuTexto += ` ${icono} ➛.${c}\n`
   }
   menuTexto += ` ㅤ└──.✦ ── ⊰ ̟!!.✦. ˙\n\n`
 }
 
+// BOTONES RAPIDOS
 menuTexto += `━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 *Owner*: @${global.owner?.[0]?.[0] || '51927174369'}
-*Version*: 2.0
-*Frase*: "Mejorando como lasaña"
+*Version*: 2.1 PRO
 
 > "Dame lasaña o dame sueño" 😼
 ━━━━━━━━━━━`
@@ -104,6 +98,13 @@ menuTexto += `━━━━━━━━━━━
 await conn.sendMessage(m.chat, {
   image: { url: IMG_MENU },
   caption: menuTexto.trim(),
+  footer: 'GARFIELD BOT',
+  buttons: [
+    {buttonId: '.nobg', buttonText: {displayText: '⚡ PING'}, type: 1},
+    {buttonId: '.owner', buttonText: {displayText: '👑 OWNER'}, type: 1},
+    {buttonId: '.s', buttonText: {displayText: 'ℹ️ INFO'}, type: 1}
+  ],
+  headerType: 4,
   mentions: [m.sender]
 }, { quoted: m })
 
