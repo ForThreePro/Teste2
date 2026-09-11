@@ -6,13 +6,16 @@ const CATEGORY_META = {
 info: 'INFO', descargas: 'DESCARGAS', buscadores: 'BÚSQUEDA',
 grupo: 'GRUPOS', fun: 'DIVERSIÓN', ia: 'INTELIGENCIA',
 tools: 'HERRAMIENTAS', sticker: 'STICKERS', config: 'CONFIG',
-owner: 'OWNER', main: 'GENERAL'
+owner: 'OWNER', main: 'GENERAL', game: 'JUEGOS', rpg: 'RPG',
+anime: 'ANIME', internet: 'INTERNET', image: 'IMÁGENES'
 }
 
+// EMOJIS UNICOS POR CATEGORIA - YA NO SE REPITEN
 const ICONOS_CATEGORIA = {
 info: 'ℹ️', descargas: '⬇️', buscadores: '🔍', grupo: '👥',
 fun: '😂', ia: '🤖', tools: '🛠️', sticker: '🧩',
-config: '⚙️', owner: '👑', main: '📁'
+config: '⚙️', owner: '👑', main: '📋', game: '🎮',
+rpg: '⚔️', anime: '🍥', internet: '🌐', image: '🖼️'
 }
 
 let handler = async (m, { conn }) => {
@@ -49,9 +52,13 @@ const ping = Math.round(performance.now() - start)
 const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 const CANAL_LINK = 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z'
 
+// ARRAY DE EMOJIS EXTRA POR SI HAY CATEGORIAS NUEVAS
+const EMOJIS_EXTRA = ['📌', '🎯', '🎨', '💎', '🔮', '🚀', '💡', '🎪', '🎭', '🏆']
+let emojiIndex = 0
+
 let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.1 PRO ：✿ 。
+⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.2 ：✿ 。
 ꒰ ◞⁺⊹ ．estado: *EN LINEA* • ${horas}h ${minutos}m
 
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
@@ -74,7 +81,7 @@ ${CANAL_LINK}
 
 `
 
-const ordenPrioridad = ['info', 'descargas', 'buscadores', 'grupo', 'fun', 'ia', 'tools', 'sticker', 'config', 'owner', 'main']
+const ordenPrioridad = ['info', 'descargas', 'buscadores', 'grupo', 'fun', 'ia', 'tools', 'sticker', 'game', 'rpg', 'anime', 'internet', 'image', 'config', 'owner', 'main']
 const tagsOrdenados = [...new Set([...ordenPrioridad,...Object.keys(byTag)])].filter(t => byTag[t])
 
 for (const tag of tagsOrdenados) {
@@ -82,7 +89,8 @@ for (const tag of tagsOrdenados) {
   if (!set || set.size === 0) continue
   const cmds = [...set].sort()
 
-  const icono = ICONOS_CATEGORIA[tag] || '📁'
+  // SI NO TIENE ICONO ASIGNADO, LE TOCA UNO UNICO
+  const icono = ICONOS_CATEGORIA[tag] || EMOJIS_EXTRA[emojiIndex++ % EMOJIS_EXTRA.length]
   const nombreCat = CATEGORY_META[tag] || tag.toUpperCase()
 
   menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` —˙𖦹.${icono}꒷\n`
@@ -95,7 +103,7 @@ for (const tag of tagsOrdenados) {
 menuTexto += `━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 *Owner*: @${ownerNum}
-*Version*: 2.1 PRO
+*Version*: 2.2
 *${CANAL_LINK}*
 
 > "Dame lasaña o dame sueño" 😼
