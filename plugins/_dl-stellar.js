@@ -24,16 +24,20 @@ let handler = async (m, { conn, text, command }) => {
 .⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` —˙𖦹.📥꒷
 
 ── *📝 DESCRIPCIÓN* ╏
-🎵 ➛ Descarga audio de YouTube y TikTok
-🎵 ➛ Envía el audio en MP3
+🎵 ➛ Descarga YT, TikTok, FB e IG
+🎵 ➛ Envía video y audio en MP3/MP4
 
 ── *📖 USO* ╏
 1️⃣ ➛.*play1* <nombre de canción>
 2️⃣ ➛.*ttmp3* <link de tiktok>
+3️⃣ ➛.*fb* <link de facebook>
+4️⃣ ➛.*ig* <link de instagram>
 
 ── *💡 EJEMPLOS* ╏
 ➛.*play1* blinding lights
-➛.*ttmp3* https://www.tiktok.com/@user/video/123
+➛.*ttmp3* https://tiktok.com/xxx
+➛.*fb* https://facebook.com/share/xxx
+➛.*ig* https://instagram.com/reel/xxx
 
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuUso }, { quoted: m })
@@ -139,6 +143,86 @@ let handler = async (m, { conn, text, command }) => {
             await conn.sendMessage(m.chat, { audio: audioBuffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3`, ptt: false }, { quoted: m })
         }
 
+        // ===== FACEBOOK ===== NUEVO
+        if (command === 'fb' || command === 'facebook') {
+            await m.reply(`𐔌 ꒱ ***.fb*** 𐔌 ꒱ ⏳
+
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.📘꒷
+
+── *📊 ESTADO* ╏
+🔍 ➛ Analizando link de Facebook...
+📥 ➛ Descargando video...
+⬇️ ➛ Preparando envío...
+
+━━━━━━━━━━━`)
+
+            const apiUrl = `${api.url}/dl/facebook?url=${encodeURIComponent(text)}&key=${api.key}`
+            const res = await fetch(apiUrl).then(r => r.json())
+            const data = res?.result || res?.data
+            let dl = data?.url || data?.download
+            const title = data?.title || 'Video de Facebook'
+            const thumb = data?.thumb || data?.thumbnail
+            
+            if (!dl) throw new Error('No se pudo descargar. Link mal o privado')
+
+            const videoBuffer = await getBuffer(dl)
+            const caption = `𐔌 ꒱ ***.fb*** 𐔌 ꒱ ✅
+
+.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGADO\`\` —˙𖦹.📘꒷
+
+── *📊 INFORMACIÓN* ╏
+📌 ➛ Título: *${title}*
+🔗 ➛ Link: ${text}
+
+── *📥 DESCARGA* ╏
+⬇️ ➛ Enviado por Andreitap Ventas 💗
+
+━━━━━━━━━━━`
+
+            await react(conn, m, '📥')
+            await conn.sendMessage(m.chat, { video: videoBuffer, caption }, { quoted: m })
+        }
+
+        // ===== INSTAGRAM ===== NUEVO
+        if (command === 'ig' || command === 'instagram') {
+            await m.reply(`𐔌 ꒱ ***.ig*** 𐔌 ꒱ ⏳
+
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.📷꒷
+
+── *📊 ESTADO* ╏
+🔍 ➛ Analizando link de Instagram...
+📥 ➛ Descargando reel/video...
+⬇️ ➛ Preparando envío...
+
+━━━━━━━━━━━`)
+
+            const apiUrl = `${api.url}/dl/instagram?url=${encodeURIComponent(text)}&key=${api.key}`
+            const res = await fetch(apiUrl).then(r => r.json())
+            const data = res?.result || res?.data
+            let dl = data?.url || data?.download
+            const title = data?.title || 'Reel de Instagram'
+            const thumb = data?.thumb || data?.thumbnail
+            
+            if (!dl) throw new Error('No se pudo descargar. Link mal o privado')
+
+            const videoBuffer = await getBuffer(dl)
+            const caption = `𐔌 ꒱ ***.ig*** 𐔌 ꒱ ✅
+
+.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGADO\`\` —˙𖦹.📷꒷
+
+── *📊 INFORMACIÓN* ╏
+📌 ➛ Título: *${title}*
+🔗 ➛ Link: ${text}
+
+── *📥 DESCARGA* ╏
+⬇️ ➛ Enviado por Andreitap Ventas 💗
+
+━━━━━━━━━━━`
+
+            await react(conn, m, '📥')
+            await conn.sendMessage(m.chat, { video: videoBuffer, caption }, { quoted: m })
+        }
+
         await react(conn, m, '✅')
     } catch (e) {
         await react(conn, m, '❌')
@@ -158,8 +242,8 @@ let handler = async (m, { conn, text, command }) => {
     }
 }
 
-handler.help = ['play1 <nombre>', 'ttmp3 <link>']
+handler.help = ['play1 <nombre>', 'ttmp3 <link>', 'fb <link>', 'ig <link>']
 handler.tags = ['descargas']
-handler.command = /^(play1|ttmp3|tomp3|tt)$/i
+handler.command = /^(play1|ttmp3|tomp3|tt|fb|facebook|ig|instagram)$/i
 handler.register = false
 export default handler
