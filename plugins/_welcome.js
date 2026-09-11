@@ -1,15 +1,24 @@
 import { WAMessageStubType } from '@whiskeysockets/baileys'
 import fetch from 'node-fetch'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const handler = async (m, { conn, args, isAdmin, isOwner }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+
   if (!isAdmin &&!isOwner) {
-    let error = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ ⚠️
+    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ACCESO DENEGADO\`\` —˙𖦹.🔒꒷
+⤷ ┇ 𝐀𝐂𝐄𝐒𝐎 𝐃𝐄𝐍𝐄𝐆𝐀𝐃𝐎 ﹒ BIENVENIDA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 🔒 —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 🔒 ➛ Solo admins pueden usar este comando
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
@@ -24,38 +33,63 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
   if (/on/i.test(args[0])) {
     await react('🟢')
     chat.bienvenida = true
-    let ok = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ ✅
+    let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`BIENVENIDA\`\` —˙𖦹.🟢꒷
+⤷ ┇ 𝐁𝐈𝐄𝐍𝐕𝐄𝐍𝐈𝐃𝐀 ﹒ ACTIVA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
-🟢 ➛ Activada
+.⃟𖥔 ݁. 𖦹˙— \`\`ACTIVADA\`\` 🟢 —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
+🟢 ➛ Bienvenida Activada
 🖼️ ➛ Con imagen personalizada
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   } else if (/off/i.test(args[0])) {
     await react('🔴')
     chat.bienvenida = false
-    let off = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ ✅
+    let off = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`BIENVENIDA\`\` —˙𖦹.🔴꒷
+⤷ ┇ 𝐁𝐈𝐄𝐍𝐕𝐄𝐍𝐈𝐃𝐀 ﹒ DESACTIVA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
-🔴 ➛ Desactivada
+.⃟𖥔 ݁. 𖦹˙— \`\`DESACTIVADA\`\` 🔴 —˙𖦹.꒷
 
+── *📊 ESTADO* ╏ 🍕
+🔴 ➛ Bienvenida Desactivada
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: off }, { quoted: m })
   } else {
     await react('❌')
-    let uso = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ 📝
+    let uso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.⚙️꒷
+⤷ ┇ 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ BIENVENIDA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
-➛ bienvenida on
-➛ bienvenida off
+.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` ⚙️ —˙𖦹.꒷
 
+── *📖 ON/OFF* ╏ 🍕
+➛.bienvenida on
+➛.bienvenida off
+
+── *✏️ EDITAR TEXTO* ╏ 🍕
+➛.setwelcome <texto>
+➛.setbye <texto>
+➛.setkick <texto>
+
+── *🔊 EDITAR AUDIO* ╏ 🍕
+➛ Responde audio +.audiowelcome
+➛ Responde audio +.audiobye
+➛ Responde audio +.audiokick
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
   }
@@ -75,16 +109,16 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const userJid = m.messageStubParameters?.[0] || m.participant
   if (!userJid) return!0
 
-  const DEFAULT_IMG = 'https://files.evogb.win/QFXQtu.jpg' // <-- TU FOTO NUEVA
+  const DEFAULT_IMG = 'https://files.evogb.win/QFXQtu.jpg'
   let imgBuffer = null
 
-  // PASO 1: Intentar obtener foto del usuario
+  // PASO 1: Foto del usuario
   try {
     let userPP = await conn.profilePictureUrl(userJid, 'image')
     let res = await fetch(userPP)
     imgBuffer = await res.buffer()
   } catch {
-    // PASO 2: Si falla, usar la foto que me diste
+    // PASO 2: Foto por defecto
     try {
       let res = await fetch(DEFAULT_IMG)
       imgBuffer = await res.buffer()
@@ -104,41 +138,56 @@ handler.before = async function (m, { conn, groupMetadata }) {
     case WAMessageStubType.GROUP_PARTICIPANT_ADD:
       audio = chat.audiowelcome
       txt = chat.customWelcome? chat.customWelcome.replace(/@user/gi, userTag).replace(/@group/gi, groupName).replace(/@desc/gi, groupDesc) :
-`𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ 👋
+`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`BIENVENIDO\`\` —˙𖦹.✨꒷
+⤷ ┇ 𝐁𝐈𝐄𝐍𝐕𝐄𝐍𝐈𝐃𝐎 ﹒ NUEVO MIEMBRO ：✿ 。
+꒰ ◞⁺⊹ ．
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`WELCOME\`\` 👋 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 👋 ➛ ${userTag} llegó a *${groupName}*
 👥 ➛ Miembro N°: *${membersCount}*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
       break
 
     case WAMessageStubType.GROUP_PARTICIPANT_LEAVE:
       audio = chat.audiobye
       txt = chat.customBye? chat.customBye.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
-`𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ 👋
+`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`SE FUE\`\` —˙𖦹.💤꒷
+⤷ ┇ 𝐒𝐄 𝐅𝐔𝐄 ﹒ ABANDONO ：✿ 。
+꒰ ◞⁺⊹ ．
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`BYE\`\` 💤 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 💤 ➛ ${userTag} salió de *${groupName}*
 📉 ➛ Quedamos: *${membersCount}*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
       break
 
     case WAMessageStubType.GROUP_PARTICIPANT_REMOVE:
       audio = chat.audiokick
       txt = chat.customKick? chat.customKick.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
-`𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ ⚠️
+`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`EXPULSADO\`\` —˙𖦹.🥊꒷
+⤷ ┇ 𝐄𝐗𝐏𝐔𝐋𝐒𝐀𝐃𝐎 ﹒ KICK ：✿ 。
+꒰ ◞⁺⊹ ．
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`KICK\`\` 🥊 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 🥊 ➛ ${userTag} fue expulsado de *${groupName}*
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
       break
   }
@@ -150,11 +199,26 @@ handler.before = async function (m, { conn, groupMetadata }) {
       await conn.sendMessage(m.chat, { text: txt, mentions: [userJid] })
     }
 
+    // FIX: REPRODUCIR AUDIO GUARDADO EN BASE64
     if (audio) {
-      if (Buffer.isBuffer(audio)) {
-        await conn.sendMessage(m.chat, { audio: audio, mimetype: 'audio/mpeg', ptt: false })
-      } else if (typeof audio === 'string' && audio.startsWith('http')) {
-        await conn.sendMessage(m.chat, { audio: { url: audio }, mimetype: 'audio/mpeg', ptt: false })
+      try {
+        let audioBuffer
+        if (typeof audio === 'string') {
+          // Si es base64 lo convertimos
+          audioBuffer = Buffer.from(audio, 'base64')
+        } else if (Buffer.isBuffer(audio)) {
+          audioBuffer = audio
+        }
+
+        if (audioBuffer) {
+          await conn.sendMessage(m.chat, {
+            audio: audioBuffer,
+            mimetype: 'audio/mp4',
+            ptt: true // true = nota de voz
+          })
+        }
+      } catch (e) {
+        console.log('Error al enviar audio:', e)
       }
     }
   }
