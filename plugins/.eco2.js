@@ -1,149 +1,137 @@
-let MONEDA = 'LASAÑA-COINS 🍝'
-let iconos = ['🍕', '🍝', '🧀', '🍔', '☕', '🍩']
+let cooldowns = { trivia: {}, work: {}, robar: {} }
 
-let preguntas = [
-    // FACIL
-    { q: '¿Cuánto es 2 + 2?', a: '4', dif: 'facil' },
-    { q: '¿De qué color es el cielo?', a: 'azul', dif: 'facil' },
-    { q: '¿Cuántos días tiene una semana?', a: '7', dif: 'facil' },
-    { q: '¿Capital de Peru?', a: 'lima', dif: 'facil' },
-    { q: '¿Cuántas patas tiene un perro?', a: '4', dif: 'facil' },
-    { q: '¿Cuánto es 9 - 3?', a: '6', dif: 'facil' },
-    { q: '¿Qué animal dice miau?', a: 'gato', dif: 'facil' },
-    { q: '¿De qué color es la nieve?', a: 'blanca', dif: 'facil' },
-    { q: '¿Cuántas horas tiene un día?', a: '24', dif: 'facil' },
-    { q: '¿Cuánto es 1 docena?', a: '12', dif: 'facil' },
+let handler = async (m, { conn, usedPrefix, text, command }) => {
+  let user = global.db.data.users[m.sender]
+  if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-    // MEDIA
-    { q: '¿Cuánto es 7 x 7?', a: '49', dif: 'media' },
-    { q: '¿Capital de Brasil?', a: 'brasilia', dif: 'media' },
-    { q: '¿Cuántos planetas hay en el sistema solar?', a: '8', dif: 'media' },
-    { q: '¿Quién creó Facebook?', a: 'mark zuckerberg', dif: 'media' },
-    { q: '¿Cuál es el río más largo del mundo?', a: 'amazonas', dif: 'media' },
-    { q: '¿En qué año llegó el hombre a la luna?', a: '1969', dif: 'media' },
-    { q: '¿Cuántos huesos tiene el cuerpo humano?', a: '206', dif: 'media' },
-    { q: '¿Cuál es el metal más caro?', a: 'oro', dif: 'media' },
-    { q: '¿Qué país tiene forma de bota?', a: 'italia', dif: 'media' },
-    { q: '¿Cuántos continentes hay?', a: '7', dif: 'media' },
+  // TRIVIA
+  if (command === 'trivia') {
+    if (cooldowns.trivia[m.sender] && Date.now() - cooldowns.trivia[m.sender] < 10000)
+      return m.reply(`Espera ${Math.ceil((10000 - (Date.now() - cooldowns.trivia[m.sender])) / 1000)}s`)
+    const preguntas = [
+      { q: '¿Cuántos días tiene una semana?', a: '7' },
+      { q: '¿De qué color es el cielo despejado?', a: 'azul' },
+      { q: '¿Cuánto es 5 + 5?', a: '10' },
+      { q: '¿Qué animal dice miau?', a: 'gato' },
+      { q: '¿Cuántas patas tiene un perro?', a: '4' },
+      { q: '¿Cuánto es 3 x 3?', a: '9' }
+    ]
+    let trivia = preguntas[Math.floor(Math.random() * preguntas.length)]
+    cooldowns.trivia[m.sender] = Date.now()
+    await conn.reply(m.chat, `🎮 *TRIVIA* 🎮\n\n${trivia.q}\n\nTienes 15 segundos`, m)
+    global.db.data.trivia = global.db.data.trivia || {}
+    global.db.data.trivia[m.sender] = { answer: trivia.a.toLowerCase(), chat: m.chat, timeout: setTimeout(() => delete global.db.data.trivia[m.sender], 15000) }
+    return
+  }
 
-    // DIFICIL
-    { q: '¿Cuál es la raíz cuadrada de 144?', a: '12', dif: 'dificil' },
-    { q: '¿Quién pintó la Mona Lisa?', a: 'leonardo da vinci', dif: 'dificil' },
-    { q: '¿Cuál es el elemento químico con símbolo Au?', a: 'oro', dif: 'dificil' },
-    { q: '¿En qué año empezó la segunda guerra mundial?', a: '1939', dif: 'dificil' },
-    { q: '¿Cuál es la capital de Australia?', a: 'canberra', dif: 'dificil' },
-    { q: '¿Quién escribió Don Quijote de la Mancha?', a: 'miguel de cervantes', dif: 'dificil' },
-    { q: '¿Cuál es el océano más profundo?', a: 'pacifico', dif: 'dificil' },
-    { q: '¿Cuántos cromosomas tiene el ser humano?', a: '46', dif: 'dificil' },
-    { q: '¿Cuál es la moneda de Japón?', a: 'yen', dif: 'dificil' },
-    { q: '¿Qué significa CPU?', a: 'unidad central de procesamiento', dif: 'dificil' }
-]
+  // RULETA
+  if (['ruleta', 'rlt'].includes(command)) {
+    let args = text.split(' ')
+    if (args.length < 2) return m.reply(`Uso: ${usedPrefix + command} <red/black> <monto>`)
+    let color = args[0].toLowerCase()
+    let monto = parseInt(args[1])
+    if (!['red', 'black', 'rojo', 'negro'].includes(color)) return m.reply('Usa: red/rojo o black/negro')
+    if (isNaN(monto) || monto < 10) return m.reply('Apuesta mínima: 10 monedas')
+    if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
+    user.coin -= monto
+    let resultado = Math.random() < 0.5? 'red' : 'black'
+    let colorElegido = color === 'rojo'? 'red' : color === 'negro'? 'black' : color
+    if (resultado === colorElegido) {
+      let ganancia = monto * 2
+      user.coin += ganancia
+      return m.reply(`🎰 *GANASTE* 🎰\n\nSalió: ${resultado === 'red'? '🔴' : '⚫'}\nGanaste: ${ganancia} 🪙\n\nSaldo: ${user.coin} 🪙`)
+    } else {
+      return m.reply(`🎰 *PERDISTE* 🎰\n\nSalió: ${resultado === 'red'? '🔴' : '⚫'}\nPerdiste: ${monto} 🪙\n\nSaldo: ${user.coin} 🪙`)
+    }
+  }
 
-function getUser(id) {
-    if (!global.db.data.users[id]) global.db.data.users[id] = {}
-    let user = global.db.data.users[id]
-    if (user.rcoins === undefined) user.rcoins = 0
-    if (user.level === undefined) user.level = 1
-    if (user.exp === undefined) user.exp = 0
-    return user
+  // SLOTS
+  if (['slots', 'slot'].includes(command)) {
+    let monto = parseInt(text)
+    if (isNaN(monto) || monto < 10) return m.reply(`Apuesta mínima: 10\nUso: ${usedPrefix + command} <monto>`)
+    if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
+    user.coin -= monto
+    const emojis = ['🍒', '🍋', '🍊', '🍉', '🍇', '💎', '7️⃣', '⭐']
+    let a = emojis[Math.floor(Math.random() * emojis.length)]
+    let b = emojis[Math.floor(Math.random() * emojis.length)]
+    let c = emojis[Math.floor(Math.random() * emojis.length)]
+    let multiplicador = 0
+    if (a === b && b === c) {
+      if (a === '7️⃣') multiplicador = 100
+      else if (a === '💎') multiplicador = 75
+      else if (a === '⭐') multiplicador = 50
+      else if (a === '🍇') multiplicador = 25
+      else if (a === '🍉') multiplicador = 15
+      else if (a === '🍊') multiplicador = 10
+      else if (a === '🍋') multiplicador = 5
+      else multiplicador = 2
+    } else if (a === b || b === c || a === c) multiplicador = 2
+    if (multiplicador > 0) {
+      let ganancia = monto * multiplicador
+      user.coin += ganancia
+      return m.reply(`🎰 *SLOTS* 🎰\n\n${a} | ${b} | ${c}\n\n🎉 *x${multiplicador}* 🎉\nGanaste: ${ganancia} 🪙\n\nSaldo: ${user.coin} 🪙`)
+    } else {
+      return m.reply(`🎰 *SLOTS* 🎰\n\n${a} | ${b} | ${c}\n\n💔 *PERDISTE* 💔\nPerdiste: ${monto} 🪙\n\nSaldo: ${user.coin} 🪙`)
+    }
+  }
+
+  // WORK
+  if (['work', 'trabajar'].includes(command)) {
+    if (cooldowns.work[m.sender] && Date.now() - cooldowns.work[m.sender] < 300000)
+      return m.reply(`Ya trabajaste. Espera ${Math.ceil((300000 - (Date.now() - cooldowns.work[m.sender])) / 60000)} min`)
+    cooldowns.work[m.sender] = Date.now()
+    const trabajos = [
+      { texto: 'Programaste y ganaste', min: 80, max: 200 },
+      { texto: 'Vendiste tacos y ganaste', min: 50, max: 120 },
+      { texto: 'Hiciste stream y ganaste', min: 30, max: 150 },
+      { texto: 'Repartiste comida y ganaste', min: 40, max: 100 },
+      { texto: 'Minaste crypto y ganaste', min: 60, max: 180 }
+    ]
+    let trabajo = trabajos[Math.floor(Math.random() * trabajos.length)]
+    let ganancia = Math.floor(Math.random() * (trabajo.max - trabajo.min + 1)) + trabajo.min
+    user.coin += ganancia
+    return m.reply(`💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\nSaldo: ${user.coin} 🪙`)
+  }
+
+  // ROBAR
+  if (['robar', 'rob'].includes(command)) {
+    if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < 600000)
+      return m.reply(`Espera ${Math.ceil((600000 - (Date.now() - cooldowns.robar[m.sender])) / 60000)} min para robar de nuevo`)
+    let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
+    if (!who) return m.reply(`Menciona a quien quieres robar`)
+    if (who === m.sender) return m.reply('No te puedes robar a ti mismo')
+    let target = global.db.data.users[who]
+    if (!target || target.coin < 10) return m.reply(`@${who.split('@')[0]} no tiene nada`, null, { mentions: [who] })
+    cooldowns.robar[m.sender] = Date.now()
+    let exito = Math.random() < 0.6
+    if (exito) {
+      let robado = Math.min(Math.floor(Math.random() * target.coin * 0.5) + 5, target.coin)
+      target.coin -= robado
+      user.coin += robado
+      return m.reply(`🦹 *ROBO EXITOSO* 🦹\n\nLe robaste *${robado} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
+    } else {
+      let multa = Math.floor(Math.random() * 50) + 20
+      user.coin = Math.max(0, user.coin - multa)
+      return m.reply(`🚔 *TE ATRAPARON* 🚔\n\nPagaste *${multa} monedas* de multa\n\nTu saldo: ${user.coin} 🪙`)
+    }
+  }
 }
 
-let handler = async (m, { conn, args, command, usedPrefix }) => {
-    let user = getUser(m.sender)
-
-    // 1. TRIVIA
-    if (command === 'trivia') {
-        let tiempo = 30 * 1000
-        if (user.lasttrivia && new Date - user.lasttrivia < tiempo) {
-            let falta = msToTime(user.lasttrivia + tiempo - new Date())
-            return conn.reply(m.chat, `😴 Garfield está durmiendo. Espera ${falta}`, m)
-        }
-
-        let preguntasDisponibles = preguntas
-        if (user.level < 5) preguntasDisponibles = preguntas.filter(p => p.dif === 'facil')
-        else if (user.level < 10) preguntasDisponibles = preguntas.filter(p => p.dif === 'facil' || p.dif === 'media')
-
-        let preg = preguntasDisponibles[Math.floor(Math.random() * preguntasDisponibles.length)]
-        user.trivia = preg.a.toLowerCase()
-        user.trivadif = preg.dif
-        user.triviatime = new Date * 1
-
-        let emoji = preg.dif === 'facil'? '🟢' : preg.dif === 'media'? '🟡' : '🔴'
-        return conn.reply(m.chat, `${emoji} *TRIVIA ${preg.dif.toUpperCase()} Nv.${user.level}*\n\n${preg.q}\n\n*Premio:* Lasaña 🍝\nResponde en 30s`, m)
-    }
-
-    // 2. RULETA
-    if (command === 'ruleta' || command === 'rlt') {
-        let color = args[0]?.toLowerCase()
-        let monto = parseInt(args[1])
-        if (!['red', 'black', 'rojo', 'negro'].includes(color)) return conn.reply(m.chat, `😼 *Uso:* ${usedPrefix}ruleta [red/black] [monto]\n*Apostar lasaña*`, m)
-
-        let apuestaMax = 100 + (user.level * 50)
-        if (!monto || monto < 10) return conn.reply(m.chat, `❌ Apuesta mínima: 10 🍝`, m)
-        if (monto > apuestaMax) return conn.reply(m.chat, `❌ Con tu Nv.${user.level} max: ${apuestaMax} 🍝`, m)
-        if (user.rcoins < monto) return conn.reply(m.chat, `❌ No tienes tanta lasaña`, m)
-
-        user.rcoins -= monto
-        let resultado = Math.random() < 0.5? 'red' : 'black'
-        let gano = ((color === 'red' || color === 'rojo') && resultado === 'red') || ((color === 'black' || color === 'negro') && resultado === 'black')
-        let multi = 2 + (user.level * 0.1)
-
-        if (gano) {
-            let gana = Math.floor(monto * multi)
-            user.rcoins += gana
-            return conn.reply(m.chat, `🎉 Salió ${resultado === 'red'? '🔴' : '⚫'}\n*GARFIELD GANÓ x${multi.toFixed(1)}:* +${gana} 🍝`, m)
-        } else {
-            return conn.reply(m.chat, `😢 Salió ${resultado === 'red'? '🔴' : '⚫'}\n*GARFIELD PERDIÓ:* -${monto} 🍝\n*Me voy a comer para olvidar*`, m)
-        }
-    }
-
-    // 3. SLOTS
-    if (command === 'slots' || command === 'slot') {
-        let monto = parseInt(args[0])
-        let apuestaMax = 200 + (user.level * 100)
-        if (!monto || monto < 10) return conn.reply(m.chat, `❌ Apuesta mínima: 10 🍝`, m)
-        if (monto > apuestaMax) return conn.reply(m.chat, `❌ Con tu Nv.${user.level} max: ${apuestaMax} 🍝`, m)
-        if (user.rcoins < monto) return conn.reply(m.chat, `❌ No tienes tanta lasaña`, m)
-
-        user.rcoins -= monto
-        let s1 = iconos[Math.floor(Math.random() * iconos.length)]
-        let s2 = iconos[Math.floor(Math.random() * iconos.length)]
-        let s3 = iconos[Math.floor(Math.random() * iconos.length)]
-
-        let iguales = s1 === s2 && s2 === s3? 3 : s1 === s2 || s1 === s3 || s2 === s3? 2 : 1
-        let baseMulti = iguales === 3? [10,15,25,50,75,100][Math.floor(Math.random()*6)] : iguales === 2? [2,5][Math.floor(Math.random()*2)] : 0
-        let multi = baseMulti + (user.level * 0.5)
-        let gana = Math.floor(monto * multi)
-        if (gana > 0) user.rcoins += gana
-
-        let resultado = iguales === 3? `🎉 JACKPOT DE LASAÑA x${multi.toFixed(1)}!` : iguales === 2? `✨ Ganaste x${multi.toFixed(1)}!` : `😢 Perdiste... *Hora de comer*`
-        return conn.reply(m.chat, `🎰 *TRAGAMONEDAS DE GARFIELD*\n\n[${s1}] [${s2}] [${s3}]\n\n${resultado}\n${gana > 0? `+${gana} 🍝` : `-${monto} 🍝`}`, m)
-    }
+handler.before = async (m, { conn }) => {
+  if (!global.db.data.trivia ||!global.db.data.trivia[m.sender]) return
+  let triviaData = global.db.data.trivia[m.sender]
+  if (m.chat!== triviaData.chat) return
+  if (m.text.toLowerCase().trim() === triviaData.answer) {
+    clearTimeout(triviaData.timeout)
+    let ganancia = Math.floor(Math.random() * 50) + 20
+    global.db.data.users[m.sender].coin += ganancia
+    await conn.reply(m.chat, `✅ ¡Correcto! Ganaste *${ganancia} monedas* 🪙\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙`, m)
+    delete global.db.data.trivia[m.sender]
+  }
 }
 
-// RESPONDER TRIVIA
-handler.before = async (m) => {
-    let user = getUser(m.sender)
-    if (user.trivia && m.text.toLowerCase() === user.trivia) {
-        if (new Date - user.triviatime > 30000) return delete user.trivia
-        let dif = user.trivadif
-
-        let premio = dif === 'facil'? 50 + (user.level * 5) : dif === 'media'? 100 + (user.level * 10) : 200 + (user.level * 20)
-        let expGanada = dif === 'facil'? 3 : dif === 'media'? 6 : 12
-
-        user.rcoins += premio
-        user.exp += expGanada
-        user.lasttrivia = new Date * 1
-        delete user.trivia; delete user.trivadif; delete user.triviatime
-
-        let emoji = dif === 'facil'? '🟢' : dif === 'media'? '🟡' : '🔴'
-        m.reply(`${emoji} *CORRECTO!* [${dif}]\n+${premio} 🍝\n+${expGanada} Exp\n*Garfield:* "Más lasaña para mí"\n💰 Total: ${user.rcoins} 🍝`)
-    }
-}
-
-handler.help = ['trivia','ruleta [color] [monto]','slots [monto]']
-handler.tags = ['games']
-handler.command = ['trivia', 'ruleta', 'rlt', 'slots', 'slot']
+handler.help = ['trivia', 'ruleta', 'slots', 'work', 'robar']
+handler.tags = ['economy']
+handler.command = ['trivia', 'ruleta', 'rlt', 'slots', 'slot', 'work', 'trabajar', 'robar', 'rob']
+handler.group = true
 export default handler
-
-function msToTime(d){let m=Math.floor((d%(1000*60*60))/(1000*60)),s=Math.floor((d%(1000*60))/1000);return m+"m "+s+"s"}
