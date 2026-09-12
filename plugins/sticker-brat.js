@@ -4,7 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
 import moment from 'moment-timezone'
-import { exec } from 'child_process'
 moment.locale('es')
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
@@ -36,42 +35,29 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   await react('🖌️')
 
-  let isAnimated = command.endsWith('anim') || command.endsWith('2')
   let apiUrl = `https://api.stellarwa.xyz/tools/brat?text=${encodeURIComponent(txt)}&key=proyectsV2`
 
   try {
     let response = await fetch(apiUrl)
-    if (!response.ok) throw new Error('API Error')
+    if (!response.ok) throw new Error(`API ${response.status}`)
 
     let inputBuffer = await response.buffer()
-    let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.${isAnimated ? 'mp4' : 'png'}`)
+    
+    // La API devuelve GIF, agarramos solo frame 1
+    let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.gif`)
     let tmpOutput = path.join(tmpdir(), `brat-${Date.now()}.webp`)
 
     fs.writeFileSync(tmpInput, inputBuffer)
 
-    // SI ES ANIMADO USAMOS FFMPEG, SI ES IMAGEN USAMOS WEBP DIRECTO
-    if (isAnimated) {
-      await new Promise((resolve, reject) => {
-        ffmpeg(tmpInput)
-          .fps(15)
-          .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x000')
-          .outputOptions(['-loop 0', '-preset default', '-an', '-vsync 0'])
-          .toFormat('webp')
-          .on('end', () => resolve(true))
-          .on('error', (err) => reject(err))
-          .save(tmpOutput)
-      })
-    } else {
-      // Para imagen estatica usamos cwebp si existe, si no ffmpeg normal
-      await new Promise((resolve, reject) => {
-        ffmpeg(tmpInput)
-          .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x000')
-          .toFormat('webp')
-          .on('end', () => resolve(true))
-          .on('error', (err) => reject(err))
-          .save(tmpOutput)
-      })
-    }
+    await new Promise((resolve, reject) => {
+      ffmpeg(tmpInput)
+        .frames(1) // SOLO PRIMER FRAME
+        .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x000')
+        .toFormat('webp')
+        .on('end', () => resolve(true))
+        .on('error', (err) => reject(err))
+        .save(tmpOutput)
+    })
 
     let stickerBuffer = fs.readFileSync(tmpOutput)
 
@@ -86,7 +72,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     await react('✅')
 
   } catch (e) {
-    console.error(e)
+    console.error("[BRAT ERROR]:", e)
     await react('❌')
     return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -95,9 +81,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
-❌ ➛ Error al generar el sticker
-💡 ➛ La API puede estar caída
+── *📝 DETALLE* ╏ 🍕
+❌ ➛ ${e.message}
+💡 ➛ Verifica que ffmpeg esté instalado
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
@@ -105,8 +91,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   }
 }
 
-handler.help = ['brat <texto>', 'bratanim <texto>']
+handler.help = ['brat <texto>']
 handler.tags = ['sticker']
-handler.command = /^(brat|bratanim|brat2)$/i
+handler.command = /^brat$/i
 
 export default handler
