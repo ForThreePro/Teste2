@@ -8,7 +8,8 @@ let preguntas = [
     { q: '¿Cuánto es 10 x 5?', a: '50' },
     { q: '¿Capital de Peru?', a: 'lima' },
     { q: '¿Cuántas patas tiene un perro?', a: '4' },
-    { q: '¿Cuánto es 9 - 3?', a: '6' }
+    { q: '¿Cuánto es 9 - 3?', a: '6' },
+    { q: '¿Cuánto es 8 / 2?', a: '4' }
 ]
 
 function getUser(id) {
@@ -23,9 +24,9 @@ function getUser(id) {
 let handler = async (m, { conn, args, command, usedPrefix }) => {
     let user = getUser(m.sender)
 
-    // 1. TRIVIA - DA EXP Y PREMIO POR NIVEL
+    // 1. TRIVIA - COOLDOWN 30s Y POCA EXP
     if (command === 'trivia') {
-        let tiempo = 2 * 60 * 1000 // 2 min
+        let tiempo = 30 * 1000 // 30 segundos
         if (user.lasttrivia && new Date - user.lasttrivia < tiempo) {
             let falta = msToTime(user.lasttrivia + tiempo - new Date())
             return conn.reply(m.chat, `⏰ Espera ${falta} para otra trivia`, m)
@@ -33,17 +34,17 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         let preg = preguntas[Math.floor(Math.random() * preguntas.length)]
         user.trivia = preg.a.toLowerCase()
         user.triviatime = new Date * 1
-        let premio = 50 + (user.level * 5) // Nv1=55... Nv10=100
+        let premio = 50 + (user.level * 5)
         return conn.reply(m.chat, `❓ *TRIVIA Nv.${user.level}*\n\n${preg.q}\n\n*Premio:* ${premio} ${MONEDA}\nResponde en 30s`, m)
     }
 
-    // 2. RULETA - APUESTA Y MULTIPLICADOR POR NIVEL
+    // 2. RULETA
     if (command === 'ruleta' || command === 'rlt') {
         let color = args[0]?.toLowerCase()
         let monto = parseInt(args[1])
         if (!['red', 'black', 'rojo', 'negro'].includes(color)) return conn.reply(m.chat, `*Uso:* ${usedPrefix}ruleta [red/black] [monto]`, m)
 
-        let apuestaMax = 100 + (user.level * 50) // Nv1=150... Nv10=600
+        let apuestaMax = 100 + (user.level * 50)
         if (!monto || monto < 10) return conn.reply(m.chat, `❌ Apuesta mínima: 10 ${MONEDA}`, m)
         if (monto > apuestaMax) return conn.reply(m.chat, `❌ Con tu Nv.${user.level} max puedes apostar ${apuestaMax} ${MONEDA}`, m)
         if (user.rcoins < monto) return conn.reply(m.chat, `❌ No tienes suficientes ${MONEDA}`, m)
@@ -51,7 +52,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         user.rcoins -= monto
         let resultado = Math.random() < 0.5? 'red' : 'black'
         let gano = ((color === 'red' || color === 'rojo') && resultado === 'red') || ((color === 'black' || color === 'negro') && resultado === 'black')
-        let multi = 2 + (user.level * 0.1) // Nv1=x2.1... Nv10=x3
+        let multi = 2 + (user.level * 0.1)
 
         if (gano) {
             let gana = Math.floor(monto * multi)
@@ -62,10 +63,10 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         }
     }
 
-    // 3. SLOTS - MULTIPLICADOR POR NIVEL
+    // 3. SLOTS
     if (command === 'slots' || command === 'slot') {
         let monto = parseInt(args[0])
-        let apuestaMax = 200 + (user.level * 100) // Nv1=300... Nv10=1200
+        let apuestaMax = 200 + (user.level * 100)
         if (!monto || monto < 10) return conn.reply(m.chat, `❌ Apuesta mínima: 10 ${MONEDA}`, m)
         if (monto > apuestaMax) return conn.reply(m.chat, `❌ Con tu Nv.${user.level} max puedes apostar ${apuestaMax} ${MONEDA}`, m)
         if (user.rcoins < monto) return conn.reply(m.chat, `❌ No tienes suficientes ${MONEDA}`, m)
@@ -77,7 +78,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
         let iguales = s1 === s2 && s2 === s3? 3 : s1 === s2 || s1 === s3 || s2 === s3? 2 : 1
         let baseMulti = iguales === 3? [10,15,25,50,75,100][Math.floor(Math.random()*6)] : iguales === 2? [2,5][Math.floor(Math.random()*2)] : 0
-        let multi = baseMulti + (user.level * 0.5) // Bonus por nivel
+        let multi = baseMulti + (user.level * 0.5)
         let gana = Math.floor(monto * multi)
         if (gana > 0) user.rcoins += gana
 
@@ -92,7 +93,7 @@ handler.before = async (m) => {
     if (user.trivia && m.text.toLowerCase() === user.trivia) {
         if (new Date - user.triviatime > 30000) return delete user.trivia
         let premio = 50 + (user.level * 5)
-        let expGanada = 5 + user.level // SOLO TRIVIA DA EXP
+        let expGanada = 3 // MUY POCA EXP
 
         user.rcoins += premio
         user.exp += expGanada
