@@ -2,7 +2,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {}, deuda: 0 }
 
-  // SALDO - SIEMPRE MUESTRA DEUDA
+  // SALDO - SILENCIOSO, NO AVISA EN GRUPO
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
 
@@ -31,16 +31,16 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
     // MOSTRAR AVISO SI TIENE DEUDA
     if (userTarget.deuda > 0) {
-      texto += `\n\n⚠️ *TIENES DEUDA* ⚠️\nUsa.work para pagar trabajando`
+      texto += `\n\n⚠️ *TIENE DEUDA* ⚠️\nDebe trabajar para pagar`
     }
 
-    // Si menciona a otro, manda al privado CON MENCION
+    // Si menciona a otro, manda al privado SIN AVISAR EN GRUPO
     if (who!== m.sender) {
       try {
         await conn.reply(m.sender, texto, null, { mentions: [who] })
-        return m.reply('📩 Te envié el saldo al privado')
+        return // NO RESPONDE NADA EN EL GRUPO
       } catch {
-        return m.reply('No pude enviarte DM. Abre tu privado con el bot')
+        return // SI FALLA TAMPOCO AVISA
       }
     } else {
       return m.reply(texto, null, { mentions: [who] })
