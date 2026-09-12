@@ -2,7 +2,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-  // SALDO - MENCIONA EN PRIVADO TAMBIÉN
+  // SALDO - CON MENCION EN PRIVADO Y GRUPO
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
 
