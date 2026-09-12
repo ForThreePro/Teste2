@@ -142,5 +142,5 @@ handler.help = ['horny @tag', 'ship @tag1 @tag2', 'security @tag', 'rank @tag']
 handler.tags = ['diversión']
 handler.command = /^(horny|ship|security|rank)$/i // <- CAMBIO IMPORTANTE: REGEX
 handler.group = false
-handler.register = true
+handler.register = false
 export default handler
