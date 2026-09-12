@@ -4,29 +4,24 @@ moment.locale('es')
 
 let handler = async (m, { conn, participants, command }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-
-    // TUS LINKS FIJOS
-    let defaultImg = 'https://files.evogb.win/ywTVtD.jpg' // DEFAULT
-    let defaultBg = 'https://files.evogb.win/iues1p.jpg' // BG
+    let defaultImg = 'https://files.evogb.win/ywTVtD.jpg'
+    let defaultBg = 'https://files.evogb.win/iues1p.jpg'
     let key = 'proyectsV2'
 
     const getAvatar = async (jid) => {
-        if (!jid || typeof jid!== 'string') jid = m.sender
+        jid = jid || m.sender // <- FORZAR SI VIENE UNDEFINED
+        if (typeof jid!== 'string') jid = jid.toString()
         try {
             let url = await conn.profilePictureUrl(jid, 'image')
             if(url && url.startsWith('https')) return url
         } catch {}
-        return defaultImg // <- si no tiene foto usa default
+        return defaultImg
     }
 
-    const getName = async (jid) => {
-        if (!jid || typeof jid!== 'string') jid = m.sender
-        let name = jid.split('@')[0]
-        try {
-            let n = await conn.getName(jid)
-            if(n && n!== 'undefined') name = n
-        } catch {}
-        return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15)
+    const getMention = (jid) => {
+        jid = jid || m.sender
+        if (typeof jid!== 'string') jid = jid.toString()
+        return jid.split('@')[0]
     }
 
     const react = async (text) => {
@@ -35,7 +30,7 @@ let handler = async (m, { conn, participants, command }) => {
 
     // ===== SHIP =====
     if (command == 'ship') {
-        if (!m.isGroup) return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ Solo funciona en grupos`)
+        if (!m.isGroup) return m.reply(`❌ Solo funciona en grupos`)
         let members = participants.map(u => u.id)
         if (members.length < 2) return m.reply(`❌ Necesitan mínimo 2 personas`)
 
@@ -49,21 +44,17 @@ let handler = async (m, { conn, participants, command }) => {
         }
 
         await react('💘')
-        await m.reply(`Calculando ship entre @${user1.split('@')[0]} + @${user2.split('@')[0]}`, { mentions: [user1, user2] })
+        await conn.sendMessage(m.chat, { text: `Calculando ship entre @${getMention(user1)} + @${getMention(user2)}`, mentions: [user1, user2] })
 
         try {
             let avatar1 = await getAvatar(user1)
             let avatar2 = await getAvatar(user2)
             let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
-
             let res = await fetch(apiUrl, { timeout: 30000 })
-            if(!res.ok) throw new Error(`API Error: ${res.status}`)
+            if(!res.ok) throw new Error(`API ${res.status}`)
             let buffer = await res.buffer()
-
             let porcentaje = Math.floor(Math.random() * 101)
-            let explicacion = porcentaje < 20? `Hay 0 química 😅` : porcentaje < 40? `Poca compatibilidad 💛` : porcentaje < 60? `Hay algo ahí ✨` : porcentaje < 80? `Buena conexión ❤️` : `Compatibilidad altísima 💖`
-
-            await conn.sendMessage(m.chat, { image: buffer, caption: `💘 *${porcentaje}%*\n💌 ${explicacion}`, mentions: [user1, user2] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `💘 *${porcentaje}%*`, mentions: [user1, user2] })
         } catch (e) {
             await react('❌')
             m.reply(`❌ Error: ${e.message}`)
@@ -74,18 +65,16 @@ let handler = async (m, { conn, participants, command }) => {
     if (command == 'security') {
         let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
         await react('🔍')
-        await m.reply(`Generando cartel para @${who.split('@')[0]}...`, { mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `Generando cartel para @${getMention(who)}...`, mentions: [who] })
 
         try {
             let pp = await getAvatar(who)
             let createdTimestamp = Math.floor(Date.now() / 1000)
             let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
-
             let res = await fetch(apiUrl, { timeout: 30000 })
-            if(!res.ok) throw new Error(`API Error: ${res.status}`)
+            if(!res.ok) throw new Error(`API ${res.status}`)
             let buffer = await res.buffer()
-
-            await conn.sendMessage(m.chat, { image: buffer, caption: `🚨 SE BUSCA: @${who.split('@')[0]}\n💰 *Recompensa: 1,000,000$*`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `🚨 SE BUSCA: @${getMention(who)}\n💰 *Recompensa: 1,000,000$*`, mentions: [who] })
         } catch (e) {
             await react('❌')
             m.reply(`❌ Error: ${e.message}`)
@@ -103,42 +92,46 @@ let handler = async (m, { conn, participants, command }) => {
         let needxp = currxp + Math.floor(Math.random() * 2000) + 1000
 
         await react('📊')
-        await m.reply(`Generando tarjeta para @${who.split('@')[0]}...`, { mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `Generando tarjeta para @${getMention(who)}...`, mentions: [who] })
 
         try {
             let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${encodeURIComponent(rank)}&currxp=${currxp}&needxp=${needxp}&key=${key}`
-
             let res = await fetch(apiUrl, { timeout: 30000 })
-            if(!res.ok) throw new Error(`API Error: ${res.status}`)
+            if(!res.ok) throw new Error(`API ${res.status}`)
             let buffer = await res.buffer()
-
-            await conn.sendMessage(m.chat, { image: buffer, caption: `👤 @${who.split('@')[0]}\n📈 Nivel: *${level}*\n🏆 Rank: *${rank}*\n✨ XP: *${currxp}/${needxp}*`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `👤 @${getMention(who)}\n📈 Nivel: *${level}*\n🏆 Rank: *${rank}*\n✨ XP: *${currxp}/${needxp}*`, mentions: [who] })
         } catch (e) {
             await react('❌')
             m.reply(`❌ Error: ${e.message}`)
         }
     }
 
-    // ===== HORNY ===== AGREGADO
+    // ===== HORNY =====
     if (command == 'horny') {
         let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
         await react('😏')
-        await m.reply(`Generando imagen para @${who.split('@')[0]}...`, { mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `Generando imagen para @${getMention(who)}...`, mentions: [who] })
 
         try {
-            let pp = await getAvatar(who) // <- si no tiene foto usa defaultImg
-            let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}` // <- TU URL
-
+            let pp = await getAvatar(who)
+            let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}`
             let res = await fetch(apiUrl, { timeout: 30000 })
-            if(!res.ok) throw new Error(`API Error: ${res.status}`)
+            if(!res.ok) throw new Error(`API ${res.status}`)
             let buffer = await res.buffer()
-
-            await conn.sendMessage(m.chat, { image: buffer, caption: `@${who.split('@')[0]} está así ahora mismo 😏🔥`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `@${getMention(who)} está así ahora mismo 😏🔥`, mentions: [who] })
         } catch (e) {
             await react('❌')
             m.reply(`❌ Error: ${e.message}`)
         }
     }
+}
+
+const getName = async (jid, conn) => {
+    jid = jid || ''
+    if (typeof jid!== 'string') jid = jid.toString()
+    let name = jid.split('@')[0]
+    try { name = await conn.getName(jid) } catch {}
+    return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15)
 }
 
 handler.help = ['ship @tag1 @tag2', 'security @tag', 'rank @tag', 'horny @tag']
