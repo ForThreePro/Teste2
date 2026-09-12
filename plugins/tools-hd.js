@@ -1,5 +1,7 @@
 import fetch from 'node-fetch'
 import FormData from 'form-data'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 // ===== CONFIG API STELLAR =====
 const api = {
@@ -39,6 +41,7 @@ async function getEnhancedBuffer(url) {
 }
 
 let handler = async (m, { conn, usedPrefix, command }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
@@ -48,32 +51,55 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     if (!mime) {
       await react('❌')
-      return m.reply(`𐔌 ꒱ ***MEJORADOR HD*** 𐔌 ꒱ ⚠️
+      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`USO\`\` —˙𖦹.🖼️꒷
+⤷ ┇ 𝐇𝐃 ﹒ MEJORADOR ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 COMO USAR* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`USO\`\` ⚠️ —˙𖦹.꒷
+
+── *📖 COMO USAR* ╏ 🍕
 ➛ Responde a una imagen con: *${usedPrefix + command}*
 ➛ Soporta: jpg, jpeg, png
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
     }
 
     if (!/image\/(jpe?g|png)/.test(mime)) {
       await react('❌')
-      return m.reply(`𐔌 ꒱ ***MEJORADOR HD*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n⚠️ ➛ El formato *${mime}* no es compatible\n━━━━━━━━━━━`)
+      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐇𝐃 ﹒ ERROR ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO INVALIDO\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+❌ ➛ El formato *${mime}* no es compatible
+💡 ➛ Solo jpg, jpeg, png
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`)
     }
 
     try {
       await react('⏳')
-      await m.reply(`𐔌 ꒱ ***MEJORADOR HD*** 𐔌 ꒱ ⏳
+      await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` —˙𖦹.🖼️꒷
+⤷ ┇ 𝐇𝐃 ﹒ PROCESANDO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 ESTADO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`MEJORANDO\`\` 🖼️ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
 ⏳ ➛ Subiendo imagen a Uguu...
-⚡ ➛ Mejorando calidad 2x...
+⚡ ➛ Mejorando calidad 2x con Stellar...
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
 
       const buffer = await q.download()
@@ -82,14 +108,20 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
       await conn.sendMessage(m.chat, {
         image: enhancedBuffer,
-        caption: `𐔌 ꒱ ***MEJORADOR HD*** 𐔌 ꒱ ✅
+        caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.✨꒷
+⤷ ┇ 𝐇𝐃 ﹒ RESULTADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 DETALLES* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`LISTO\`\` ✅ —˙𖦹.꒷
+
+── *📊 DETALLES* ╏ 🍕
 ✨ ➛ Calidad: Mejorada 2x
 🔧 ➛ API: Stellar
+👤 ➛ Autor: GARFIELD BOT V2.6
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
       }, { quoted: m })
 
@@ -97,13 +129,19 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     } catch (err) {
       await react('❌')
-      await m.reply(`𐔌 ꒱ ***MEJORADOR HD*** 𐔌 ꒱ ⚠️
+      await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐇𝐃 ﹒ ERROR ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ ${err.message || err}
+💡 ➛ La API puede estar saturada
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
     }
 }
