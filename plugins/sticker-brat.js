@@ -3,8 +3,11 @@ import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
@@ -14,33 +17,44 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   if (!txt) {
     await react('❌')
-    return m.reply(`𐔌 ꒱ ***BRAT*** 𐔌 ꒱ ⚠️
+    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR DE USO\`\` —˙𖦹.⚠️꒷
+⤷ ┇ 𝐁𝐑𝐀𝐓 ﹒ ERROR ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR DE USO\`\` ⚠️ —˙𖦹.꒷
+
+── *📖 USO* ╏ 🍕
 ➛ Escribe el texto para generar el sticker
-➛ Ejemplo: ${usedPrefix}${command} Hola
+➛ Ejemplo: ${usedPrefix}${command} whois
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
   }
 
   await react('🖌️')
 
   let isAnimated = command.endsWith('anim') || command.endsWith('2')
-  let apiUrl = `https://api.evogb.org/tools/brat?text=${encodeURIComponent(txt)}&animated=${isAnimated}&key=sasuke`
+  // TU API DE STELLAR
+  let apiUrl = `https://api.stellarwa.xyz/tools/brat?text=${encodeURIComponent(txt)}&key=proyectsV2`
 
   let response = await fetch(apiUrl)
   if (!response.ok) {
     await react('❌')
-    return m.reply(`𐔌 ꒱ ***BRAT*** 𐔌 ꒱ ⚠️
+    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐁𝐑𝐀𝐓 ﹒ ERROR ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ Error al generar el sticker
 🔄 ➛ Intenta de nuevo
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
   }
 
@@ -74,8 +88,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   await conn.sendMessage(m.chat, {
     sticker: stickerBuffer,
-    packname: 'Sticker',
-    author: 'Bot'
+    packname: 'GARFIELD BOT',
+    author: 'V2.6'
   }, { quoted: m })
 
   if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
