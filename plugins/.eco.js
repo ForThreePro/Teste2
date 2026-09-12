@@ -1,9 +1,20 @@
 let MONEDA = 'R-COINS'
 
-// Función para crear usuario si no existe
+// Función para crear usuario y migrar datos viejos
 function getUser(id) {
     if (!global.db.data.users[id]) global.db.data.users[id] = {}
     let user = global.db.data.users[id]
+
+    // MIGRACION: si tiene lasana/bank lo pasa a rcoins/rbank
+    if (user.lasana!== undefined && user.rcoins === undefined) {
+        user.rcoins = user.lasana
+        delete user.lasana
+    }
+    if (user.bank!== undefined && user.rbank === undefined) {
+        user.rbank = user.bank
+        delete user.bank
+    }
+
     if (user.rcoins === undefined) user.rcoins = 0
     if (user.rbank === undefined) user.rbank = 0
     return user
@@ -39,19 +50,19 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         return conn.reply(m.chat, `✅ Retiraste *${amount}* ${MONEDA} del banco\n👛 Billetera: ${user.rcoins}\n🏦 Banco: ${user.rbank}`, m)
     }
 
-    // 4. ROBAR - Solo de billetera
+    // 4. ROBAR - ARREGLADO
     if (command === 'robar') {
         let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted?.sender
         if (!who) return conn.reply(m.chat, `*Uso:* ${usedPrefix}robar @usuario`, m)
         if (who === m.sender) return conn.reply(m.chat, `❌ No te puedes robar a ti mismo`, m)
 
-        let target = getUser(who)
+        let target = getUser(who) // Ahora si migra sus datos viejos
         let tiempo = 1 * 60 * 60 * 1000
         if (user.lastrob && new Date - user.lastrob < tiempo) {
             let falta = msToTime(user.lastrob + tiempo - new Date())
             return conn.reply(m.chat, `⏰ Espera ${falta} para volver a robar`, m)
         }
-        if (target.rcoins < 10) return conn.reply(m.chat, `❌ @${who.split('@')[0]} no tiene ${MONEDA} en la billetera para robar`, m, { mentions: [who] })
+        if (target.rcoins < 10) return conn.reply(m.chat, `❌ @${who.split('@')[0]} no tiene ${MONEDA} en la billetera para robar\n*Tiene:* ${target.rcoins} ${MONEDA}`, m, { mentions: [who] })
 
         let robo = Math.floor(Math.random() * target.rcoins * 0.3) + 10
         if (robo > target.rcoins) robo = target.rcoins
@@ -67,7 +78,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
     if (command === 'pay' || command === 'pagar') {
         let who = m.mentionedJid[0]
         let monto = parseInt(args[0])
-        if (!who ||!monto) return conn.reply(m.chat, `*Uso:* ${usedPrefix}pay [monto] @usuario\nEjemplo: ${usedPrefix}pay 100 @pepito`, m)
+        if (!who ||!monto) return conn.reply(m.chat, `*Uso:* ${usedPrefix}pay [monto] @usuario`, m)
         if (monto < 1) return conn.reply(m.chat, `❌ Ingresa un monto válido`, m)
         if (user.rcoins < monto) return conn.reply(m.chat, `❌ No tienes suficientes ${MONEDA}`, m)
 
