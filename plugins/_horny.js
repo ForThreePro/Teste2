@@ -78,11 +78,11 @@ let handler = async (m, { conn, participants }) => {
         }
     }
 
-    // ===== SECURITY ===== ACTUALIZADO
+    // ===== SECURITY =====
     if (m.message?.extendedTextMessage?.text?.includes('security') || m.text?.includes('security')) {
         let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let pp = await getAvatar(who)
-        let createdTimestamp = Math.floor(Date.now() / 1000) // <- en segundos
+        let createdTimestamp = Math.floor(Date.now() / 1000)
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
         await react('🔍')
         await m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.📢꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando cartel para @${getMention(who)}...\n\n━━━━━━━━━━━`, { mentions: [who] })
@@ -96,7 +96,7 @@ let handler = async (m, { conn, participants }) => {
         }
     }
 
-    // ===== RANK2 ===== ACTUALIZADO
+    // ===== RANK2 =====
     if (m.message?.extendedTextMessage?.text?.includes('rank') || m.text?.includes('rank')) {
         let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let name = await getName(who)
