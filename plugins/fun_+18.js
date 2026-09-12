@@ -2,29 +2,7 @@ import fetch from 'node-fetch'
 
 let handler = async (m, { conn, usedPrefix, text, command }) => {
 
-  // 1. paja / pajeame - FIXED
-  if (['paja', 'pajeame'].includes(command)) {
-    let { key } = await conn.sendMessage(m.chat, { text: "Tas caliente! Ahora te hare una paja..." }, { quoted: m });
-    const array = [
-      "8==👊==D", "8===👊=D", "8=👊===D", "8=👊===D", "8==👊==D", "8===👊=D", "8====👊D", "8==👊=D", "8==👊==D", "8=👊===D", "8👊====D", "8=👊===D","8==👊==D", "8===👊=D", "8====👊D","8==👊==D", "8===👊=D", "8=👊===D", "8=👊===D", "8==👊==D", "8===👊=D", "8====👊D💦"
-    ];
-    for (let item of array) {
-      await new Promise(resolve => setTimeout(resolve, 80)); // 80ms para que no se bugee
-      try {
-        await conn.sendMessage(m.chat, { text: `${item}`, edit: key }, { quoted: m });
-      } catch {
-        // Si el bot no soporta edit, manda mensaje normal
-        await conn.sendMessage(m.chat, { text: `${item}` }, { quoted: m });
-      }
-    }
-    try {
-      return conn.sendMessage(m.chat, { text: `Oh, se corrió en menos de 1 hora!`, edit: key, mentions: [m.sender] }, { quoted: m });
-    } catch {
-      return conn.sendMessage(m.chat, { text: `Oh, se corrió en menos de 1 hora!`, mentions: [m.sender] }, { quoted: m });
-    }
-  }
-
-  // 2. poeta
+  // 1. poeta
   if (command == 'poeta') {
     try {
       const frasesDePoeta = [
@@ -51,38 +29,17 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return
   }
 
-  // 3. formartrio - FIXED MENTIONS
-  if (command == 'formartrio') {
-    if (m.mentionedJid && m.mentionedJid.length === 2) {
-      let person1 = m.mentionedJid[0];
-      let person2 = m.mentionedJid[1];
-      let name1 = await conn.getName(person1);
-      let name2 = await conn.getName(person2);
-      let name3 = await conn.getName(m.sender);
-      const pp = './src/Imagen.jpg';
-
-      let trio = `\t\t*TRIO VIOLENTOOOOO!*
-
-@${person1.split('@')[0]} y @${person2.split('@')[0]} tienen un *${Math.floor(Math.random() * 100)}%* de compatibilidad como pareja.
-Mientras que @${person1.split('@')[0]} y @${m.sender.split('@')[0]} tienen un *${Math.floor(Math.random() * 100)}%* de compatibilidad.
-Y @${person2.split('@')[0]} y @${m.sender.split('@')[0]} tienen un *${Math.floor(Math.random() * 100)}%* de compatibilidad.
-¿Qué opinas de un trío? 😏`;
-
-      return conn.sendMessage(m.chat, { image: { url: pp }, caption: trio, mentions: [person1, person2, m.sender] }, { quoted: m });
-    } else {
-      return conn.reply(m.chat, `Menciona a 2 usuarios mas, para calcular la compatibilidad.\n\nEjemplo: ${usedPrefix}formartrio @user1 @user2`, m);
-    }
-  }
-
-  // 4. embarazar / preg / preñar - FIXED MENTIONS
+  // 2. embarazar / preg / preñar - FIXED
   if (['preg','embarazar','preñar'].includes(command)) {
-    let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false;
-    if (!who) return m.reply(`Etiqueta o menciona a alguien.\n\nEjemplo: ${usedPrefix + command} @tag`);
+    let who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false;
+    if (!who) return m.reply(`Etiqueta o responde al mensaje de alguien.\n\nEjemplo: ${usedPrefix + command} @tag`);
 
-    let name = await conn.getName(who);
-    let name2 = await conn.getName(m.sender);
+    let senderName = m.name || await conn.getName(m.sender).catch(_ => 'Usuario');
+    let targetName = await conn.getName(who).catch(_ => 'Usuario');
+    
     m.react('😏');
-    let str = `@${m.sender.split('@')[0]} embarazo a @${who.split('@')[0]}`.trim();
+    let str = `@${m.sender.split('@')[0]} embarazo a @${who.split('@')[0]}`;
+    
     if (m.isGroup) {
       let pp = 'https://files.catbox.moe/054z2h.mp4'
       let pp2 = 'https://files.catbox.moe/3ucfc0.mp4'
@@ -93,28 +50,28 @@ Y @${person2.split('@')[0]} y @${m.sender.split('@')[0]} tienen un *${Math.floor
     }
   }
 
-  // 5. follar / violar - FIXED MENTIONS
+  // 3. follar / violar - FIXED
   if (/^(follar|violar)$/i.test(command)) {
-    let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false;
-    let target = who ? `@${who.split('@')[0]}` : text;
-    if (!target) return m.reply(`*Ingresa el @ o responde al mensaje de la persona que quieres ${command}*`)
-
-    let nameTarget = who ? await conn.getName(who) : text;
+    let who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false;
+    if (!who && !text) return m.reply(`*Etiqueta o responde al mensaje de la persona que quieres ${command}*`)
+    
+    let targetMention = who ? `@${who.split('@')[0]}` : text;
+    let mentionsArray = who ? [who, m.sender] : [m.sender];
     
     let texto = `🤤👅🥵 *𝐀𝐂𝐀𝐁𝐀𝐒 𝐃𝐄 𝐅𝐎𝐋𝐋𝐀𝐑𝐓𝐄𝐋@!*🥵👅🤤
 
-*𝙏𝙚 𝙖𝙘𝙖𝙗𝙖𝙨 𝙙𝙚 𝙛𝙤𝙡𝙡𝙖𝙧 𝙖 𝙡𝙖 𝙥𝙚𝙧𝙧𝙖 𝙙𝙚* *${target}* *𝙖 𝟰 𝙥𝙖𝙩𝙖𝙨 𝙢𝙞𝙚𝙣𝙩𝙧𝙖𝙨 𝙩𝙚 𝙜𝙚𝙢𝙞𝙖 𝙘𝙤𝙢𝙤 𝙪𝙣𝙖 𝙢𝙖𝙡𝙙𝙞𝙩𝙖 𝙥𝙚𝙧𝙧𝙖 "𝐀𝐚𝐚𝐡.., 𝐀𝐚𝐚𝐡𝐡, 𝐬𝐢𝐠𝐮𝐞, 𝐧𝐨 𝐩𝐚𝐫𝐞𝐬, 𝐧𝐨 𝐩𝐚𝐫𝐞𝐬.." 𝙮 𝙡𝙖 𝙝𝙖𝙨 𝙙𝙚𝙟𝙖𝙙𝙤 𝙩𝙖𝙣 𝙧𝙚𝙫𝙚𝙣𝙩𝙖𝙙𝙖 𝙦𝙪𝙚 𝙣𝙤 𝙥𝙪𝙚𝙙𝙚 𝙨𝙤𝙨𝙩𝙚𝙣𝙚𝙧 𝙣𝙞 𝙨𝙪 𝙥𝙧𝙤𝙥𝙞𝙤 𝙘𝙪𝙚𝙧𝙥𝙤 𝙡𝙖 𝙢𝙖𝙡𝙙𝙞𝙩𝙖 𝙯𝙤𝙧𝙧𝙖!*
+*𝙏𝙚 𝙖𝙘𝙖𝙗𝙖𝙨 𝙙𝙚 𝙛𝙤𝙡𝙡𝙖𝙧 𝙖 𝙡𝙖 𝙥𝙚𝙧𝙧𝙖 𝙙𝙚* ${targetMention} *𝙖 𝟰 𝙥𝙖𝙩𝙖𝙨 𝙢𝙞𝙚𝙣𝙩𝙧𝙖𝙨 𝙩𝙚 𝙜𝙚𝙢𝙞𝙖 𝙘𝙤𝙢𝙤 𝙪𝙣𝙖 𝙢𝙖𝙡𝙙𝙞𝙩𝙖 𝙥𝙚𝙧𝙧𝙖 "𝐀𝐚𝐚𝐡.., 𝐀𝐚𝐚𝐡𝐡, 𝐬𝐢𝐠𝐮𝐞, 𝐧𝐨 𝐩𝐚𝐫𝐞𝐬, 𝐧𝐨 𝐩𝐚𝐫𝐞𝐬.." 𝙮 𝙡𝙖 𝙝𝙖𝙨 𝙙𝙚𝙟𝙖𝙙𝙤 𝙩𝙖𝙣 𝙧𝙚𝙫𝙚𝙣𝙩𝙖𝙙𝙖 𝙦𝙪𝙚 𝙣𝙤 𝙥𝙪𝙚𝙙𝙚 𝙨𝙤𝙨𝙩𝙚𝙣𝙚𝙧 𝙣𝙞 𝙨𝙪 𝙥𝙧𝙤𝙥𝙞𝙤 𝙘𝙪𝙚𝙧𝙥𝙤 𝙡𝙖 𝙢𝙖𝙡𝙙𝙞𝙩𝙖 𝙯𝙤𝙧𝙧𝙖!*
 
-*${target}*
+${targetMention}
 🤤🥵 *¡𝐘𝐀 𝐓𝐄 𝐇𝐀𝐍 𝐅𝐎𝐋𝐋𝐀𝐃𝐎!* 🥵🤤`
 
-    return conn.reply(m.chat, texto, m, { mentions: who ? [who, m.sender] : [m.sender] })
+    return conn.reply(m.chat, texto, m, { mentions: mentionsArray })
   }
 };
 
-handler.help = ['pajeame', 'poeta', 'formartrio @usuario1 @usuario2', 'embarazar @tag', 'follar @tag'];
+handler.help = ['poeta', 'embarazar @tag', 'follar @tag'];
 handler.tags = ['fun'];
-handler.command = ['paja', 'pajeame', 'poeta', 'formartrio', 'preg', 'embarazar', 'preñar', 'follar', 'violar'];
+handler.command = ['poeta', 'preg', 'embarazar', 'preñar', 'follar', 'violar'];
 handler.group = true;
 handler.register = false;
 
