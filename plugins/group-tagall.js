@@ -11,7 +11,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     if (!(isAdmin || isOwner)) {
       await react('❌')
       return conn.sendMessage(m.chat, {
-        text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo admins pueden usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`
+        text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo admins pueden usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`
       }, { quoted: m })
     }
 
@@ -112,7 +112,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     await react('❌')
     let errorMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
