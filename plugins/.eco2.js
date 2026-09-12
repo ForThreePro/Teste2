@@ -32,6 +32,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     if (args.length < 2) return m.reply(`Uso: ${usedPrefix + command} <red/black> <monto>`)
     let color = args[0].toLowerCase()
     let monto = parseInt(args[1])
+    user.coin = Number(user.coin) || 0
     if (!['red', 'black', 'rojo', 'negro'].includes(color)) return m.reply('Usa: red/rojo o black/negro')
     if (isNaN(monto) || monto < 10) return m.reply('Apuesta mínima: 10 monedas')
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
@@ -52,6 +53,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   // SLOTS
   if (['slots', 'slot'].includes(command)) {
     let monto = parseInt(text)
+    user.coin = Number(user.coin) || 0
     if (isNaN(monto) || monto < 10) return m.reply(`Apuesta mínima: 10\nUso: ${usedPrefix + command} <monto>`)
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
     user.coin -= monto
@@ -94,11 +96,11 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     ]
     let trabajo = trabajos[Math.floor(Math.random() * trabajos.length)]
     let ganancia = Math.floor(Math.random() * (trabajo.max - trabajo.min + 1)) + trabajo.min
-    user.coin += ganancia
+    user.coin = (Number(user.coin) || 0) + ganancia
     return m.reply(`💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\nSaldo: ${user.coin} 🪙`)
   }
 
-  // ROBAR - COOLDOWN 1-5 MIN RANDOM + AVISA AL ROBADO POR PRIVADO
+  // ROBAR - MÍNIMO 1 MONEDA AHORA
   if (['robar', 'rob'].includes(command)) {
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
     if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < tiempoEspera)
@@ -106,34 +108,39 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
     if (!who) return m.reply(`Menciona a quien quieres robar`)
+    who = who.replace(/@lid$/, '@s.whatsapp.net')
     if (who === m.sender) return m.reply('No te puedes robar a ti mismo')
+
+    if (!global.db.data.users[who]) global.db.data.users[who] = { coin: 0, bank: 0 }
     let target = global.db.data.users[who]
-    if (!target || target.coin < 10) return m.reply(`@${who.split('@')[0]} no tiene nada`, null, { mentions: [who] })
+    target.coin = Number(target.coin) || 0
+
+    // AHORA EL MÍNIMO ES 1 MONEDA
+    if (target.coin < 1) return m.reply(`@${who.split('@')[0]} no tiene nada en la billetera`, null, { mentions: [who] })
 
     cooldowns.robar[m.sender] = Date.now()
     let exito = Math.random() < 0.6
-    let ladronName
-    try {
-      ladronName = conn.getName(m.sender)
-    } catch {
-      ladronName = 'Alguien'
-    }
 
     if (exito) {
-      let robado = Math.min(Math.floor(Math.random() * target.coin * 0.5) + 5, target.coin)
+      // Si tiene menos de 5, roba todo. Si no, roba 5-50% random
+      let robado = target.coin <= 5? target.coin : Math.min(Math.floor(Math.random() * target.coin * 0.5) + 1, target.coin)
       target.coin -= robado
-      user.coin += robado
+      user.coin = (Number(user.coin) || 0) + robado
 
       // AVISAR AL ROBADO POR PRIVADO
-      await conn.reply(who, `🚨 *TE ROBARON* 🚨\n\n@${m.sender.split('@')[0]} te robó *${robado} monedas* 🪙 de tu billetera\n\nTu saldo: ${target.coin} 🪙`, null, { mentions: [m.sender] })
+      try {
+        await conn.reply(who, `🚨 *TE ROBARON* 🚨\n\n@${m.sender.split('@')[0]} te robó *${robado} monedas* 🪙 de tu billetera\n\nTu saldo: ${target.coin} 🪙`, null, { mentions: [m.sender] })
+      } catch {}
 
       return m.reply(`🦹 *ROBO EXITOSO* 🦹\n\nLe robaste *${robado} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
     } else {
       let multa = Math.floor(Math.random() * 50) + 20
-      user.coin = Math.max(0, user.coin - multa)
+      user.coin = Math.max(0, (Number(user.coin) || 0) - multa)
 
       // AVISAR AL QUE INTENTARON ROBAR
-      await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y pagó *${multa} monedas* de multa`, null, { mentions: [m.sender] })
+      try {
+        await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y pagó *${multa} monedas* de multa`, null, { mentions: [m.sender] })
+      } catch {}
 
       return m.reply(`🚔 *TE ATRAPARON* 🚔\n\nPagaste *${multa} monedas* de multa\n\nTu saldo: ${user.coin} 🪙`)
     }
@@ -147,7 +154,7 @@ handler.before = async (m, { conn }) => {
   if (m.text.toLowerCase().trim() === triviaData.answer) {
     clearTimeout(triviaData.timeout)
     let ganancia = Math.floor(Math.random() * 50) + 20
-    global.db.data.users[m.sender].coin += ganancia
+    global.db.data.users[m.sender].coin = (Number(global.db.data.users[m.sender].coin) || 0) + ganancia
     await conn.reply(m.chat, `✅ ¡Correcto! Ganaste *${ganancia} monedas* 🪙\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙`, m)
     delete global.db.data.trivia[m.sender]
   }
