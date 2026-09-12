@@ -37,11 +37,11 @@ let handler = async (m, { conn, participants }) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
-    // ===== HORNY =====
+    // ===== HORNY ===== CON BG
     if (m.message?.extendedTextMessage?.text?.includes('horny') || m.text?.includes('horny')) {
         let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let pp = await getAvatar(who)
-        let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}`
+        let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&key=${key}` // <- BG AGREGADO
         try {
             await react('😏')
             await m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 😏\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🔥꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando imagen...\n\n━━━━━━━━━━━`)
@@ -54,7 +54,7 @@ let handler = async (m, { conn, participants }) => {
         }
     }
 
-    // ===== SHIP =====
+    // ===== SHIP ===== CON BG
     if (m.message?.extendedTextMessage?.text?.includes('ship') || m.text?.includes('ship')) {
         if (!m.isGroup) return m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ Solo funciona en grupos`)
         let members = participants.map(u => toJid(u.id))
@@ -67,7 +67,7 @@ let handler = async (m, { conn, participants }) => {
         await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` —˙𖦹.💖꒷\n\n── *📊 PAREJA* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n━━━━━━━━━━━`, mentions: [user1, user2] })
         try {
             let avatar1 = await getAvatar(user1); let avatar2 = await getAvatar(user2)
-            let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
+            let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}` // <- YA TENIA BG
             let res = await fetch(apiUrl, { timeout: 20000 }); let buffer = await res.buffer()
             let porcentaje = Math.floor(Math.random() * 101)
             let explicacion = porcentaje < 20? `Hay 0 química 😅` : porcentaje < 40? `Poca compatibilidad 💛` : porcentaje < 60? `Hay algo ahí ✨` : porcentaje < 80? `Buena conexión ❤️` : `Compatibilidad altísima 💖`
@@ -99,7 +99,7 @@ let handler = async (m, { conn, participants }) => {
         }
     }
 
-    // ===== RANK2 ===== USANDO RANK2
+    // ===== RANK2 =====
     if (m.message?.extendedTextMessage?.text?.includes('rank') || m.text?.includes('rank')) {
         let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let name = await getName(who)
@@ -108,8 +108,6 @@ let handler = async (m, { conn, participants }) => {
         let rankNum = Math.floor(Math.random() * 500) + 1
         let currxp = Math.floor(Math.random() * 5000)
         let needxp = currxp + Math.floor(Math.random() * 2000) + 1000
-
-        // AQUI ESTA EL CAMBIO: rank2
         let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rankNum}&currxp=${currxp}&needxp=${needxp}&key=${key}`
 
         await react('📊')
