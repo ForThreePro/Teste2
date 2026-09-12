@@ -37,24 +37,33 @@ let handler = async (m, { conn, participants }) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
-    // ===== HORNY ===== CON BG
+    const sendImage = async (res, who, caption) => { // <- NUEVA FUNCION PARA VALIDAR
+        let contentType = res.headers.get('content-type')
+        if(!contentType ||!contentType.includes('image')){
+            let txt = await res.text()
+            throw new Error(txt)
+        }
+        let buffer = await res.buffer()
+        await conn.sendMessage(m.chat, { image: buffer, caption, mentions: [who] })
+    }
+
+    // ===== HORNY =====
     if (m.message?.extendedTextMessage?.text?.includes('horny') || m.text?.includes('horny')) {
         let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let pp = await getAvatar(who)
-        let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&key=${key}` // <- BG AGREGADO
+        let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
         try {
             await react('😏')
             await m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 😏\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🔥꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando imagen...\n\n━━━━━━━━━━━`)
             let res = await fetch(apiUrl, { timeout: 20000 })
-            let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 🔥\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.😏꒷\n\n── *📊 RESULTADO* ╏\n@${getMention(who)} está así ahora mismo 😏🔥\n\n━━━━━━━━━━━`, mentions: [who] })
+            await sendImage(res, who, `𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 🔥\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.😏꒷\n\n── *📊 RESULTADO* ╏\n@${getMention(who)} está así ahora mismo 😏🔥\n\n━━━━━━━━━━━`)
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
+            m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ ⚠️\n\n❌ La API devolvió error:\n${e.message}`)
         }
     }
 
-    // ===== SHIP ===== CON BG
+    // ===== SHIP =====
     if (m.message?.extendedTextMessage?.text?.includes('ship') || m.text?.includes('ship')) {
         if (!m.isGroup) return m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ Solo funciona en grupos`)
         let members = participants.map(u => toJid(u.id))
@@ -67,14 +76,13 @@ let handler = async (m, { conn, participants }) => {
         await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` —˙𖦹.💖꒷\n\n── *📊 PAREJA* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n━━━━━━━━━━━`, mentions: [user1, user2] })
         try {
             let avatar1 = await getAvatar(user1); let avatar2 = await getAvatar(user2)
-            let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}` // <- YA TENIA BG
-            let res = await fetch(apiUrl, { timeout: 20000 }); let buffer = await res.buffer()
-            let porcentaje = Math.floor(Math.random() * 101)
-            let explicacion = porcentaje < 20? `Hay 0 química 😅` : porcentaje < 40? `Poca compatibilidad 💛` : porcentaje < 60? `Hay algo ahí ✨` : porcentaje < 80? `Buena conexión ❤️` : `Compatibilidad altísima 💖`
-            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.💖꒷\n\n── *📊 COMPATIBILIDAD* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n💘 ➛ *${porcentaje}%*\n💌 ➛ ${explicacion}\n\n━━━━━━━━━━━`, mentions: [user1, user2] })
+            let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
+            let res = await fetch(apiUrl, { timeout: 20000 });
+            let caption = `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.💖꒷\n\n── *📊 COMPATIBILIDAD* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n💘 ➛ *${Math.floor(Math.random() * 101)}%*\n💌 ➛ Hay conexión 💖\n\n━━━━━━━━━━━`
+            await sendImage(res, user1, caption) // <- USA LA VALIDACION
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
+            m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ La API devolvió error:\n${e.message}`)
         }
     }
 
@@ -89,13 +97,10 @@ let handler = async (m, { conn, participants }) => {
         await conn.sendMessage(m.chat, { text: txt, mentions: [who] })
         try {
             let res = await fetch(apiUrl, { timeout: 30000 });
-            if(!res.ok) throw new Error(await res.text())
-            let buffer = await res.buffer()
-            let caption = `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷\n\n── *📊 INFORMACIÓN* ╏\n🚨 ➛ @${getMention(who)}\n💰 ➛ *Recompensa: 1,000,000$*\n\n━━━━━━━━━━━`
-            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] })
+            await sendImage(res, who, `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷\n\n── *📊 INFORMACIÓN* ╏\n🚨 ➛ @${getMention(who)}\n💰 ➛ *Recompensa: 1,000,000$*\n\n━━━━━━━━━━━`)
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
+            m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ ⚠️\n\n❌ La API devolvió error:\n${e.message}`)
         }
     }
 
@@ -116,13 +121,10 @@ let handler = async (m, { conn, participants }) => {
 
         try {
             let res = await fetch(apiUrl, { timeout: 30000 });
-            if(!res.ok) throw new Error(await res.text())
-            let buffer = await res.buffer()
-            let caption = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rankNum}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`
-            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] })
+            await sendImage(res, who, `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rankNum}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`)
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
+            m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ La API devolvió error:\n${e.message}`)
         }
     }
 }
