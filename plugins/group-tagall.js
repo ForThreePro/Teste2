@@ -1,4 +1,8 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
@@ -7,7 +11,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     if (!(isAdmin || isOwner)) {
       await react('❌')
       return conn.sendMessage(m.chat, {
-        text: `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ Solo admins pueden usar este comando\n━━━━━━━━━━━`
+        text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo admins pueden usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`
       }, { quoted: m })
     }
 
@@ -59,19 +63,22 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     // Ordenar las banderas según el orden definido
     const orderedFlags = countryFlags.map(c => c.bandera).concat(['🚩'])
 
-    // TU IMAGEN
+    // TU IMAGEN GARFIELD
     const catalogoImg = { url: 'https://files.evogb.win/QFXQtu.jpg' }
 
-    let messageText = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ 📢
+    let messageText = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`INVOCACIÓN GENERAL\`\` —˙𖦹.📢꒷
+⤷ ┇ 𝐈𝐍𝐕𝐎𝐂𝐀𝐂𝐈𝐎𝐍 ﹒ GENERAL ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`TAGALL\`\` 📢 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 👥 ➛ Grupo: *${groupName}*
 👤 ➛ Integrantes: *${participants.length}*
 💬 ➛ Mensaje: *${customMessage}*
 
-── *🌍 MIEMBROS POR PAÍS* ╏
+── *🌍 MIEMBROS POR PAÍS* ╏ 🍕
 `
 
     for (const flag of orderedFlags) {
@@ -85,9 +92,11 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     }
 
     messageText += `
-── *📝 NOTA* ╏
+── *📝 NOTA* ╏ 🍕
 📢 ➛ Todos fueron mencionados
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
@@ -101,13 +110,18 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
   } catch (error) {
     console.error("[ERROR EN TODOS]:", error)
     await react('❌')
-    let errorMsg = `𐔌 ꒱ ***GARFIEL BOT*** 𐔌 ꒱ ⚠️
+    let errorMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ Ocurrió un error al ejecutar el comando
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     conn.sendMessage(m.chat, { text: errorMsg }, { quoted: m })
   }
