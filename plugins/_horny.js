@@ -5,7 +5,13 @@ let handler = async (m, { conn, participants }) => {
     let defaultBg = 'https://files.evogb.win/7BY3Yv.jpg'
     let key = 'proyectsV2'
 
+    const getJid = (m) => { // <- AGREGA ESTO PARA QUE NO CRASHEE
+        let jid = m.mentionedJid[0] || m.quoted?.sender || m.sender
+        return jid.toString()
+    }
+
     const getAvatar = async (jid) => {
+        jid = jid.toString()
         try {
             let url = await conn.profilePictureUrl(jid, 'image')
             if(url && url.startsWith('https')) return url
@@ -14,54 +20,39 @@ let handler = async (m, { conn, participants }) => {
     }
 
     const getName = async (jid) => {
+        jid = jid.toString()
         let name = jid.split('@')[0]
         try {
             let n = await conn.getName(jid)
             if(n && n!== 'undefined') name = n
         } catch {}
-        return name
+        return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15) // <- limpio para la api
     }
+
+    const getMention = (jid) => jid.toString().split('@')[0]
 
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
-    // ===== HORNY =====
+    // ===== HORNY ===== ESTA SI JALA
     if (m.message?.extendedTextMessage?.text?.includes('horny') || m.text?.includes('horny')) {
-        let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
+        let who = getJid(m)
         let pp = await getAvatar(who)
         let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}`
         try {
             await react('😏')
-            await m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 😏
-
-.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🔥꒷
-
-── *📊 ESTADO* ╏
-🖼️ ➛ Creando imagen...
-
-━━━━━━━━━━━`)
+            await m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 😏\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🔥꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando imagen...\n\n━━━━━━━━━━━`)
             let res = await fetch(apiUrl, { timeout: 20000 })
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, {
-                image: buffer,
-                caption: `𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 🔥
-
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.😏꒷
-
-── *📊 RESULTADO* ╏
-@${who.split('@')[0]} está así ahora mismo 😏🔥
-
-━━━━━━━━━━━`,
-                mentions: [who]
-            })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 🔥\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.😏꒷\n\n── *📊 RESULTADO* ╏\n@${getMention(who)} está así ahora mismo 😏🔥\n\n━━━━━━━━━━━`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ ⚠️\n\n❌ Error al generar la imagen`)
+            m.reply(`𐔌 ꒱ ***HORNY*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
         }
     }
 
-    // ===== SHIP =====
+    // ===== SHIP ===== ESTA SI JALA
     if (m.message?.extendedTextMessage?.text?.includes('ship') || m.text?.includes('ship')) {
         if (!m.isGroup) return m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ Solo funciona en grupos`)
         let members = participants.map(u => u.id)
@@ -71,119 +62,59 @@ let handler = async (m, { conn, participants }) => {
         else { user1 = members[Math.floor(Math.random() * members.length)]; user2 = members[Math.floor(Math.random() * members.length)]; while(user1 === user2) user2 = members[Math.floor(Math.random() * members.length)] }
 
         await react('💘')
-        await conn.sendMessage(m.chat, {
-            text: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘
-
-.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` —˙𖦹.💖꒷
-
-── *📊 PAREJA* ╏
-@${user1.split('@')[0]} + @${user2.split('@')[0]}
-
-━━━━━━━━━━━`,
-            mentions: [user1, user2]
-        })
+        await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` —˙𖦹.💖꒷\n\n── *📊 PAREJA* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n━━━━━━━━━━━`, mentions: [user1, user2] })
         try {
             let avatar1 = await getAvatar(user1); let avatar2 = await getAvatar(user2)
             let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
             let res = await fetch(apiUrl, { timeout: 20000 }); let buffer = await res.buffer()
             let porcentaje = Math.floor(Math.random() * 101)
-            let explicacion = porcentaje < 20? `Hay 0 química 😅` : porcentaje < 40? `Poca compatibilidad 💛` : porcentaje < 60? `Hay algo ahí ✨` : porcentaje < 80? `Buena conexión ❤️` : porcentaje < 100? `Compatibilidad altísima 💖` : `100% ALMAS GEMELAS 💍`
-            await conn.sendMessage(m.chat, {
-                image: buffer,
-                caption: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘
-
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.💖꒷
-
-── *📊 COMPATIBILIDAD* ╏
-@${user1.split('@')[0]} + @${user2.split('@')[0]}
-
-💘 ➛ *${porcentaje}%*
-💌 ➛ ${explicacion}
-
-━━━━━━━━━━━`,
-                mentions: [user1, user2]
-            })
+            let explicacion = porcentaje < 20? `Hay 0 química 😅` : porcentaje < 40? `Poca compatibilidad 💛` : porcentaje < 60? `Hay algo ahí ✨` : porcentaje < 80? `Buena conexión ❤️` : `Compatibilidad altísima 💖`
+            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` —˙𖦹.💖꒷\n\n── *📊 COMPATIBILIDAD* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n💘 ➛ *${porcentaje}%*\n💌 ➛ ${explicacion}\n\n━━━━━━━━━━━`, mentions: [user1, user2] })
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ Error al generar la imagen`)
+            m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
         }
     }
 
-    // ===== SECURITY =====
+    // ===== SECURITY ===== ARREGLADO
     if (m.message?.extendedTextMessage?.text?.includes('security') || m.text?.includes('security')) {
-        let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
+        let who = getJid(m) // <- USAR getJid
         let pp = await getAvatar(who)
-        let createdTimestamp = Date.now()
+        let createdTimestamp = Math.floor(Date.now() / 1000) // <- ARREGLADO A SEGUNDOS
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
         await react('🔍')
-        await m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨
-
-.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.📢꒷
-
-── *📊 ESTADO* ╏
-🖼️ ➛ Creando cartel para @${who.split('@')[0]}...
-
-━━━━━━━━━━━`, { mentions: [who] })
+        await m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.📢꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando cartel para @${getMention(who)}...\n\n━━━━━━━━━━━`, { mentions: [who] })
         try {
-            let res = await fetch(apiUrl, { timeout: 30000 }); let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, {
-                image: buffer,
-                caption: `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨
-
-.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷
-
-── *📊 INFORMACIÓN* ╏
-🚨 ➛ @${who.split('@')[0]}
-💰 ➛ *Recompensa: 1,000,000$*
-
-━━━━━━━━━━━`,
-                mentions: [who]
-            })
+            let res = await fetch(apiUrl, { timeout: 30000 });
+            if(!res.ok) throw new Error(await res.text()) // <- para ver el error real
+            let buffer = await res.buffer()
+            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷\n\n── *📊 INFORMACIÓN* ╏\n🚨 ➛ @${getMention(who)}\n💰 ➛ *Recompensa: 1,000,000$*\n\n━━━━━━━━━━━`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ ⚠️\n\n❌ Error al generar la imagen`)
+            m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
         }
     }
 
-    // ===== RANK2 =====
+    // ===== RANK ===== ARREGLADO
     if (m.message?.extendedTextMessage?.text?.includes('rank') || m.text?.includes('rank')) {
-        let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
+        let who = getJid(m) // <- USAR getJid
         let name = await getName(who)
         let pp = await getAvatar(who)
         let level = Math.floor(Math.random() * 100) + 1
         let rank = Math.floor(Math.random() * 500) + 1
         let currxp = Math.floor(Math.random() * 5000)
         let needxp = currxp + Math.floor(Math.random() * 2000) + 1000
-        let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}`
+        let apiUrl = `https://api.stellarwa.xyz/generate/rank?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}` // <- ERA rank NO rank2
         await react('📊')
-        await m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊
-
-.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🎮꒷
-
-── *📊 ESTADO* ╏
-🖼️ ➛ Creando tarjeta para @${who.split('@')[0]}...
-
-━━━━━━━━━━━`, { mentions: [who] })
+        await m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🎮꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando tarjeta para @${getMention(who)}...\n\n━━━━━━━━━━━`, { mentions: [who] })
         try {
-            let res = await fetch(apiUrl, { timeout: 30000 }); let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, {
-                image: buffer,
-                caption: `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷
-
-── *📊 DATOS* ╏
-👤 ➛ @${who.split('@')[0]}
-📈 ➛ Nivel: *${level}*
-🏆 ➛ Rank: *#${rank}*
-✨ ➛ XP: *${currxp}/${needxp}*
-
-━━━━━━━━━━━`,
-                mentions: [who]
-            })
+            let res = await fetch(apiUrl, { timeout: 30000 });
+            if(!res.ok) throw new Error(await res.text()) // <- para ver el error real
+            let buffer = await res.buffer()
+            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rank}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ Error al generar la imagen`)
+            m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
         }
     }
 }
