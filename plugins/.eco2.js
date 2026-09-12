@@ -2,14 +2,41 @@ let MONEDA = 'R-COINS'
 let iconos = ['🍒', '🍋', '⭐', '💎', '7', '🍀']
 
 let preguntas = [
-    { q: '¿Cuánto es 2 + 2?', a: '4' },
-    { q: '¿De qué color es el cielo?', a: 'azul' },
-    { q: '¿Cuántos días tiene una semana?', a: '7' },
-    { q: '¿Cuánto es 10 x 5?', a: '50' },
-    { q: '¿Capital de Peru?', a: 'lima' },
-    { q: '¿Cuántas patas tiene un perro?', a: '4' },
-    { q: '¿Cuánto es 9 - 3?', a: '6' },
-    { q: '¿Cuánto es 8 / 2?', a: '4' }
+    // FACIL - +50 a +100 coins, +3 exp
+    { q: '¿Cuánto es 2 + 2?', a: '4', dif: 'facil' },
+    { q: '¿De qué color es el cielo?', a: 'azul', dif: 'facil' },
+    { q: '¿Cuántos días tiene una semana?', a: '7', dif: 'facil' },
+    { q: '¿Capital de Peru?', a: 'lima', dif: 'facil' },
+    { q: '¿Cuántas patas tiene un perro?', a: '4', dif: 'facil' },
+    { q: '¿Cuánto es 9 - 3?', a: '6', dif: 'facil' },
+    { q: '¿Qué animal dice miau?', a: 'gato', dif: 'facil' },
+    { q: '¿De qué color es la nieve?', a: 'blanca', dif: 'facil' },
+    { q: '¿Cuántas horas tiene un día?', a: '24', dif: 'facil' },
+    { q: '¿Cuánto es 1 docena?', a: '12', dif: 'facil' },
+
+    // MEDIA - +100 a +200 coins, +6 exp
+    { q: '¿Cuánto es 7 x 7?', a: '49', dif: 'media' },
+    { q: '¿Capital de Brasil?', a: 'brasilia', dif: 'media' },
+    { q: '¿Cuántos planetas hay en el sistema solar?', a: '8', dif: 'media' },
+    { q: '¿Quién creó Facebook?', a: 'mark zuckerberg', dif: 'media' },
+    { q: '¿De qué color es la bandera de Francia?', a: 'azul blanco rojo', dif: 'media' },
+    { q: '¿Cuál es el río más largo del mundo?', a: 'amazonas', dif: 'media' },
+    { q: '¿En qué año llegó el hombre a la luna?', a: '1969', dif: 'media' },
+    { q: '¿Cuántos huesos tiene el cuerpo humano?', a: '206', dif: 'media' },
+    { q: '¿Cuál es el metal más caro?', a: 'oro', dif: 'media' },
+    { q: '¿Qué país tiene forma de bota?', a: 'italia', dif: 'media' },
+
+    // DIFICIL - +200 a +400 coins, +12 exp
+    { q: '¿Cuál es la raíz cuadrada de 144?', a: '12', dif: 'dificil' },
+    { q: '¿Quién pintó la Mona Lisa?', a: 'leonardo da vinci', dif: 'dificil' },
+    { q: '¿Cuál es el elemento químico con símbolo Au?', a: 'oro', dif: 'dificil' },
+    { q: '¿En qué año empezó la segunda guerra mundial?', a: '1939', dif: 'dificil' },
+    { q: '¿Cuál es la capital de Australia?', a: 'canberra', dif: 'dificil' },
+    { q: '¿Quién escribió Don Quijote de la Mancha?', a: 'miguel de cervantes', dif: 'dificil' },
+    { q: '¿Cuál es el océano más profundo?', a: 'pacifico', dif: 'dificil' },
+    { q: '¿Cuántos cromosomas tiene el ser humano?', a: '46', dif: 'dificil' },
+    { q: '¿Cuál es la moneda de Japón?', a: 'yen', dif: 'dificil' },
+    { q: '¿Qué significa CPU?', a: 'unidad central de procesamiento', dif: 'dificil' }
 ]
 
 function getUser(id) {
@@ -24,18 +51,26 @@ function getUser(id) {
 let handler = async (m, { conn, args, command, usedPrefix }) => {
     let user = getUser(m.sender)
 
-    // 1. TRIVIA - COOLDOWN 30s Y POCA EXP
+    // 1. TRIVIA CON DIFICULTAD POR NIVEL
     if (command === 'trivia') {
         let tiempo = 30 * 1000 // 30 segundos
         if (user.lasttrivia && new Date - user.lasttrivia < tiempo) {
             let falta = msToTime(user.lasttrivia + tiempo - new Date())
             return conn.reply(m.chat, `⏰ Espera ${falta} para otra trivia`, m)
         }
-        let preg = preguntas[Math.floor(Math.random() * preguntas.length)]
+
+        // Filtra preguntas según nivel
+        let preguntasDisponibles = preguntas
+        if (user.level < 5) preguntasDisponibles = preguntas.filter(p => p.dif === 'facil')
+        else if (user.level < 10) preguntasDisponibles = preguntas.filter(p => p.dif === 'facil' || p.dif === 'media')
+
+        let preg = preguntasDisponibles[Math.floor(Math.random() * preguntasDisponibles.length)]
         user.trivia = preg.a.toLowerCase()
+        user.trivadif = preg.dif // Guardamos dificultad
         user.triviatime = new Date * 1
-        let premio = 50 + (user.level * 5)
-        return conn.reply(m.chat, `❓ *TRIVIA Nv.${user.level}*\n\n${preg.q}\n\n*Premio:* ${premio} ${MONEDA}\nResponde en 30s`, m)
+
+        let emoji = preg.dif === 'facil'? '🟢' : preg.dif === 'media'? '🟡' : '🔴'
+        return conn.reply(m.chat, `${emoji} *TRIVIA ${preg.dif.toUpperCase()} Nv.${user.level}*\n\n${preg.q}\n\nResponde en 30s`, m)
     }
 
     // 2. RULETA
@@ -92,20 +127,24 @@ handler.before = async (m) => {
     let user = getUser(m.sender)
     if (user.trivia && m.text.toLowerCase() === user.trivia) {
         if (new Date - user.triviatime > 30000) return delete user.trivia
-        let premio = 50 + (user.level * 5)
-        let expGanada = 3 // MUY POCA EXP
+        let dif = user.trivadif
+
+        // PREMIO SEGÚN DIFICULTAD
+        let premio = dif === 'facil'? 50 + (user.level * 5) : dif === 'media'? 100 + (user.level * 10) : 200 + (user.level * 20)
+        let expGanada = dif === 'facil'? 3 : dif === 'media'? 6 : 12
 
         user.rcoins += premio
         user.exp += expGanada
         user.lasttrivia = new Date * 1
-        delete user.trivia; delete user.triviatime
+        delete user.trivia; delete user.trivadif; delete user.triviatime
 
-        m.reply(`✅ *CORRECTO!* +${premio} ${MONEDA}\n+${expGanada} Exp\n💰 Total: ${user.rcoins} ${MONEDA}`)
+        let emoji = dif === 'facil'? '🟢' : dif === 'media'? '🟡' : '🔴'
+        m.reply(`${emoji} *CORRECTO!* [${dif}]\n+${premio} ${MONEDA}\n+${expGanada} Exp\n💰 Total: ${user.rcoins} ${MONEDA}`)
     }
 }
 
 handler.help = ['trivia','ruleta [color] [monto]','slots [monto]']
-handler.tags = ['games']
+handler.tags = ['economy']
 handler.command = ['trivia', 'ruleta', 'rlt', 'slots', 'slot']
 export default handler
 
