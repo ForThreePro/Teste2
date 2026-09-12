@@ -2,9 +2,12 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-  // SALDO - FIXED NaN Y UNDEFINED
+  // SALDO - FIX JID Y MENCIONES
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
+
+    // Normalizar JID - algunos bots usan @lid, otros @s.whatsapp.net
+    who = who.replace(/@lid$/, '@s.whatsapp.net')
 
     // Si el usuario no existe en la DB, crearlo
     if (!global.db.data.users[who]) {
@@ -14,71 +17,71 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let userTarget = global.db.data.users[who]
 
     // Asegurar que coin y bank sean números
-    userTarget.coin = userTarget.coin || 0
-    userTarget.bank = userTarget.bank || 0
+    userTarget.coin = Number(userTarget.coin) || 0
+    userTarget.bank = Number(userTarget.bank) || 0
 
     let name = 'Usuario'
     try {
       name = await conn.getName(who)
-      if (!name || name === 'undefined') name = 'Usuario'
+      if (!name || name === 'undefined' || name === '') name = who.split('@')[0]
     } catch {
-      name = 'Usuario'
+      name = who.split('@')[0]
     }
 
-    let texto = `💰 *SALDO DE ${name}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`
+    let texto = `💰 *SALDO DE @${who.split('@')[0]}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`
 
     // Si menciona a otro, manda al privado y no muestra en el grupo
     if (who!== m.sender) {
       try {
-        await conn.reply(m.sender, texto, null)
+        await conn.reply(m.sender, texto, null, { mentions: [who] })
         return m.reply('📩 Te envié el saldo al privado')
       } catch {
         return m.reply('No pude enviarte DM. Abre tu privado con el bot')
       }
     } else {
-      return m.reply(texto)
+      return m.reply(texto, null, { mentions: [who] })
     }
   }
 
   // DEPOSITAR TODO
   if (command === 'dall') {
-    user.coin = user.coin || 0
+    user.coin = Number(user.coin) || 0
     if (user.coin === 0) return m.reply('No tienes monedas en la billetera')
     let cantidad = user.coin
     user.coin = 0
-    user.bank = (user.bank || 0) + cantidad
+    user.bank = (Number(user.bank) || 0) + cantidad
     return m.reply(`🏦 Depositaste *${cantidad} monedas* al banco\n\nBilletera: ${user.coin} 🪙\nBanco: ${user.bank} 🏦`)
   }
 
   // RETIRAR TODO
   if (command === 'rall') {
-    user.bank = user.bank || 0
+    user.bank = Number(user.bank) || 0
     if (user.bank === 0) return m.reply('No tienes monedas en el banco')
     let cantidad = user.bank
     user.bank = 0
-    user.coin = (user.coin || 0) + cantidad
+    user.coin = (Number(user.coin) || 0) + cantidad
     return m.reply(`🏦 Retiraste *${cantidad} monedas* del banco\n\nBilletera: ${user.coin} 🪙\nBanco: ${user.bank} 🏦`)
   }
 
   // DEPOSITAR MONTO
   if (command === 'd') {
     let monto = parseInt(text)
-    user.coin = user.coin || 0
+    user.coin = Number(user.coin) || 0
     if (isNaN(monto) || monto < 1) return m.reply(`Uso: ${usedPrefix}d <monto>`)
     if (user.coin < monto) return m.reply(`No tienes suficiente. Billetera: ${user.coin} 🪙`)
     user.coin -= monto
-    user.bank = (user.bank || 0) + monto
+    user.bank = (Number(user.bank) || 0) + monto
     return m.reply(`🏦 Depositaste *${monto} monedas*\n\nBilletera: ${user.coin} 🪙\nBanco: ${user.bank} 🏦`)
   }
 
   // RETIRAR MONTO
   if (command === 'r') {
     let monto = parseInt(text)
-    user.bank = user.bank || 0
+    user.bank = Number(user.bank) || 0
     if (isNaN(monto) || monto < 1) return m.reply(`Uso: ${usedPrefix}r <monto>`)
     if (user.bank < monto) return m.reply(`No tienes suficiente. Banco: ${user.bank} 🏦`)
     user.bank -= monto
-    user.coin = (user.coin || 0) + monto
+    user.coin = (Number(user.coin) || 0) + monto
     return m.reply(`🏦 Retiraste *${monto} monedas*\n\nBilletera: ${user.coin} 🪙\nBanco: ${user.bank} 🏦`)
   }
 
@@ -87,14 +90,15 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let args = text.split(' ')
     if (args.length < 2) return m.reply(`Uso: ${usedPrefix + command} <monto> @user`)
     let monto = parseInt(args[0])
-    user.coin = user.coin || 0
+    user.coin = Number(user.coin) || 0
     if (isNaN(monto) || monto < 1) return m.reply('Monto inválido')
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
     let who = m.mentionedJid[0]
     if (!who) return m.reply('Menciona a quien le quieres pagar')
+    who = who.replace(/@lid$/, '@s.whatsapp.net')
     if (who === m.sender) return m.reply('No te puedes pagar a ti mismo')
     if (!global.db.data.users[who]) global.db.data.users[who] = { coin: 0, bank: 0 }
-    global.db.data.users[who].coin = (global.db.data.users[who].coin || 0)
+    global.db.data.users[who].coin = Number(global.db.data.users[who].coin) || 0
     user.coin -= monto
     global.db.data.users[who].coin += monto
     return m.reply(`💸 *TRANSFERENCIA* 💸\n\nLe pagaste *${monto} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
@@ -104,8 +108,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   if (['leaderboard', 'lb', 'top'].includes(command)) {
     let users = Object.entries(global.db.data.users).map(([key, value]) => ({
       jid: key,
-      coin: value.coin || 0,
-      bank: value.bank || 0
+      coin: Number(value.coin) || 0,
+      bank: Number(value.bank) || 0
     })).filter(v => v.coin || v.bank)
 
     if (users.length === 0) return m.reply('No hay usuarios con monedas aún')
