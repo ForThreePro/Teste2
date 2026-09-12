@@ -139,5 +139,3 @@ handler.help = ['horny @tag', 'ship @tag1 @tag2', 'security @tag', 'rank @tag']
 handler.tags = ['diversión']
 handler.command = ['horny', 'ship', 'security', 'rank']
 export default handler
-
-Entrégame con diseño Garfield Bot
