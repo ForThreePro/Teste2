@@ -43,16 +43,24 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     let inputBuffer = await response.buffer()
     
-    // La API devuelve GIF, agarramos solo frame 1
     let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.gif`)
     let tmpOutput = path.join(tmpdir(), `brat-${Date.now()}.webp`)
 
     fs.writeFileSync(tmpInput, inputBuffer)
 
+    // FIX: Quitamos el pad y usamos solo scale + background
     await new Promise((resolve, reject) => {
       ffmpeg(tmpInput)
-        .frames(1) // SOLO PRIMER FRAME
-        .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x000')
+        .frames(1)
+        .size('512x512')
+        .aspect('1:1')
+        .autopad()
+        .outputOptions('-vcodec', 'libwebp')
+        .outputOptions('-lossless', '0')
+        .outputOptions('-q:v', '50')
+        .outputOptions('-preset', 'picture')
+        .outputOptions('-an')
+        .outputOptions('-vsync', '0')
         .toFormat('webp')
         .on('end', () => resolve(true))
         .on('error', (err) => reject(err))
@@ -83,7 +91,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📝 DETALLE* ╏ 🍕
 ❌ ➛ ${e.message}
-💡 ➛ Verifica que ffmpeg esté instalado
+💡 ➛ Ejecuta: apt install ffmpeg -y
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
