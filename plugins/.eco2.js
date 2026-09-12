@@ -34,7 +34,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let monto = parseInt(args[1])
     user.coin = Number(user.coin) || 0
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla`)
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> o ${usedPrefix}work para pagarla`)
     if (!['red', 'black', 'rojo', 'negro'].includes(color)) return m.reply('Usa: red/rojo o black/negro')
     if (isNaN(monto) || monto < 10) return m.reply('Apuesta mínima: 10 monedas')
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
@@ -57,7 +57,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let monto = parseInt(text)
     user.coin = Number(user.coin) || 0
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla`)
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> o ${usedPrefix}work para pagarla`)
     if (isNaN(monto) || monto < 10) return m.reply(`Apuesta mínima: 10\nUso: ${usedPrefix + command} <monto>`)
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
     user.coin -= monto
@@ -85,31 +85,46 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     }
   }
 
-  // WORK - COOLDOWN 1-5 MIN RANDOM
+  // WORK - SI TIENES DEUDA, TODO SE VA A PAGARLA
   if (['work', 'trabajar'].includes(command)) {
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla primero`)
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
     if (cooldowns.work[m.sender] && Date.now() - cooldowns.work[m.sender] < tiempoEspera)
       return m.reply(`Ya trabajaste. Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.work[m.sender])) / 60000)} min`)
+
     cooldowns.work[m.sender] = Date.now()
     const trabajos = [
-      { texto: 'Programaste y ganaste', min: 80, max: 200 },
-      { texto: 'Vendiste tacos y ganaste', min: 50, max: 120 },
-      { texto: 'Hiciste stream y ganaste', min: 30, max: 150 },
-      { texto: 'Repartiste comida y ganaste', min: 40, max: 100 },
-      { texto: 'Minaste crypto y ganaste', min: 60, max: 180 }
+      { texto: 'Hiciste trabajo comunitario y ganaste', min: 80, max: 200 },
+      { texto: 'Limpiando calles ganaste', min: 50, max: 120 },
+      { texto: 'Servicio social y ganaste', min: 30, max: 150 },
+      { texto: 'Pintando paredes ganaste', min: 40, max: 100 },
+      { texto: 'Recogiendo basura ganaste', min: 60, max: 180 }
     ]
     let trabajo = trabajos[Math.floor(Math.random() * trabajos.length)]
     let ganancia = Math.floor(Math.random() * (trabajo.max - trabajo.min + 1)) + trabajo.min
-    user.coin = (Number(user.coin) || 0) + ganancia
-    return m.reply(`💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\nSaldo: ${user.coin} 🪙`)
+
+    // SI TIENE DEUDA, TODO SE VA A LA DEUDA
+    if (user.deuda > 0) {
+      let pagoDeuda = Math.min(ganancia, user.deuda)
+      user.deuda -= pagoDeuda
+      let sobrante = ganancia - pagoDeuda
+
+      if (sobrante > 0) {
+        user.coin = (Number(user.coin) || 0) + sobrante
+        return m.reply(`💼 *TRABAJO COMUNITARIO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\n💸 Pagaste ${pagoDeuda} a tu deuda\n💰 Te quedaron ${sobrante} monedas\n\n🚔 *DEUDA RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙`)
+      } else {
+        return m.reply(`💼 *TRABAJO COMUNITARIO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\n💸 *TODO SE FUE A PAGAR TU DEUDA*\n\n🚔 *DEUDA RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙`)
+      }
+    } else {
+      user.coin = (Number(user.coin) || 0) + ganancia
+      return m.reply(`💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\nSaldo: ${user.coin} 🪙`)
+    }
   }
 
-  // ROBAR - CON SISTEMA DE DEUDAS
+  // ROBAR - NO PUEDES CON DEUDA
   if (['robar', 'rob'].includes(command)) {
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla. No puedes robar con deudas`)
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> o ${usedPrefix}work para pagarla. No puedes robar con deudas`)
 
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
     if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < tiempoEspera)
@@ -143,7 +158,6 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       let multa = Math.floor(Math.random() * 50) + 20
       user.coin = Number(user.coin) || 0
 
-      // SI NO TIENE SUFICIENTE, QUEDA EN DEUDA
       if (user.coin < multa) {
         let deudaNueva = multa - user.coin
         user.deuda = (Number(user.deuda) || 0) + deudaNueva
@@ -153,7 +167,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
           await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y ahora tiene una *deuda con la policía* de ${deudaNueva} monedas`, null, { mentions: [m.sender] })
         } catch {}
 
-        return m.reply(`🚔 *TE ATRAPARON Y NO TENÍAS SUFICIENTE* 🚔\n\nMulta: ${multa} monedas\nPagaste: ${user.coin} monedas\n\n💸 *DEUDA CON LA POLICÍA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}pagardeuda <monto> para pagar\n\nTu saldo: 0 🪙`)
+        return m.reply(`🚔 *TE ATRAPARON Y NO TENÍAS SUFICIENTE* 🚔\n\nMulta: ${multa} monedas\nPagaste: ${user.coin} monedas\n\n💸 *DEUDA CON LA POLICÍA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}pagardeuda <monto> o ${usedPrefix}work para pagar\n\nTu saldo: 0 🪙`)
       } else {
         user.coin -= multa
 
@@ -173,8 +187,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     if (user.deuda === 0) return m.reply('✅ No tienes deudas con la policía')
 
     let monto = parseInt(text)
-    if (isNaN(monto) || monto < 1) return m.reply(`💸 *DEUDA ACTUAL*: ${user.deuda} monedas\n\nUso: ${usedPrefix}pagardeuda <monto>`)
-    if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙\nDeuda: ${user.deuda} 🪙`)
+    if (isNaN(monto) || monto < 1) return m.reply(`💸 *DEUDA ACTUAL*: ${user.deuda} monedas\n\nUso: ${usedPrefix}pagardeuda <monto>\n\nO usa ${usedPrefix}work para pagar trabajando`)
+    if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙\nDeuda: ${user.deuda} 🪙\n\nUsa ${usedPrefix}work para ganar monedas`)
 
     let aPagar = Math.min(monto, user.deuda)
     user.coin -= aPagar
@@ -199,7 +213,7 @@ handler.before = async (m, { conn }) => {
       global.db.data.users[m.sender].coin = (Number(global.db.data.users[m.sender].coin) || 0) + ganancia
       await conn.reply(m.chat, `✅ ¡Correcto! Ganaste *${ganancia} monedas* 🪙\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙`, m)
     } else {
-      await conn.reply(m.chat, `✅ ¡Correcto! Pero tienes una deuda de ${global.db.data.users[m.sender].deuda} 🪙\n\nUsa.pagardeuda para pagarla primero`, m)
+      await conn.reply(m.chat, `✅ ¡Correcto! Pero tienes una deuda de ${global.db.data.users[m.sender].deuda} 🪙\n\nUsa.work para pagarla trabajando`, m)
     }
     delete global.db.data.trivia[m.sender]
   }
