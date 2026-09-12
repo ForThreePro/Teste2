@@ -2,11 +2,18 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-  // SALDO
+  // SALDO - FIXED
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
     let userTarget = global.db.data.users[who] || { coin: 0, bank: 0 }
-    let name = await conn.getName(who).catch(_ => 'Usuario')
+
+    let name
+    try {
+      name = conn.getName(who)
+    } catch {
+      name = 'Usuario'
+    }
+
     return m.reply(`💰 *SALDO DE ${name}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`, null, { mentions: [who] })
   }
 
@@ -64,7 +71,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`💸 *TRANSFERENCIA* 💸\n\nLe pagaste *${monto} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
   }
 
-  // LEADERBOARD
+  // LEADERBOARD - FIXED
   if (['leaderboard', 'lb', 'top'].includes(command)) {
     let users = Object.entries(global.db.data.users).map(([key, value]) => ({...value, jid: key })).filter(v => v.coin || v.bank)
     if (users.length === 0) return m.reply('No hay usuarios con monedas aún')
