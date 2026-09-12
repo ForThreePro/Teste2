@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
 import moment from 'moment-timezone'
+import { exec } from 'child_process'
 moment.locale('es')
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
@@ -36,11 +37,56 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   await react('🖌️')
 
   let isAnimated = command.endsWith('anim') || command.endsWith('2')
-  // TU API DE STELLAR
   let apiUrl = `https://api.stellarwa.xyz/tools/brat?text=${encodeURIComponent(txt)}&key=proyectsV2`
 
-  let response = await fetch(apiUrl)
-  if (!response.ok) {
+  try {
+    let response = await fetch(apiUrl)
+    if (!response.ok) throw new Error('API Error')
+
+    let inputBuffer = await response.buffer()
+    let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.${isAnimated ? 'mp4' : 'png'}`)
+    let tmpOutput = path.join(tmpdir(), `brat-${Date.now()}.webp`)
+
+    fs.writeFileSync(tmpInput, inputBuffer)
+
+    // SI ES ANIMADO USAMOS FFMPEG, SI ES IMAGEN USAMOS WEBP DIRECTO
+    if (isAnimated) {
+      await new Promise((resolve, reject) => {
+        ffmpeg(tmpInput)
+          .fps(15)
+          .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x000')
+          .outputOptions(['-loop 0', '-preset default', '-an', '-vsync 0'])
+          .toFormat('webp')
+          .on('end', () => resolve(true))
+          .on('error', (err) => reject(err))
+          .save(tmpOutput)
+      })
+    } else {
+      // Para imagen estatica usamos cwebp si existe, si no ffmpeg normal
+      await new Promise((resolve, reject) => {
+        ffmpeg(tmpInput)
+          .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x000')
+          .toFormat('webp')
+          .on('end', () => resolve(true))
+          .on('error', (err) => reject(err))
+          .save(tmpOutput)
+      })
+    }
+
+    let stickerBuffer = fs.readFileSync(tmpOutput)
+
+    await conn.sendMessage(m.chat, {
+      sticker: stickerBuffer,
+      packname: 'GARFIELD BOT',
+      author: 'V2.6'
+    }, { quoted: m })
+
+    if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
+    if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput)
+    await react('✅')
+
+  } catch (e) {
+    console.error(e)
     await react('❌')
     return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
@@ -51,55 +97,16 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Error al generar el sticker
-🔄 ➛ Intenta de nuevo
+💡 ➛ La API puede estar caída
 
 ━━━━━━━━━━━
 🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`)
   }
-
-  let inputBuffer = await response.buffer()
-  let ext = isAnimated ? 'mp4' : 'png'
-  let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.${ext}`)
-  let tmpOutput = path.join(tmpdir(), `brat-${Date.now()}.webp`)
-
-  fs.writeFileSync(tmpInput, inputBuffer)
-
-  await new Promise((resolve, reject) => {
-    let process = ffmpeg(tmpInput)
-    if (isAnimated) {
-      process
-        .fps(15)
-        .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000')
-        .outputOptions(['-loop 0', '-preset default', '-an', '-vsync 0'])
-    } else {
-      process
-        .videoFilters('scale=512:512:force_original_aspect_ratio=decrease,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000')
-    }
-
-    process
-      .toFormat('webp')
-      .on('end', () => resolve(true))
-      .on('error', (err) => reject(err))
-      .save(tmpOutput)
-  })
-
-  let stickerBuffer = fs.readFileSync(tmpOutput)
-
-  await conn.sendMessage(m.chat, {
-    sticker: stickerBuffer,
-    packname: 'GARFIELD BOT',
-    author: 'V2.6'
-  }, { quoted: m })
-
-  if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
-  if (fs.existsSync(tmpOutput)) fs.unlinkSync(tmpOutput)
-
-  await react('✅')
 }
 
-handler.help = ['brat <texto>']
+handler.help = ['brat <texto>', 'bratanim <texto>']
 handler.tags = ['sticker']
-handler.command = /^brat?$/i
+handler.command = /^(brat|bratanim|brat2)$/i
 
 export default handler
