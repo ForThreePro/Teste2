@@ -2,7 +2,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-  // SALDO - FIXED
+  // SALDO - SI MENCIONAS A ALGUIEN, TE LO MANDA AL PRIVADO
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
     let userTarget = global.db.data.users[who] || { coin: 0, bank: 0 }
@@ -14,7 +14,15 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       name = 'Usuario'
     }
 
-    return m.reply(`💰 *SALDO DE ${name}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`, null, { mentions: [who] })
+    let texto = `💰 *SALDO DE ${name}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`
+
+    // Si menciona a otro, manda al privado y no muestra en el grupo
+    if (who!== m.sender) {
+      await conn.reply(m.sender, texto, null)
+      return m.reply('📩 Te envié el saldo al privado')
+    } else {
+      return m.reply(texto)
+    }
   }
 
   // DEPOSITAR TODO
@@ -71,7 +79,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`💸 *TRANSFERENCIA* 💸\n\nLe pagaste *${monto} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
   }
 
-  // LEADERBOARD - FIXED
+  // LEADERBOARD
   if (['leaderboard', 'lb', 'top'].includes(command)) {
     let users = Object.entries(global.db.data.users).map(([key, value]) => ({...value, jid: key })).filter(v => v.coin || v.bank)
     if (users.length === 0) return m.reply('No hay usuarios con monedas aún')
@@ -94,5 +102,4 @@ handler.help = ['saldo', 'dall', 'rall', 'd', 'r', 'pay', 'lb']
 handler.tags = ['economy']
 handler.command = ['saldo', 'bal', 'balance', 'dall', 'rall', 'd', 'r', 'pay', 'pagar', 'leaderboard', 'lb', 'top']
 handler.group = true
-handler.register = false
 export default handler
