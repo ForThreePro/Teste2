@@ -10,6 +10,7 @@ let handler = async (m, { conn, participants, command }) => {
     let key = 'proyectsV2'
 
     const getAvatar = async (jid) => {
+        if (!jid || typeof jid!== 'string') jid = m.sender // <- FIX del endsWith
         try {
             let url = await conn.profilePictureUrl(jid, 'image')
             if(url && url.startsWith('https')) return url
@@ -18,12 +19,13 @@ let handler = async (m, { conn, participants, command }) => {
     }
 
     const getName = async (jid) => {
+        if (!jid || typeof jid!== 'string') jid = m.sender
         let name = jid.split('@')[0]
         try {
             let n = await conn.getName(jid)
             if(n && n!== 'undefined') name = n
         } catch {}
-        return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15) // limpiar emojis
+        return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15)
     }
 
     const react = async (text) => {
@@ -34,39 +36,16 @@ let handler = async (m, { conn, participants, command }) => {
     if (command == 'horny') {
         let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
         let pp = await getAvatar(who)
-        let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&key=${key}` // <- AGREGADO defaultBg
+        let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
         try {
             await react('😏')
-            await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
-
-⤷ ┇ 𝐆𝐄𝐍𝐄𝐑𝐀𝐍𝐃𝐎 ﹒ HORNY ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` 🔥 —˙𖦹.꒷
-
-── *📊 ESTADO* ╏ 🍕
-🖼️ ➛ Creando imagen para @${who.split('@')[0]}...
-
-━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
-━━━━━━━━━━━`, { mentions: [who] })
+            await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\nGenerando imagen para @${who.split('@')[0]}...`, { mentions: [who] })
             let res = await fetch(apiUrl, { timeout: 20000 })
+            if(!res.ok) throw new Error(`API ${res.status}`)
             let buffer = await res.buffer()
             await conn.sendMessage(m.chat, {
                 image: buffer,
-                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
-
-⤷ ┇ 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎 ﹒ HORNY ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 😏 —˙𖦹.꒷
-
-── *📊 RESULTADO* ╏ 🍕
-@${who.split('@')[0]} está así ahora mismo 😏🔥
-
-━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
-━━━━━━━━━━━`,
+                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n@${who.split('@')[0]} está así ahora mismo 😏🔥`,
                 mentions: [who]
             })
         } catch (e) {
@@ -77,48 +56,42 @@ let handler = async (m, { conn, participants, command }) => {
 
     // ===== SHIP =====
     if (command == 'ship') {
-        if (!m.isGroup) return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ Solo funciona en grupos`)
+        if (!m.isGroup) return m.reply(`❌ Solo funciona en grupos`)
         let members = participants.map(u => u.id)
-        if (members.length < 2) return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ Necesitan mínimo 2 personas`)
+        if (members.length < 2) return m.reply(`❌ Necesitan mínimo 2 personas`)
         let user1, user2
         if (m.mentionedJid.length >= 2) { user1 = m.mentionedJid[0]; user2 = m.mentionedJid[1] }
         else { user1 = members[Math.floor(Math.random() * members.length)]; user2 = members[Math.floor(Math.random() * members.length)]; while(user1 === user2) user2 = members[Math.floor(Math.random() * members.length)] }
 
         await react('💘')
-        await conn.sendMessage(m.chat, {
-            text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\nCalculando ship entre @${user1.split('@')[0]} + @${user2.split('@')[0]}`,
-            mentions: [user1, user2] // <- ARREGLADO
-        })
+        await m.reply(`Calculando ship entre @${user1.split('@')[0]} + @${user2.split('@')[0]}`, null, { mentions: [user1, user2] })
         try {
             let avatar1 = await getAvatar(user1); let avatar2 = await getAvatar(user2)
             let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
             let res = await fetch(apiUrl, { timeout: 20000 }); let buffer = await res.buffer()
             let porcentaje = Math.floor(Math.random() * 101)
-            let explicacion = porcentaje < 20? `Hay 0 química 😅` : porcentaje < 40? `Poca compatibilidad 💛` : porcentaje < 60? `Hay algo ahí ✨` : porcentaje < 80? `Buena conexión ❤️` : porcentaje < 100? `Compatibilidad altísima 💖` : `100% ALMAS GEMELAS 💍`
-            await conn.sendMessage(m.chat, {
-                image: buffer,
-                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n💘 *${porcentaje}%*\n💌 ${explicacion}`,
-                mentions: [user1, user2]
-            })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `💘 *${porcentaje}%*`, mentions: [user1, user2] })
         } catch (e) {
             await react('❌')
             m.reply(`❌ Error: ${e.message}`)
         }
     }
 
-    // ===== SECURITY ===== ARREGLADO
+    // ===== SECURITY =====
     if (command == 'security') {
         let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
         let pp = await getAvatar(who)
-        let createdTimestamp = Math.floor(Date.now() / 1000) // <- EN SEGUNDOS
+        let createdTimestamp = Math.floor(Date.now() / 1000)
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
         await react('🔍')
-        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\nGenerando cartel para @${who.split('@')[0]}...`, null, { mentions: [who] })
+        await m.reply(`Generando cartel para @${who.split('@')[0]}...`, null, { mentions: [who] })
         try {
-            let res = await fetch(apiUrl, { timeout: 30000 }); let buffer = await res.buffer()
+            let res = await fetch(apiUrl, { timeout: 30000 });
+            if(!res.ok) throw new Error(`API ${res.status}`)
+            let buffer = await res.buffer()
             await conn.sendMessage(m.chat, {
                 image: buffer,
-                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n🚨 SE BUSCA: @${who.split('@')[0]}\n💰 *Recompensa: 1,000,000$*`,
+                caption: `🚨 SE BUSCA: @${who.split('@')[0]}\n💰 *Recompensa: 1,000,000$*`,
                 mentions: [who]
             })
         } catch (e) {
@@ -127,7 +100,7 @@ let handler = async (m, { conn, participants, command }) => {
         }
     }
 
-    // ===== RANK ===== ARREGLADO
+    // ===== RANK ===== AGREGADO defaultBg
     if (command == 'rank') {
         let who = m.mentionedJid[0] || m.quoted?.sender || m.sender
         let name = await getName(who)
@@ -136,14 +109,16 @@ let handler = async (m, { conn, participants, command }) => {
         let rank = Math.floor(Math.random() * 500) + 1
         let currxp = Math.floor(Math.random() * 5000)
         let needxp = currxp + Math.floor(Math.random() * 2000) + 1000
-        let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currentXP=${currxp}&requiredXP=${needxp}&key=${key}` // <- CAMBIADO
+        let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currentXP=${currxp}&requiredXP=${needxp}&key=${key}` // <- YA TIENE defaultBg
         await react('📊')
-        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\nGenerando tarjeta para @${who.split('@')[0]}...`, null, { mentions: [who] })
+        await m.reply(`Generando tarjeta para @${who.split('@')[0]}...`, null, { mentions: [who] })
         try {
-            let res = await fetch(apiUrl, { timeout: 30000 }); let buffer = await res.buffer()
+            let res = await fetch(apiUrl, { timeout: 30000 });
+            if(!res.ok) throw new Error(`API ${res.status}`)
+            let buffer = await res.buffer()
             await conn.sendMessage(m.chat, {
                 image: buffer,
-                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n👤 @${who.split('@')[0]}\n📈 Nivel: *${level}*\n🏆 Rank: *#${rank}*\n✨ XP: *${currxp}/${needxp}*`,
+                caption: `👤 @${who.split('@')[0]}\n📈 Nivel: *${level}*\n🏆 Rank: *#${rank}*\n✨ XP: *${currxp}/${needxp}*`,
                 mentions: [who]
             })
         } catch (e) {
@@ -155,5 +130,6 @@ let handler = async (m, { conn, participants, command }) => {
 
 handler.help = ['horny @tag', 'ship @tag1 @tag2', 'security @tag', 'rank @tag']
 handler.tags = ['diversión']
-handler.command = /^(horny|ship|security|rank)$/i // <- CAMBIO PARA QUE DETE
+handler.command = /^(horny|ship|security|rank)$/i
+
 export default handler
