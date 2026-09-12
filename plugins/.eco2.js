@@ -2,7 +2,13 @@ let MONEDA = 'R-COINS'
 let iconos = ['🍒', '🍋', '⭐', '💎', '7', '🍀']
 
 let preguntas = [
-    { q: '¿Cuánto es 2 + 2?', a: '4' }, { q: '¿De qué color es el cielo?', a: 'azul' }, { q: '¿Cuántos días tiene una semana?', a: '7' }
+    { q: '¿Cuánto es 2 + 2?', a: '4' },
+    { q: '¿De qué color es el cielo?', a: 'azul' },
+    { q: '¿Cuántos días tiene una semana?', a: '7' },
+    { q: '¿Cuánto es 10 x 5?', a: '50' },
+    { q: '¿Capital de Peru?', a: 'lima' },
+    { q: '¿Cuántas patas tiene un perro?', a: '4' },
+    { q: '¿Cuánto es 9 - 3?', a: '6' }
 ]
 
 function getUser(id) {
@@ -17,7 +23,7 @@ function getUser(id) {
 let handler = async (m, { conn, args, command, usedPrefix }) => {
     let user = getUser(m.sender)
 
-    // 1. TRIVIA - PREMIO POR NIVEL
+    // 1. TRIVIA - DA EXP Y PREMIO POR NIVEL
     if (command === 'trivia') {
         let tiempo = 2 * 60 * 1000 // 2 min
         if (user.lasttrivia && new Date - user.lasttrivia < tiempo) {
@@ -31,11 +37,12 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         return conn.reply(m.chat, `❓ *TRIVIA Nv.${user.level}*\n\n${preg.q}\n\n*Premio:* ${premio} ${MONEDA}\nResponde en 30s`, m)
     }
 
-    // 2. RULETA - GANANCIA POR NIVEL
+    // 2. RULETA - APUESTA Y MULTIPLICADOR POR NIVEL
     if (command === 'ruleta' || command === 'rlt') {
         let color = args[0]?.toLowerCase()
         let monto = parseInt(args[1])
         if (!['red', 'black', 'rojo', 'negro'].includes(color)) return conn.reply(m.chat, `*Uso:* ${usedPrefix}ruleta [red/black] [monto]`, m)
+
         let apuestaMax = 100 + (user.level * 50) // Nv1=150... Nv10=600
         if (!monto || monto < 10) return conn.reply(m.chat, `❌ Apuesta mínima: 10 ${MONEDA}`, m)
         if (monto > apuestaMax) return conn.reply(m.chat, `❌ Con tu Nv.${user.level} max puedes apostar ${apuestaMax} ${MONEDA}`, m)
@@ -49,11 +56,9 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         if (gano) {
             let gana = Math.floor(monto * multi)
             user.rcoins += gana
-            user.exp += 5
-            return conn.reply(m.chat, `🎉 Salió ${resultado === 'red'? '🔴' : '⚫'}\n*GANASTE x${multi.toFixed(1)}:* +${gana} ${MONEDA}\n+5 Exp`, m)
+            return conn.reply(m.chat, `🎉 Salió ${resultado === 'red'? '🔴' : '⚫'}\n*GANASTE x${multi.toFixed(1)}:* +${gana} ${MONEDA}`, m)
         } else {
-            user.exp += 1
-            return conn.reply(m.chat, `😢 Salió ${resultado === 'red'? '🔴' : '⚫'}\n*PERDISTE:* -${monto} ${MONEDA}\n+1 Exp`, m)
+            return conn.reply(m.chat, `😢 Salió ${resultado === 'red'? '🔴' : '⚫'}\n*PERDISTE:* -${monto} ${MONEDA}`, m)
         }
     }
 
@@ -75,20 +80,26 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         let multi = baseMulti + (user.level * 0.5) // Bonus por nivel
         let gana = Math.floor(monto * multi)
         if (gana > 0) user.rcoins += gana
-        user.exp += iguales
 
         let resultado = iguales === 3? `🎉 JACKPOT x${multi.toFixed(1)}!` : iguales === 2? `✨ Ganaste x${multi.toFixed(1)}!` : `😢 Perdiste`
-        return conn.reply(m.chat, `🎰 *TRAGAMONEDAS Nv.${user.level}*\n\n[${s1}] [${s2}] [${s3}]\n\n${resultado}\n${gana > 0? `+${gana} ${MONEDA}` : `-${monto} ${MONEDA}`}\n+${iguales} Exp`, m)
+        return conn.reply(m.chat, `🎰 *TRAGAMONEDAS Nv.${user.level}*\n\n[${s1}] [${s2}] [${s3}]\n\n${resultado}\n${gana > 0? `+${gana} ${MONEDA}` : `-${monto} ${MONEDA}`}`, m)
     }
 }
 
+// RESPONDER TRIVIA
 handler.before = async (m) => {
     let user = getUser(m.sender)
     if (user.trivia && m.text.toLowerCase() === user.trivia) {
         if (new Date - user.triviatime > 30000) return delete user.trivia
         let premio = 50 + (user.level * 5)
-        user.rcoins += premio; user.exp += 10; user.lasttrivia = new Date * 1; delete user.trivia; delete user.triviatime
-        m.reply(`✅ *CORRECTO!* +${premio} ${MONEDA}\n+10 Exp\n💰 Total: ${user.rcoins}`)
+        let expGanada = 5 + user.level // SOLO TRIVIA DA EXP
+
+        user.rcoins += premio
+        user.exp += expGanada
+        user.lasttrivia = new Date * 1
+        delete user.trivia; delete user.triviatime
+
+        m.reply(`✅ *CORRECTO!* +${premio} ${MONEDA}\n+${expGanada} Exp\n💰 Total: ${user.rcoins} ${MONEDA}`)
     }
 }
 
@@ -96,4 +107,5 @@ handler.help = ['trivia','ruleta [color] [monto]','slots [monto]']
 handler.tags = ['games']
 handler.command = ['trivia', 'ruleta', 'rlt', 'slots', 'slot']
 export default handler
+
 function msToTime(d){let m=Math.floor((d%(1000*60*60))/(1000*60)),s=Math.floor((d%(1000*60))/1000);return m+"m "+s+"s"}
