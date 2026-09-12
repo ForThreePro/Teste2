@@ -1,20 +1,29 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 let handler = async (m, { conn }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
   if (!m.quoted) {
     await react('❌')
-    let error = `𐔌 ꒱ ***ELIMINAR MENSAJE*** 𐔌 ꒱ ⚠️
+    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐑 ﹒ MENSAJE ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ Responde al mensaje que deseas eliminar
 
-── *💡 EJEMPLO* ╏
-➛ Responde a un mensaje + comando
+── *💡 EJEMPLO* ╏ 🍕
+➛ Responde a un mensaje + .del
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
@@ -24,19 +33,24 @@ let handler = async (m, { conn }) => {
   try {
     let delet = m.message.extendedTextMessage.contextInfo.participant
     let bang = m.message.extendedTextMessage.contextInfo.stanzaId
-    return conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }})
+    await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: delet }})
   } catch {
     await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
   }
 
-  let ok = `𐔌 ꒱ ***ELIMINAR MENSAJE*** 𐔌 ꒱ ✅
+  let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` —˙𖦹.🗑️꒷
+⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ MENSAJE ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 🗑️ —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Mensaje eliminado
 👤 ➛ Por: @${m.sender.split('@')[0]}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
   conn.sendMessage(m.chat, { text: ok, mentions: [m.sender] }, { quoted: m })
 }
