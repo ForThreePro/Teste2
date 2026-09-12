@@ -1,13 +1,13 @@
 let MONEDA = 'R-COINS'
 
 let trabajos = [
-    { name: 'Repartidor', min: 20, max: 50, exp: 10 },
-    { name: 'Programador', min: 40, max: 100, exp: 15 },
-    { name: 'Chef', min: 30, max: 80, exp: 12 },
-    { name: 'Minero', min: 50, max: 120, exp: 18 },
-    { name: 'Streamer', min: 60, max: 150, exp: 20 },
-    { name: 'Hacker', min: 80, max: 200, exp: 25 },
-    { name: 'CEO', min: 100, max: 300, exp: 30 }
+    { name: 'Repartidor', min: 20, max: 50, exp: 5 },
+    { name: 'Programador', min: 40, max: 100, exp: 8 },
+    { name: 'Chef', min: 30, max: 80, exp: 6 },
+    { name: 'Minero', min: 50, max: 120, exp: 10 },
+    { name: 'Streamer', min: 60, max: 150, exp: 12 },
+    { name: 'Hacker', min: 80, max: 200, exp: 15 },
+    { name: 'CEO', min: 100, max: 300, exp: 20 }
 ]
 
 function getUser(id) {
@@ -25,7 +25,7 @@ function getUser(id) {
 }
 
 function subirNivel(user) {
-    let expNecesaria = user.level * 100
+    let expNecesaria = user.level * 500 // AHORA ES MAS DIFICIL
     if (user.exp >= expNecesaria) {
         user.level += 1
         user.exp = user.exp - expNecesaria
@@ -36,25 +36,26 @@ function subirNivel(user) {
 
 let handler = async (m, { conn, args, command, usedPrefix }) => {
     let user = getUser(m.sender)
-    if (subirNivel(user)) conn.reply(m.chat, `🎉 *¡SUBISTE A NIVEL ${user.level}!* 🎉\n+${user.level * 50} ${MONEDA} de bono`, m)
+    if (subirNivel(user)) conn.reply(m.chat, `🎉 *¡SUBISTE A NIVEL ${user.level}!* 🎉\n+${user.level * 100} ${MONEDA} de bono`, m)
 
     // 1. SALDO
     if (command === 'saldo' || command === 'balance') {
+        let expNecesaria = user.level * 500
         let texto = `💰 *TU PERFIL*\n\n` +
                     `📊 *Nivel*: ${user.level}\n` +
-                    `✨ *Exp*: ${user.exp}/${user.level * 100}\n\n` +
+                    `✨ *Exp*: ${user.exp}/${expNecesaria}\n\n` +
                     `👛 *BILLETERA*: ${user.rcoins} ${MONEDA}\n` +
                     `🏦 *BANCO*: ${user.rbank} ${MONEDA}\n` +
                     `💵 *TOTAL*: ${user.rcoins + user.rbank} ${MONEDA}`
         return conn.reply(m.chat, texto, m)
     }
 
-    // 2. WORK - UNICA FORMA DE SUBIR NIVEL
+    // 2. WORK - COOLDOWN 1 A 10 MIN RANDOM
     if (command === 'work' || command === 'trabajar') {
-        let tiempo = 30 * 60 * 1000 // 30 minutos
+        let tiempo = (Math.floor(Math.random() * 10) + 1) * 60 * 1000 // 1 a 10 minutos
         if (user.lastwork && new Date - user.lastwork < tiempo) {
             let falta = msToTime(user.lastwork + tiempo - new Date())
-            return conn.reply(m.chat, `⏰ Ya trabajaste. Espera ${falta}`, m)
+            return conn.reply(m.chat, `⏰ Ya trabajaste. Vuelve en ${falta}`, m)
         }
 
         let trabajosDisponibles = trabajos.slice(0, user.level + 2)
@@ -68,7 +69,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         user.exp += trabajo.exp // SOLO AQUI DA EXP
         user.lastwork = new Date * 1
 
-        return conn.reply(m.chat, `💼 *FUISTE A TRABAJAR*\n\n*Trabajo:* ${trabajo.name}\n*Ganaste:* ${paga} ${MONEDA}\n*+${trabajo.exp} Exp*\n\n👛 Billetera: ${user.rcoins} ${MONEDA}`, m)
+        return conn.reply(m.chat, `💼 *FUISTE A TRABAJAR*\n\n*Trabajo:* ${trabajo.name}\n*Ganaste:* ${paga} ${MONEDA}\n*+${trabajo.exp} Exp*\n\n⏰ Vuelve en 1-10 min\n👛 Billetera: ${user.rcoins} ${MONEDA}`, m)
     }
 
     // 3. DEPOSITAR
@@ -104,7 +105,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         if (target.rcoins < 10) return conn.reply(m.chat, `❌ @${who.split('@')[0]} no tiene ${MONEDA} en la billetera\n*Tiene:* ${target.rcoins} ${MONEDA}`, m, { mentions: [who] })
 
         // POR NIVEL
-        let porcentajeRobo = 0.10 + (user.level * 0.01) // Nv1=11%... Nv20=30%
+        let porcentajeRobo = 0.10 + (user.level * 0.01)
         if (porcentajeRobo > 0.30) porcentajeRobo = 0.30
 
         let robo = Math.floor(target.rcoins * porcentajeRobo) + 10
@@ -141,7 +142,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 
 handler.help = [
     'saldo ( Ver Perfil )',
-    'work ( Trabajar Cada 30min )',
+    'work ( Trabajar Cada 1-10min )',
     'd [monto] ( Depositar )',
     'dall ( Depositar Todo )',
     'r [monto] ( Retirar )',
