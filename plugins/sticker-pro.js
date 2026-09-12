@@ -110,7 +110,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         if (txt.length > 30) return error('Máximo *30 caracteres*')
 
         const obj = {
-            "type": "quote", "format": "png", "backgroundColor": "#FF8C00", "width": 512, "height": 768, "scale": 2,
+            "type": "quote", "format": "png", "backgroundColor": "#000", "width": 512, "height": 768, "scale": 2,
             "messages": [{"entities": [], "avatar": true, "from": { "id": 1, "name": authorName || "Anónimo", "photo": { "url": pp } }, "text": txt, "replyMessage": {}}]
         }
 
