@@ -2,7 +2,7 @@ let cooldowns = { trivia: {}, work: {}, robar: {} }
 
 let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
-  if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
+  if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {}, deuda: 0 }
 
   // TRIVIA - COOLDOWN 30 SEG
   if (command === 'trivia') {
@@ -33,6 +33,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let color = args[0].toLowerCase()
     let monto = parseInt(args[1])
     user.coin = Number(user.coin) || 0
+    user.deuda = Number(user.deuda) || 0
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla`)
     if (!['red', 'black', 'rojo', 'negro'].includes(color)) return m.reply('Usa: red/rojo o black/negro')
     if (isNaN(monto) || monto < 10) return m.reply('Apuesta mínima: 10 monedas')
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
@@ -54,6 +56,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   if (['slots', 'slot'].includes(command)) {
     let monto = parseInt(text)
     user.coin = Number(user.coin) || 0
+    user.deuda = Number(user.deuda) || 0
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla`)
     if (isNaN(monto) || monto < 10) return m.reply(`Apuesta mínima: 10\nUso: ${usedPrefix + command} <monto>`)
     if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙`)
     user.coin -= monto
@@ -83,6 +87,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
   // WORK - COOLDOWN 1-5 MIN RANDOM
   if (['work', 'trabajar'].includes(command)) {
+    user.deuda = Number(user.deuda) || 0
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla primero`)
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
     if (cooldowns.work[m.sender] && Date.now() - cooldowns.work[m.sender] < tiempoEspera)
       return m.reply(`Ya trabajaste. Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.work[m.sender])) / 60000)} min`)
@@ -100,8 +106,11 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\nSaldo: ${user.coin} 🪙`)
   }
 
-  // ROBAR - MÍNIMO 1 MONEDA AHORA
+  // ROBAR - CON SISTEMA DE DEUDAS
   if (['robar', 'rob'].includes(command)) {
+    user.deuda = Number(user.deuda) || 0
+    if (user.deuda > 0) return m.reply(`🚔 Tienes una *deuda con la policía* de ${user.deuda} 🪙\n\nUsa ${usedPrefix}pagardeuda <monto> para pagarla. No puedes robar con deudas`)
+
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
     if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < tiempoEspera)
       return m.reply(`Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.robar[m.sender])) / 60000)} min para robar de nuevo`)
@@ -111,23 +120,20 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     who = who.replace(/@lid$/, '@s.whatsapp.net')
     if (who === m.sender) return m.reply('No te puedes robar a ti mismo')
 
-    if (!global.db.data.users[who]) global.db.data.users[who] = { coin: 0, bank: 0 }
+    if (!global.db.data.users[who]) global.db.data.users[who] = { coin: 0, bank: 0, deuda: 0 }
     let target = global.db.data.users[who]
     target.coin = Number(target.coin) || 0
 
-    // AHORA EL MÍNIMO ES 1 MONEDA
     if (target.coin < 1) return m.reply(`@${who.split('@')[0]} no tiene nada en la billetera`, null, { mentions: [who] })
 
     cooldowns.robar[m.sender] = Date.now()
     let exito = Math.random() < 0.6
 
     if (exito) {
-      // Si tiene menos de 5, roba todo. Si no, roba 5-50% random
       let robado = target.coin <= 5? target.coin : Math.min(Math.floor(Math.random() * target.coin * 0.5) + 1, target.coin)
       target.coin -= robado
       user.coin = (Number(user.coin) || 0) + robado
 
-      // AVISAR AL ROBADO POR PRIVADO
       try {
         await conn.reply(who, `🚨 *TE ROBARON* 🚨\n\n@${m.sender.split('@')[0]} te robó *${robado} monedas* 🪙 de tu billetera\n\nTu saldo: ${target.coin} 🪙`, null, { mentions: [m.sender] })
       } catch {}
@@ -135,14 +141,49 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       return m.reply(`🦹 *ROBO EXITOSO* 🦹\n\nLe robaste *${robado} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
     } else {
       let multa = Math.floor(Math.random() * 50) + 20
-      user.coin = Math.max(0, (Number(user.coin) || 0) - multa)
+      user.coin = Number(user.coin) || 0
 
-      // AVISAR AL QUE INTENTARON ROBAR
-      try {
-        await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y pagó *${multa} monedas* de multa`, null, { mentions: [m.sender] })
-      } catch {}
+      // SI NO TIENE SUFICIENTE, QUEDA EN DEUDA
+      if (user.coin < multa) {
+        let deudaNueva = multa - user.coin
+        user.deuda = (Number(user.deuda) || 0) + deudaNueva
+        user.coin = 0
 
-      return m.reply(`🚔 *TE ATRAPARON* 🚔\n\nPagaste *${multa} monedas* de multa\n\nTu saldo: ${user.coin} 🪙`)
+        try {
+          await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y ahora tiene una *deuda con la policía* de ${deudaNueva} monedas`, null, { mentions: [m.sender] })
+        } catch {}
+
+        return m.reply(`🚔 *TE ATRAPARON Y NO TENÍAS SUFICIENTE* 🚔\n\nMulta: ${multa} monedas\nPagaste: ${user.coin} monedas\n\n💸 *DEUDA CON LA POLICÍA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}pagardeuda <monto> para pagar\n\nTu saldo: 0 🪙`)
+      } else {
+        user.coin -= multa
+
+        try {
+          await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y pagó *${multa} monedas* de multa`, null, { mentions: [m.sender] })
+        } catch {}
+
+        return m.reply(`🚔 *TE ATRAPARON* 🚔\n\nPagaste *${multa} monedas* de multa\n\nTu saldo: ${user.coin} 🪙`)
+      }
+    }
+  }
+
+  // PAGAR DEUDA
+  if (['pagardeuda', 'deuda'].includes(command)) {
+    user.coin = Number(user.coin) || 0
+    user.deuda = Number(user.deuda) || 0
+    if (user.deuda === 0) return m.reply('✅ No tienes deudas con la policía')
+
+    let monto = parseInt(text)
+    if (isNaN(monto) || monto < 1) return m.reply(`💸 *DEUDA ACTUAL*: ${user.deuda} monedas\n\nUso: ${usedPrefix}pagardeuda <monto>`)
+    if (user.coin < monto) return m.reply(`No tienes suficiente. Saldo: ${user.coin} 🪙\nDeuda: ${user.deuda} 🪙`)
+
+    let aPagar = Math.min(monto, user.deuda)
+    user.coin -= aPagar
+    user.deuda -= aPagar
+
+    if (user.deuda === 0) {
+      return m.reply(`✅ *DEUDA PAGADA* ✅\n\nPagaste ${aPagar} monedas\nYa no tienes deudas con la policía\n\nTu saldo: ${user.coin} 🪙`)
+    } else {
+      return m.reply(`💸 Pagaste ${aPagar} monedas\n\n*DEUDA RESTANTE*: ${user.deuda} monedas\n\nTu saldo: ${user.coin} 🪙`)
     }
   }
 }
@@ -154,14 +195,18 @@ handler.before = async (m, { conn }) => {
   if (m.text.toLowerCase().trim() === triviaData.answer) {
     clearTimeout(triviaData.timeout)
     let ganancia = Math.floor(Math.random() * 50) + 20
-    global.db.data.users[m.sender].coin = (Number(global.db.data.users[m.sender].coin) || 0) + ganancia
-    await conn.reply(m.chat, `✅ ¡Correcto! Ganaste *${ganancia} monedas* 🪙\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙`, m)
+    if (!global.db.data.users[m.sender].deuda || global.db.data.users[m.sender].deuda === 0) {
+      global.db.data.users[m.sender].coin = (Number(global.db.data.users[m.sender].coin) || 0) + ganancia
+      await conn.reply(m.chat, `✅ ¡Correcto! Ganaste *${ganancia} monedas* 🪙\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙`, m)
+    } else {
+      await conn.reply(m.chat, `✅ ¡Correcto! Pero tienes una deuda de ${global.db.data.users[m.sender].deuda} 🪙\n\nUsa.pagardeuda para pagarla primero`, m)
+    }
     delete global.db.data.trivia[m.sender]
   }
 }
 
-handler.help = ['trivia', 'ruleta', 'slots', 'work', 'robar']
+handler.help = ['trivia', 'ruleta', 'slots', 'work', 'robar', 'pagardeuda']
 handler.tags = ['economy']
-handler.command = ['trivia', 'ruleta', 'rlt', 'slots', 'slot', 'work', 'trabajar', 'robar', 'rob']
+handler.command = ['trivia', 'ruleta', 'rlt', 'slots', 'slot', 'work', 'trabajar', 'robar', 'rob', 'pagardeuda', 'deuda']
 handler.group = true
 export default handler
