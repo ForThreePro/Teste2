@@ -30,7 +30,7 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
 }
 
 handler.help = ['antilag <on/off>']
-handler.tags = ['group']
+handler.tags = ['grupo']
 handler.command = /^(antilag)$/i
 
 handler.before = async function (m, { conn, isAdmin, isBotAdmin }) {
