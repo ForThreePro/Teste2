@@ -20,10 +20,13 @@ function getUser(id) {
 let handler = async (m, { conn, args, command, usedPrefix }) => {
     let user = getUser(m.sender)
 
-    // 1. TRIVIA
+    // 1. TRIVIA - AHORA 2 MINUTOS
     if (command === 'trivia') {
-        let tiempo = 10 * 60 * 1000
-        if (user.lasttrivia && new Date - user.lasttrivia < tiempo) return conn.reply(m.chat, `⏰ Espera ${msToTime(user.lasttrivia + tiempo - new Date())} para otra trivia`, m)
+        let tiempo = 2 * 60 * 1000 // 2 minutos antes era 10
+        if (user.lasttrivia && new Date - user.lasttrivia < tiempo) {
+            let falta = msToTime(user.lasttrivia + tiempo - new Date())
+            return conn.reply(m.chat, `⏰ Espera ${falta} para otra trivia`, m)
+        }
         let preg = preguntas[Math.floor(Math.random() * preguntas.length)]
         user.trivia = preg.a.toLowerCase()
         user.triviatime = new Date * 1
@@ -51,7 +54,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
         }
     }
 
-    // 3. SLOTS - x2 x5 x10 x15 x25 x50 x75 x100
+    // 3. SLOTS
     if (command === 'slots' || command === 'slot') {
         let monto = parseInt(args[0])
         if (!monto || monto < 10) return conn.reply(m.chat, `❌ Apuesta mínima: 10 ${MONEDA}`, m)
@@ -75,7 +78,7 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
 handler.before = async (m) => {
     let user = getUser(m.sender)
     if (user.trivia && m.text.toLowerCase() === user.trivia) {
-        if (new Date - user.triviatime > 30000) return delete user.trivia
+        if (new Date - user.triviatime > 30000) return delete user.trivia // 30 seg para responder
         user.rcoins += 50; user.lasttrivia = new Date * 1; delete user.trivia; delete user.triviatime
         m.reply(`✅ *CORRECTO!* +50 ${MONEDA}\n💰 Total: ${user.rcoins} ${MONEDA}`)
     }
