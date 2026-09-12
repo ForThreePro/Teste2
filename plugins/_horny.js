@@ -5,23 +5,24 @@ let handler = async (m, { conn, participants }) => {
     let defaultBg = 'https://files.evogb.win/7BY3Yv.jpg'
     let key = 'proyectsV2'
 
-    const getJid = (jid) => { // <- ESTA ES LA CLAVE
-        if (!jid) jid = m.sender
-        if (typeof jid === 'object') jid = jid.id || jid.sender || jid.jid || jid.toString()
-        return jid.toString()
+    const toJid = (jid) => {
+        if (!jid) return m.sender
+        if (typeof jid === 'string') return jid
+        if (typeof jid === 'object') return jid.sender || jid.id || jid.jid || m.sender
+        return m.sender
     }
 
     const getAvatar = async (jid) => {
-        jid = getJid(jid)
+        jid = toJid(jid)
         try {
             let url = await conn.profilePictureUrl(jid, 'image')
-            if(url && url.startsWith('https')) return url
+            if(url) return url
         } catch {}
         return defaultImg
     }
 
     const getName = async (jid) => {
-        jid = getJid(jid)
+        jid = toJid(jid)
         let name = jid.split('@')[0]
         try {
             let n = await conn.getName(jid)
@@ -30,7 +31,7 @@ let handler = async (m, { conn, participants }) => {
         return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15)
     }
 
-    const getMention = (jid) => getJid(jid).split('@')[0]
+    const getMention = (jid) => toJid(jid).split('@')[0]
 
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
@@ -38,7 +39,7 @@ let handler = async (m, { conn, participants }) => {
 
     // ===== HORNY =====
     if (m.message?.extendedTextMessage?.text?.includes('horny') || m.text?.includes('horny')) {
-        let who = getJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
+        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let pp = await getAvatar(who)
         let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}`
         try {
@@ -56,11 +57,11 @@ let handler = async (m, { conn, participants }) => {
     // ===== SHIP =====
     if (m.message?.extendedTextMessage?.text?.includes('ship') || m.text?.includes('ship')) {
         if (!m.isGroup) return m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ Solo funciona en grupos`)
-        let members = participants.map(u => u.id)
+        let members = participants.map(u => toJid(u.id))
         if (members.length < 2) return m.reply(`𐔌 ꒱ ***SHIP*** 𐔌 ꒱ ⚠️\n\n❌ Necesitan mínimo 2 personas`)
         let user1, user2
-        if (m.mentionedJid.length >= 2) { user1 = getJid(m.mentionedJid[0]); user2 = getJid(m.mentionedJid[1]) }
-        else { user1 = getJid(members[Math.floor(Math.random() * members.length)]); user2 = getJid(members[Math.floor(Math.random() * members.length)]); while(user1 === user2) user2 = getJid(members[Math.floor(Math.random() * members.length)]) }
+        if (m.mentionedJid.length >= 2) { user1 = toJid(m.mentionedJid[0]); user2 = toJid(m.mentionedJid[1]) }
+        else { user1 = members[Math.floor(Math.random() * members.length)]; user2 = members[Math.floor(Math.random() * members.length)]; while(user1 === user2) user2 = members[Math.floor(Math.random() * members.length)] }
 
         await react('💘')
         await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` —˙𖦹.💖꒷\n\n── *📊 PAREJA* ╏\n@${getMention(user1)} + @${getMention(user2)}\n\n━━━━━━━━━━━`, mentions: [user1, user2] })
@@ -77,42 +78,46 @@ let handler = async (m, { conn, participants }) => {
         }
     }
 
-    // ===== SECURITY ===== FIX
+    // ===== SECURITY ===== FIX FINAL
     if (m.message?.extendedTextMessage?.text?.includes('security') || m.text?.includes('security')) {
-        let who = getJid(m.mentionedJid[0] || m.quoted?.sender || m.sender) // <- FORZADO A STRING
+        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender) // <- SIEMPRE STRING
         let pp = await getAvatar(who)
-        let createdTimestamp = Math.floor(Date.now() / 1000) // <- EN SEGUNDOS
+        let createdTimestamp = Math.floor(Date.now() / 1000)
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
         await react('🔍')
-        await m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.📢꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando cartel para @${getMention(who)}...\n\n━━━━━━━━━━━`, { mentions: [who] }) // <- who ya es string
+        let txt = `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.📢꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando cartel para @${getMention(who)}...\n\n━━━━━━━━━━━`
+        await conn.sendMessage(m.chat, { text: txt, mentions: [who] }) // <- MANDAR TEXTO Y MENTIONS SEPARADO
         try {
             let res = await fetch(apiUrl, { timeout: 30000 });
             if(!res.ok) throw new Error(await res.text())
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷\n\n── *📊 INFORMACIÓN* ╏\n🚨 ➛ @${getMention(who)}\n💰 ➛ *Recompensa: 1,000,000$*\n\n━━━━━━━━━━━`, mentions: [who] })
+            let caption = `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷\n\n── *📊 INFORMACIÓN* ╏\n🚨 ➛ @${getMention(who)}\n💰 ➛ *Recompensa: 1,000,000$*\n\n━━━━━━━━━━━`
+            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] }) // <- MENTIONS TAMBIEN AQUI
         } catch (e) {
             await react('❌')
             m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
         }
     }
 
-    // ===== RANK ===== FIX
+    // ===== RANK ===== FIX FINAL
     if (m.message?.extendedTextMessage?.text?.includes('rank') || m.text?.includes('rank')) {
-        let who = getJid(m.mentionedJid[0] || m.quoted?.sender || m.sender) // <- FORZADO A STRING
+        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender) // <- SIEMPRE STRING
         let name = await getName(who)
         let pp = await getAvatar(who)
         let level = Math.floor(Math.random() * 100) + 1
         let rank = Math.floor(Math.random() * 500) + 1
         let currxp = Math.floor(Math.random() * 5000)
         let needxp = currxp + Math.floor(Math.random() * 2000) + 1000
-        let apiUrl = `https://api.stellarwa.xyz/generate/rank?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}` // <- ES rank NO rank2
+        let apiUrl = `https://api.stellarwa.xyz/generate/rank?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}`
         await react('📊')
-        await m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🎮꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando tarjeta para @${getMention(who)}...\n\n━━━━━━━━━━━`, { mentions: [who] })
+        let txt = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🎮꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando tarjeta para @${getMention(who)}...\n\n━━━━━━━━━━━`
+        await conn.sendMessage(m.chat, { text: txt, mentions: [who] }) // <- MANDAR TEXTO Y MENTIONS SEPARADO
         try {
             let res = await fetch(apiUrl, { timeout: 30000 });
             if(!res.ok) throw new Error(await res.text())
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rank}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`, mentions: [who] })
+            let caption = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rank}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`
+            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] }) // <- MENTIONS TAMBIEN AQUI
         } catch (e) {
             await react('❌')
             m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
