@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
 let handler = async (m, { conn, participants }) => {
-    let defaultImg = 'https://files.evogb.win/n4InsB.jpg'
+    let defaultImg = 'https://files.evogb.win/QFXQtu.jpg'
     let defaultBg = 'https://files.evogb.win/7BY3Yv.jpg'
     let key = 'proyectsV2'
 
