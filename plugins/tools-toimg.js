@@ -1,13 +1,29 @@
 import { webp2mp4 } from '../lib/webp2mp4.js'
 import { ffmpeg, toAudio } from '../lib/converter.js'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 let handler = async (m, { conn, command }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+  
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
   const error = (msg) => {
-    return m.reply(`𐔌 ꒱ ***CONVERTIDOR*** 𐔌 ꒱ ⚠️\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷\n\n── *📝 AVISO* ╏\n❌ ➛ ${msg}\n━━━━━━━━━━━`)
+    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐂𝐎𝐍𝐕𝐄𝐑𝐓𝐈𝐃𝐎𝐑 ﹒ ERROR ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+❌ ➛ ${msg}
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`)
   }
 
   // TOVID
@@ -19,11 +35,26 @@ let handler = async (m, { conn, command }) => {
       await react('⏳')
       let media = await m.quoted.download()
       let out = await webp2mp4(media)
-      await conn.sendFile(m.chat, out, 'video.mp4', `𐔌 ꒱ ***CONVERTIDOR*** 𐔌 ꒱ ✅\n\n.⃟𖥔 ݁. 𖦹˙— \`\`TOVIDEO\`\` —˙𖦹.🎬꒷\n\n── *📊 ESTADO* ╏\n✅ ➛ Conversión completada\n🎬 ➛ Sticker a Video MP4\n━━━━━━━━━━━`, m)
+      await conn.sendFile(m.chat, out, 'video.mp4', `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐓𝐎𝐕𝐈𝐃𝐄𝐎 ﹒ COMPLETADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`CONVERTIDO\`\` ✅ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
+✅ ➛ Conversión completada
+🎬 ➛ Sticker animado a Video MP4
+👤 ➛ GARFIELD BOT V2.6
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`, m)
       await react('✅')
-    } catch {
+    } catch (e) {
+      console.error(e)
       await react('❌')
-      return error('No se pudo convertir')
+      return error('No se pudo convertir el sticker')
     }
   }
 
@@ -36,11 +67,26 @@ let handler = async (m, { conn, command }) => {
       await react('⏳')
       let media = await q.download?.()
       let audio = await toAudio(media, 'mp4')
-      await conn.sendFile(m.chat, audio.data, 'audio.mp3', `𐔌 ꒱ ***CONVERTIDOR*** 𐔌 ꒱ ✅\n\n.⃟𖥔 ݁. 𖦹˙— \`\`TOMP3\`\` —˙𖦹.🎵꒷\n\n── *📊 ESTADO* ╏\n✅ ➛ Audio extraído\n🎵 ➛ Formato: MP3\n━━━━━━━━━━━`, m, null, { mimetype: 'audio/mp4' })
+      await conn.sendFile(m.chat, audio.data, 'audio.mp3', `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐓𝐎𝐌𝐏𝟑 ﹒ COMPLETADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`EXTRAIDO\`\` ✅ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
+✅ ➛ Audio extraído
+🎵 ➛ Formato: MP3
+👤 ➛ GARFIELD BOT V2.6
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`, m, null, { mimetype: 'audio/mp4' })
       await react('✅')
-    } catch {
+    } catch (e) {
+      console.error(e)
       await react('❌')
-      return error('No se pudo convertir')
+      return error('No se pudo convertir a audio')
     }
   }
 
@@ -54,10 +100,25 @@ let handler = async (m, { conn, command }) => {
       let media = await q.download()
       await conn.sendMessage(m.chat, { 
         image: media, 
-        caption: `𐔌 ꒱ ***CONVERTIDOR*** 𐔌 ꒱ ✅\n\n.⃟𖥔 ݁. 𖦹˙— \`\`TOIMG\`\` —˙𖦹.🖼️꒷\n\n── *📊 ESTADO* ╏\n✅ ➛ Conversión completada\n🖼️ ➛ Sticker a Imagen JPG\n━━━━━━━━━━━` 
+        caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐓𝐎𝐈𝐌𝐆 ﹒ COMPLETADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`CONVERTIDO\`\` ✅ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 🍕
+✅ ➛ Conversión completada
+🖼️ ➛ Sticker a Imagen JPG
+👤 ➛ GARFIELD BOT V2.6
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━` 
       }, { quoted: m })
       await react('✅')
-    } catch {
+    } catch (e) {
+      console.error(e)
       await react('❌')
       error('No pude convertir el *sticker*')
     }
