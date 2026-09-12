@@ -1,7 +1,7 @@
 let handler = async (m, { conn, command, args, isAdmin, isBotAdmin }) => {
     if (!m.isGroup) return conn.reply(m.chat, '❌ Este comando solo funciona en grupos', m)
 
-    let tiempo = args[0]? args[0] : '7d' // Ej: 1d, 12h, 2d
+    let tiempo = args[0]? args[0] : '7d' // Ej: 3d, 12h, 1d
     let milisegundos = 0
 
     if (tiempo.endsWith('d')) milisegundos = parseInt(tiempo) * 24 * 60 * 60 * 1000
@@ -14,10 +14,15 @@ let handler = async (m, { conn, command, args, isAdmin, isBotAdmin }) => {
     let fantasmas = []
 
     for (let user of participants) {
+        if (user.admin) continue // No toca admins
         let u = global.db.data.users[user.id]
         if (!u) continue
+
         let lastseen = u.lastseen || 0
-        if (now - lastseen > milisegundos &&!user.admin) {
+        let diferencia = now - lastseen
+
+        // Si nunca habló = fantasma
+        if (lastseen === 0 || diferencia > milisegundos) {
             fantasmas.push(user.id)
         }
     }
@@ -25,7 +30,7 @@ let handler = async (m, { conn, command, args, isAdmin, isBotAdmin }) => {
     if (command === 'fantasmas') {
         if (fantasmas.length === 0) return conn.reply(m.chat, `✅ *NO HAY FANTASMAS*\nTodos han estado activos en las últimas ${tiempo}`, m)
 
-        let texto = `👻 *FANTASMAS DETECTADOS* - Inactivos +${tiempo}\n`
+        let texto = `👻 *FANTASMAS DETECTADOS* - Inactivos +${tiempo}\n\n`
         texto += fantasmas.map((v, i) => `${i+1}. @${v.split('@')[0]}`).join('\n')
         texto += `\n\n*Total:* ${fantasmas.length} fantasmas`
         return conn.reply(m.chat, texto, m, { mentions: fantasmas })
@@ -43,16 +48,18 @@ let handler = async (m, { conn, command, args, isAdmin, isBotAdmin }) => {
             try {
                 await conn.groupParticipantsUpdate(m.chat, [fantasma], 'remove')
                 kick++
-                await new Promise(resolve => setTimeout(resolve, 2000))
-            } catch {}
+                await new Promise(resolve => setTimeout(resolve, 3000)) // 3 seg entre cada uno
+            } catch (e) {
+                console.log(e)
+            }
         }
         return conn.reply(m.chat, `✅ *LISTO*\nSe eliminaron ${kick} fantasmas del grupo`, m)
     }
 }
 
 handler.help = [
-    'fantasmas [tiempo] ( Ver Inactivos. Ej: fantasmas 1d / fantasmas 12h )',
-    'kickfantasmas [tiempo] ( Eliminar Inactivos. Ej: kickfantasmas 1d )'
+    'fantasmas [tiempo] ( Ver Inactivos. Ej: fantasmas 3d )',
+    'kickfantasmas [tiempo] ( Eliminar Inactivos. Ej: kickfantasmas 3d )'
 ]
 handler.tags = ['grupo']
 handler.command = ['fantasmas', 'kickfantasmas']
