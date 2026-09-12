@@ -103,6 +103,6 @@ handler.help = ['pajeame', 'poeta', 'formartrio @usuario1 @usuario2', 'embarazar
 handler.tags = ['fun'];
 handler.command = ['paja', 'pajeame', 'poeta', 'formartrio', 'preg', 'embarazar', 'preñar', 'Follar', 'violar'];
 handler.group = true;
-handler.register = true;
+handler.register = false;
 
 export default handler;
