@@ -2,7 +2,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {}, deuda: 0 }
 
-  // SALDO - MUESTRA DEUDA SI TIENE
+  // SALDO - SIEMPRE MUESTRA DEUDA
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
 
@@ -27,11 +27,11 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       name = who.split('@')[0]
     }
 
-    let texto = `💰 *SALDO DE @${who.split('@')[0]}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`
+    let texto = `💰 *SALDO DE @${who.split('@')[0]}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas\n🚔 Deuda Policía: ${userTarget.deuda} monedas`
 
-    // MOSTRAR DEUDA SI TIENE
+    // MOSTRAR AVISO SI TIENE DEUDA
     if (userTarget.deuda > 0) {
-      texto += `\n\n🚔 *DEUDA POLICÍA*: ${userTarget.deuda} monedas\n⚠️ No puedes trabajar ni apostar hasta pagar`
+      texto += `\n\n⚠️ *TIENES DEUDA* ⚠️\nUsa.work para pagar trabajando`
     }
 
     // Si menciona a otro, manda al privado CON MENCION
