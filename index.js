@@ -17,25 +17,38 @@ const rl = createInterface(process.stdin, process.stdout);
 const inicializarEntorno = () => {
   const carpetas = ['tmp', 'Sesiones/Subbots', 'Sesiones/Principal'];
   carpetas.forEach(dir => {
-    if (dir?.trim() && !existsSync(dir)) {
+    if (dir?.trim() &&!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
   });
 };
 
 const mostrarBanner = () => {
-  cfonts.say('nox bot', {
+  cfonts.say('GARFIELD', {
     font: 'block',
     align: 'center',
-    colors: ['blue', 'white'],
-    background: 'black'
+    colors: ['yellow', 'red'],
+    background: 'black',
+    letterSpacing: 1,
+    lineHeight: 1,
+    space: true,
+    maxLength: '0'
   });
 
-  cfonts.say('Developed By • Nox Bot MD', {
+  cfonts.say('BOT MD v2.6 PRO', {
     font: 'console',
     align: 'center',
-    colors: ['cyan']
+    colors: ['yellow']
   });
+
+  cfonts.say('La pereza es mi superpoder', {
+    font: 'tiny',
+    align: 'center',
+    colors: ['orange']
+  });
+
+  console.log(chalk.hex('#FFA500')('🍕 N°1 EN TODO EL MUNDO 🌎 🍕'));
+  console.log(chalk.hex('#FFA500')('Owner: @Garfiel Store\n'));
 };
 
 let ejecucionActiva = false;
@@ -46,7 +59,7 @@ const ejecutarProceso = (archivo) => {
   ejecucionActiva = true;
 
   const rutaArchivo = join(__dirname, archivo);
-  const argumentos = [rutaArchivo, ...process.argv.slice(2)];
+  const argumentos = [rutaArchivo,...process.argv.slice(2)];
 
   procesoHijo = spawn('node', argumentos, { stdio: ['inherit', 'inherit', 'inherit', 'ipc'] });
 
@@ -62,12 +75,13 @@ const ejecutarProceso = (archivo) => {
 
   procesoHijo.on('exit', estado => {
     ejecucionActiva = false;
-    console.error('🚩 Error :\n', estado);
+    console.error(chalk.red('🚩 ZZZ... Garfield se quedó dormido :\n'), estado);
+    console.log(chalk.yellow('🍕 Reiniciando para más lasaña...\n'));
     process.exit();
   });
 
   const opciones = yargs(process.argv.slice(2)).exitProcess(false).parse();
-  if (!opciones['test'] && !rl.listenerCount('line')) {
+  if (!opciones['test'] &&!rl.listenerCount('line')) {
     rl.on('line', entrada => {
       if (procesoHijo?.connected) {
         procesoHijo.send(entrada.trim());
@@ -85,11 +99,15 @@ const ejecutarProceso = (archivo) => {
 
 process.on('warning', alerta => {
   if (alerta.name === 'MaxListenersExceededWarning') {
-    console.warn('🚩 Se excedió el límite de Listeners en :');
-    console.warn(alerta.stack);
+    console.warn(chalk.yellow('🚩 Se excedió el límite de Listeners en :'));
+    console.warn(chalk.gray(alerta.stack));
   }
 });
 
 inicializarEntorno();
+console.log(chalk.hex('#FFA500')('😼 Iniciando GARFIELD BOT...'));
+console.log(chalk.hex('#FFD700')('🍕 Cargando lasaña virtual...'));
+console.log(chalk.hex('#FFA500')('⚡ Sistema: Estable | Ping: 70ms'));
+console.log(chalk.hex('#FFA500')('━━━━━━━━━━━━━━\n'));
 mostrarBanner();
 ejecutarProceso('main.js');
