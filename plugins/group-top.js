@@ -1,31 +1,39 @@
 import util from 'util'
 import path from 'path'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 let user = a => '@' + a.split('@')[0]
 
 function handler(m, { groupMetadata, command, conn, text }) {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
     if (!groupMetadata) {
-        return m.reply(`𐔌 ꒱ ***TOP 10*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ Este comando solo funciona en grupos\n━━━━━━━━━━━`)
+        return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Este comando solo funciona en grupos\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
     }
 
     if (!text) {
         await react('❌')
-        let error = `𐔌 ꒱ ***TOP 10*** 𐔌 ꒱ ⚠️
+        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.🏆꒷
+⤷ ┇ 𝐓𝐎𝐏 ﹒ RANKING ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
-➛ top <motivo del ranking>
+.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` 🏆 —˙𖦹.꒷
 
-── *💡 EJEMPLOS* ╏
-➛ top Mejores en PVP
-➛ top Más activos
-➛ top Más tóxicos
+── *📖 USO* ╏ 🍕
+➛.top <motivo del ranking>
 
+── *💡 EJEMPLOS* ╏ 🍕
+➛.top Mejores en PVP
+➛.top Más activos
+➛.top Más tóxicos
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -33,7 +41,7 @@ function handler(m, { groupMetadata, command, conn, text }) {
     let ps = groupMetadata.participants.map(v => v.id)
     if (ps.length < 10) {
         await react('⚠️')
-        return m.reply(`𐔌 ꒱ ***TOP 10*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n⚠️ ➛ Se necesitan mínimo 10 miembros en el grupo\n━━━━━━━━━━━`)
+        return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Se necesitan mínimo 10 miembros en el grupo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
     }
 
     let a = ps.getRandom()
@@ -53,11 +61,14 @@ function handler(m, { groupMetadata, command, conn, text }) {
 
     let vn = `https://hansxd.nasihosting.com/sound/sound${k}.mp3`
 
-    let top = `𐔌 ꒱ ***TOP 10*** 𐔌 ꒱ 🏆
+    let top = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`${text.toUpperCase()}\`\` —˙𖦹.${x}꒷
+⤷ ┇ 𝐑𝐀𝐍𝐊𝐈𝐍𝐆 ﹒ ${text.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *🏅 RANKING* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`TOP 10\`\` ${x} —˙𖦹.꒷
+
+── *🏅 RANKING* ╏ 🍕
 ${x} *1.* ${user(a)}
 ${x} *2.* ${user(b)}
 ${x} *3.* ${user(c)}
@@ -69,12 +80,15 @@ ${x} *8.* ${user(h)}
 ${x} *9.* ${user(i)}
 ${x} *10.* ${user(j)}
 
-── *📝 NOTA* ╏
+── *📝 NOTA* ╏ 🍕
 🎲 ➛ Ranking 100% aleatorio y divertido
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
 
     m.reply(top, null, { mentions: [a, b, c, d, e, f, g, h, i, j] })
+    await react(x)
 
     // Descomenta si quieres que mande audio
     // conn.sendFile(m.chat, vn, 'top.mp3', null, m, true, { type: 'audioMessage', ptt: true })
