@@ -41,19 +41,19 @@ let handler = async (m, { conn, participants }) => {
 
         if (mentionedJid === conn.user.jid) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo eliminarme a mí mismo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo eliminarme a mí mismo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
         if (mentionedJid === ownerGroup) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al propietario del grupo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al propietario del grupo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
         if (mentionedJid === ownerBot) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al dueño del bot\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al dueño del bot\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
         if (isAdmin) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar a un administrador\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar a un administrador\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
 
         await react('👢')
@@ -78,7 +78,7 @@ let handler = async (m, { conn, participants }) => {
         await react('❌')
         let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
