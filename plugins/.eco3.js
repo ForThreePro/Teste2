@@ -38,5 +38,5 @@ handler.help = ['shop', 'buy']
 handler.tags = ['economy']
 handler.command = ['shop', 'tienda', 'buy', 'comprar']
 handler.group = true
-handler.register = true
+handler.register = false
 export default handler
