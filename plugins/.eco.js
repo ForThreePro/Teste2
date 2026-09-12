@@ -2,11 +2,11 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-  // SALDO - FIX JID Y MENCIONES
+  // SALDO - MENCIONA EN PRIVADO TAMBIÉN
   if (['saldo', 'bal', 'balance'].includes(command)) {
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : m.sender
 
-    // Normalizar JID - algunos bots usan @lid, otros @s.whatsapp.net
+    // Normalizar JID
     who = who.replace(/@lid$/, '@s.whatsapp.net')
 
     // Si el usuario no existe en la DB, crearlo
@@ -15,8 +15,6 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     }
 
     let userTarget = global.db.data.users[who]
-
-    // Asegurar que coin y bank sean números
     userTarget.coin = Number(userTarget.coin) || 0
     userTarget.bank = Number(userTarget.bank) || 0
 
@@ -30,7 +28,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
     let texto = `💰 *SALDO DE @${who.split('@')[0]}* 💰\n\n🪙 Billetera: ${userTarget.coin} monedas\n🏦 Banco: ${userTarget.bank} monedas\n💵 Total: ${userTarget.coin + userTarget.bank} monedas`
 
-    // Si menciona a otro, manda al privado y no muestra en el grupo
+    // Si menciona a otro, manda al privado CON MENCION
     if (who!== m.sender) {
       try {
         await conn.reply(m.sender, texto, null, { mentions: [who] })
