@@ -1,4 +1,8 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 let handler = async (m, { conn }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
@@ -8,33 +12,43 @@ let handler = async (m, { conn }) => {
         let link = await conn.groupInviteCode(m.chat)
         let groupMetadata = await conn.groupMetadata(m.chat)
 
-        let texto = `𐔌 ꒱ ***LINK DEL GRUPO*** 𐔌 ꒱ ✅
+        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`INVITACIÓN\`\` —˙𖦹.🔗꒷
+⤷ ┇ 𝐋𝐈𝐍𝐊 ﹒ DEL GRUPO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`INVITACIÓN\`\` 🔗 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 👥 ➛ Grupo: *${groupMetadata.subject}*
 
-── *🔗 ENLACE* ╏
+── *🔗 ENLACE* ╏ 🍕
 https://chat.whatsapp.com/${link}
 
-── *📝 NOTAS* ╏
+── *📝 NOTAS* ╏ 🍕
 🔒 ➛ Solo admins pueden resetear el link
 ⚠️ ➛ No lo compartas con desconocidos
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: texto }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `𐔌 ꒱ ***LINK DEL GRUPO*** 𐔌 ꒱ ⚠️
+        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ LINK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ No pude obtener el link
 🔒 ➛ ¿Soy admin del grupo?
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
