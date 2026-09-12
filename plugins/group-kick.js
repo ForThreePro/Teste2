@@ -1,4 +1,8 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 let handler = async (m, { conn, participants }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
@@ -7,17 +11,22 @@ let handler = async (m, { conn, participants }) => {
 
     if (!mentionedJid) {
         await react('❌')
-        let error = `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ⚠️
+        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.👢꒷
+⤷ ┇ 𝐄𝐗𝐏𝐔𝐋𝐒𝐀𝐑 ﹒ USUARIO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` 👢 —˙𖦹.꒷
+
+── *📖 USO* ╏ 🍕
 ➛ Menciona a un usuario
 ➛ Responde al mensaje del usuario
 
-── *📝 AVISO* ╏
+── *📝 AVISO* ╏ 🍕
 🔒 ➛ Solo admins
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -32,44 +41,54 @@ let handler = async (m, { conn, participants }) => {
 
         if (mentionedJid === conn.user.jid) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ No puedo eliminarme a mí mismo\n━━━━━━━━━━━` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo eliminarme a mí mismo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
         if (mentionedJid === ownerGroup) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ No puedo expulsar al propietario del grupo\n━━━━━━━━━━━` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al propietario del grupo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
         if (mentionedJid === ownerBot) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ No puedo expulsar al dueño del bot\n━━━━━━━━━━━` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al dueño del bot\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
         if (isAdmin) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ No puedo expulsar a un administrador\n━━━━━━━━━━━` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar a un administrador\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
         }
 
         await react('👢')
         await conn.groupParticipantsUpdate(m.chat, [mentionedJid], 'remove')
 
-        let kickMsg = `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ✅
+        let kickMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`EXPULSADO\`\` —˙𖦹.👢꒷
+⤷ ┇ 𝐄𝐗𝐏𝐔𝐋𝐒𝐀𝐃𝐎 ﹒ USUARIO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 👢 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 👢 ➛ Usuario: @${mentionedJid.split('@')[0]}
 👑 ➛ Por: @${m.sender.split('@')[0]}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: kickMsg, mentions: [mentionedJid, m.sender] }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `𐔌 ꒱ ***EXPULSAR USUARIO*** 𐔌 ꒱ ⚠️
+        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ KICK ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ Se ha producido un problema
 🔧 ➛ ${e.message}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
