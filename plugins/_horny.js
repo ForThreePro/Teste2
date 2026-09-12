@@ -28,7 +28,7 @@ let handler = async (m, { conn, participants }) => {
             let n = await conn.getName(jid)
             if(n) name = n
         } catch {}
-        return name.replace(/[^a-zA-Z0-9 ]/g, "").slice(0, 15)
+        return name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 10) // <- LIMPIO PARA LA API
     }
 
     const getMention = (jid) => toJid(jid).split('@')[0]
@@ -78,49 +78,65 @@ let handler = async (m, { conn, participants }) => {
         }
     }
 
-    // ===== SECURITY ===== FIX FINAL
+    // ===== SECURITY ===== ARREGLADO
     if (m.message?.extendedTextMessage?.text?.includes('security') || m.text?.includes('security')) {
-        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender) // <- SIEMPRE STRING
+        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
         let pp = await getAvatar(who)
-        let createdTimestamp = Math.floor(Date.now() / 1000)
+        let createdTimestamp = Math.floor(Date.now() / 1000) // <- EN SEGUNDOS
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
         await react('🔍')
         let txt = `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.📢꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando cartel para @${getMention(who)}...\n\n━━━━━━━━━━━`
-        await conn.sendMessage(m.chat, { text: txt, mentions: [who] }) // <- MANDAR TEXTO Y MENTIONS SEPARADO
+        await conn.sendMessage(m.chat, { text: txt, mentions: [who] })
         try {
             let res = await fetch(apiUrl, { timeout: 30000 });
             if(!res.ok) throw new Error(await res.text())
             let buffer = await res.buffer()
             let caption = `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CARTEL\`\` —˙𖦹.💰꒷\n\n── *📊 INFORMACIÓN* ╏\n🚨 ➛ @${getMention(who)}\n💰 ➛ *Recompensa: 1,000,000$*\n\n━━━━━━━━━━━`
-            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] }) // <- MENTIONS TAMBIEN AQUI
+            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] })
         } catch (e) {
             await react('❌')
             m.reply(`𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
         }
     }
 
-    // ===== RANK ===== FIX FINAL
+    // ===== RANK ===== ARREGLADO + ALTERNATIVA
     if (m.message?.extendedTextMessage?.text?.includes('rank') || m.text?.includes('rank')) {
-        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender) // <- SIEMPRE STRING
-        let name = await getName(who)
+        let who = toJid(m.mentionedJid[0] || m.quoted?.sender || m.sender)
+        let name = await getName(who) // <- YA VIENE LIMPIO
         let pp = await getAvatar(who)
         let level = Math.floor(Math.random() * 100) + 1
-        let rank = Math.floor(Math.random() * 500) + 1
+        let rankNum = Math.floor(Math.random() * 500) + 1
         let currxp = Math.floor(Math.random() * 5000)
         let needxp = currxp + Math.floor(Math.random() * 2000) + 1000
-        let apiUrl = `https://api.stellarwa.xyz/generate/rank?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}`
+
+        // OPCION 1: RANK NORMAL
+        let apiUrl = `https://api.stellarwa.xyz/generate/rank?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rankNum}&currxp=${currxp}&needxp=${needxp}&key=${key}`
+
         await react('📊')
         let txt = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` —˙𖦹.🎮꒷\n\n── *📊 ESTADO* ╏\n🖼️ ➛ Creando tarjeta para @${getMention(who)}...\n\n━━━━━━━━━━━`
-        await conn.sendMessage(m.chat, { text: txt, mentions: [who] }) // <- MANDAR TEXTO Y MENTIONS SEPARADO
+        await conn.sendMessage(m.chat, { text: txt, mentions: [who] })
+
         try {
             let res = await fetch(apiUrl, { timeout: 30000 });
-            if(!res.ok) throw new Error(await res.text())
+            let txtError = await res.text()
+            if(!res.ok) throw new Error(txtError)
             let buffer = await res.buffer()
-            let caption = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rank}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`
-            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] }) // <- MENTIONS TAMBIEN AQUI
+            let caption = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ESTADÍSTICAS\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n🏆 ➛ Rank: *#${rankNum}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`
+            await conn.sendMessage(m.chat, { image: buffer, caption: caption, mentions: [who] })
         } catch (e) {
-            await react('❌')
-            m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ ${e.message}`)
+            // SI FALLA RANK, INTENTA CON LEVELUP
+            try {
+                await react('⚠️')
+                let apiUrl2 = `https://api.stellarwa.xyz/generate/levelup?avatar=${encodeURIComponent(pp)}&key=${key}`
+                let res2 = await fetch(apiUrl2, { timeout: 30000 });
+                if(!res2.ok) throw new Error(await res2.text())
+                let buffer2 = await res2.buffer()
+                let caption = `𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ 📊\n\n.⃟𖥔 ݁. 𖦹˙— \`\`ALTERNATIVA\`\` —˙𖦹.🎮꒷\n\n── *📊 DATOS* ╏\n👤 ➛ @${getMention(who)}\n📈 ➛ Nivel: *${level}*\n✨ ➛ XP: *${currxp}/${needxp}*\n\n━━━━━━━━━━━`
+                await conn.sendMessage(m.chat, { image: buffer2, caption: caption, mentions: [who] })
+            } catch (e2) {
+                await react('❌')
+                m.reply(`𐔌 ꒱ ***TARJETA DE NIVEL*** 𐔌 ꒱ ⚠️\n\n❌ Error API: ${e.message}\n\nIntenta con.security`)
+            }
         }
     }
 }
