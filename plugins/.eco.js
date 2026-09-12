@@ -1,13 +1,52 @@
 let MONEDA = 'R-COINS'
 
 let trabajos = [
+    // NIVEL BAJO 1-3
     { name: 'Repartidor', min: 20, max: 50, exp: 5 },
+    { name: 'Lava Platos', min: 15, max: 40, exp: 4 },
+    { name: 'Vendedor Ambulante', min: 25, max: 60, exp: 5 },
+    { name: 'Pintor', min: 30, max: 70, exp: 6 },
+    { name: 'Jardinero', min: 25, max: 55, exp: 5 },
+    { name: 'Mesero', min: 30, max: 65, exp: 6 },
+    { name: 'Taxista', min: 35, max: 80, exp: 7 },
+
+    // NIVEL MEDIO 4-7
     { name: 'Programador', min: 40, max: 100, exp: 8 },
     { name: 'Chef', min: 30, max: 80, exp: 6 },
+    { name: 'Diseñador', min: 50, max: 110, exp: 9 },
+    { name: 'Fotógrafo', min: 45, max: 100, exp: 8 },
+    { name: 'Mecánico', min: 55, max: 120, exp: 10 },
+    { name: 'Electricista', min: 60, max: 130, exp: 11 },
+    { name: 'Doctor', min: 70, max: 150, exp: 12 },
+    { name: 'Abogado', min: 65, max: 140, exp: 11 },
+    { name: 'Profesor', min: 50, max: 105, exp: 9 },
+
+    // NIVEL ALTO 8-12
     { name: 'Minero', min: 50, max: 120, exp: 10 },
     { name: 'Streamer', min: 60, max: 150, exp: 12 },
-    { name: 'Hacker', min: 150, max: 400, exp: 25 }, // NUEVO TRABAJO
-    { name: 'CEO', min: 100, max: 300, exp: 20 }
+    { name: 'Youtuber', min: 70, max: 170, exp: 13 },
+    { name: 'Influencer', min: 80, max: 190, exp: 14 },
+    { name: 'Piloto', min: 90, max: 210, exp: 15 },
+    { name: 'Arquitecto', min: 85, max: 200, exp: 15 },
+    { name: 'Ingeniero', min: 95, max: 220, exp: 16 },
+
+    // NIVEL PRO 13-18
+    { name: 'Hacker', min: 150, max: 400, exp: 25 },
+    { name: 'Científico', min: 120, max: 300, exp: 20 },
+    { name: 'Astronauta', min: 140, max: 350, exp: 22 },
+    { name: 'CEO', min: 100, max: 300, exp: 20 },
+    { name: 'Inversionista', min: 130, max: 320, exp: 21 },
+    { name: 'Cirujano', min: 160, max: 380, exp: 24 },
+    { name: 'Director', min: 110, max: 280, exp: 18 },
+
+    // NIVEL ÉPICO 19+
+    { name: 'Dueño de Banco', min: 200, max: 500, exp: 30 },
+    { name: 'Magnate', min: 250, max: 600, exp: 35 },
+    { name: 'Presidente', min: 300, max: 700, exp: 40 },
+    { name: 'Rey', min: 350, max: 800, exp: 45 },
+    { name: 'Dueño de Meta', min: 400, max: 900, exp: 50 },
+    { name: 'Creador de Cripto', min: 450, max: 1000, exp: 55 },
+    { name: 'Dios', min: 500, max: 1200, exp: 60 }
 ]
 
 function getUser(id) {
