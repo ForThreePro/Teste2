@@ -1,4 +1,6 @@
 import fs from 'fs'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const filePath = './temp_groups.json'
 
@@ -23,12 +25,24 @@ setInterval(async () => {
 
   for (let i of global.tempGroups) {
     const timeLeft = i.exitTime - now
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
     // AVISO 5 MINUTOS ANTES
     if (timeLeft <= 300000 && timeLeft > 0 &&!i.warned) {
       try {
         await global.conn.sendMessage(i.id, {
-          text: `𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⏰\n\n.⃟𖥔 ݁. 𖦹˙— \`\`AVISO\`\` —˙𖦹.⏰꒷\n\n── *📝 AVISO* ╏\n⏰ ➛ El bot se saldrá de este grupo en 5 minutos\n━━━━━━━━━━━`
+          text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ AVISO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`5 MINUTOS\`\` ⏰ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+⏰ ➛ El bot se saldrá de este grupo en 5 minutos
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
         })
         i.warned = true
         saveTempGroups()
@@ -41,7 +55,18 @@ setInterval(async () => {
       while (attempts < 3) {
         try {
           await global.conn.sendMessage(i.id, {
-            text: `𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ 👋\n\n.⃟𖥔 ݁. 𖦹˙— \`\`SALIDA\`\` —˙𖦹.👋꒷\n\n── *📝 AVISO* ╏\n⏰ ➛ Temporizador finalizado. Saliendo...\n━━━━━━━━━━━`
+            text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ SALIDA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`SALIENDO\`\` 👋 —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
+⏰ ➛ Temporizador finalizado. Saliendo...
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
           })
           await new Promise(r => setTimeout(r, 1500))
           await global.conn.groupLeave(i.id)
@@ -87,18 +112,19 @@ function isOwner(m) {
 }
 
 let handler = async (m, { conn, args, command }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
   // BLOQUEO PARA NO AUTORIZADOS
   if (!isOwner(m)) {
     await react(conn, m, "❌")
-    return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━`)
+    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
   }
 
   // COMANDO: TEMPLIST
   if (command === 'templist') {
     if (global.tempGroups.length === 0) {
       await react(conn, m, "⚠️")
-      return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n⚠️ ➛ No hay grupos con temporizador activo\n━━━━━━━━━━━`)
+      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ No hay grupos con temporizador activo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
     }
 
     let list = global.tempGroups.map((v, i) => {
@@ -106,16 +132,21 @@ let handler = async (m, { conn, args, command }) => {
       return `│ ${i+1}. *${v.name}*\n│ ⏰ Falta: ${msToTime(timeLeft)}`
     }).join('\n')
 
-    let texto = `𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ 📋
+    let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`LISTA ACTIVA\`\` —˙𖦹.📋꒷
+⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ ACTIVA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 GRUPOS* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`GRUPOS\`\` 📋 —˙𖦹.꒷
+
+── *📊 GRUPOS* ╏ 🍕
 ${list}
 
-── *📝 NOTA* ╏
+── *📝 NOTA* ╏ 🍕
 💡 ➛ Usa tempcancel para cancelar
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     await react(conn, m, "📋")
     return m.reply(texto)
@@ -124,25 +155,30 @@ ${list}
   // COMANDO: TEMPORIZADOR
   if (!m.isGroup) {
     await react(conn, m, "❌")
-    return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━`)
+    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
   }
 
   if (!args[0]) {
     await react(conn, m, "❌")
-    let error = `𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️
+    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` —˙𖦹.⏰꒷
+⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ FORMATO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📖 USO* ╏
-➛ temporizador 30d
-➛ temporizador 5h
-➛ temporizador 1d5h30m
+.⃟𖥔 ݁. 𖦹˙— \`\`USO\`\` ⏰ —˙𖦹.꒷
 
-── *💡 EJEMPLOS* ╏
+── *📖 USO* ╏ 🍕
+➛.temporizador 30d
+➛.temporizador 5h
+➛.temporizador 1d5h30m
+
+── *💡 EJEMPLOS* ╏ 🍕
 ➛ 1m = 1 minuto
 ➛ 2h = 2 horas
 ➛ 3d = 3 días
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     return m.reply(error)
   }
@@ -160,7 +196,7 @@ ${list}
   }
   if (ms < 60000) {
     await react(conn, m, "❌")
-    return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ Mínimo 1 minuto\n━━━━━━━━━━━`)
+    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Mínimo 1 minuto\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
   }
 
   const exitTime = Date.now() + ms
@@ -173,20 +209,25 @@ ${list}
   global.tempGroups.push({ id: groupId, name: groupName, exitTime, addedBy: m.sender, warned: false })
   saveTempGroups()
 
-  const fecha = new Date(exitTime).toLocaleString('es-PE', { timeZone: 'America/Lima' })
+  const fechaSalida = moment.tz(exitTime, 'America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
-  let ok = `𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ✅
+  let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ACTIVADO\`\` —˙𖦹.⏰꒷
+⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ ACTIVADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`PROGRAMADO\`\` ⏰ —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 🏠 ➛ Grupo: ${groupName}
 ⏰ ➛ Salida en: ${msToTime(ms)}
-📅 ➛ Fecha: ${fecha}
+📅 ➛ Fecha: ${fechaSalida}
 
-── *📝 NOTA* ╏
+── *📝 NOTA* ╏ 🍕
 🗑️ ➛ Usa tempcancel para cancelar
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
   await react(conn, m, "✅")
   return m.reply(ok)
@@ -194,37 +235,43 @@ ${list}
 
 // CANCELAR
 handler.before = async (m, { conn, command }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   if (command === 'tempcancel') {
 
     // BLOQUEO PARA NO AUTORIZADOS
     if (!isOwner(m)) {
       await react(conn, m, "❌")
-      return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━`)
+      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
     }
 
     if (!m.isGroup) {
       await react(conn, m, "❌")
-      return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━`)
+      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
     }
 
     let index = global.tempGroups.findIndex(v => v.id === m.chat)
     if (index === -1) {
       await react(conn, m, "⚠️")
-      return m.reply(`𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ ⚠️\n\n── *📝 AVISO* ╏\n⚠️ ➛ No hay temporizador activo\n━━━━━━━━━━━`)
+      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ No hay temporizador activo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
     }
 
     const groupName = global.tempGroups[index].name
     global.tempGroups.splice(index, 1)
     saveTempGroups()
 
-    let cancel = `𐔌 ꒱ ***TEMPORIZADOR*** 𐔌 ꒱ 🗑️
+    let cancel = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`CANCELADO\`\` —˙𖦹.🗑️꒷
+⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ CANCELADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` 🗑️ —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 🏠 ➛ Grupo: ${groupName}
 ✅ ➛ Estado: Cancelado
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
     await react(conn, m, "🗑️")
     return m.reply(cancel)
