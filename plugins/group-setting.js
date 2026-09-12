@@ -1,4 +1,8 @@
+import moment from 'moment-timezone'
+moment.locale('es')
+
 let handler = async (m, { conn, command }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (text) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
@@ -25,31 +29,41 @@ let handler = async (m, { conn, command }) => {
         await conn.groupSettingUpdate(m.chat, isClose)
         await react(reactEmoji)
 
-        let msg = `𐔌 ꒱ ***ESTADO DEL GRUPO*** 𐔌 ꒱ ✅
+        let msg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZADO\`\` —˙𖦹.${icon}꒷
+⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ${estado} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📊 INFORMACIÓN* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZADO\`\` ${icon} —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
 ${icon} ➛ Estado: *${estado}*
 👑 ➛ Por: @${m.sender.split('@')[0]}
 
-── *📝 NOTA* ╏
+── *📝 NOTA* ╏ 🍕
 ${command === 'cerrar' 
 ? '🔒 ➛ Solo admins pueden enviar mensajes' 
 : '💬 ➛ Todos pueden enviar mensajes'}
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         await conn.sendMessage(m.chat, { text: msg, mentions: [m.sender] }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `𐔌 ꒱ ***ESTADO DEL GRUPO*** 𐔌 ꒱ ⚠️
+        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` —˙𖦹.❌꒷
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ GRUPO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
 
-── *📝 AVISO* ╏
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 🍕
 ❌ ➛ No se pudo cambiar el estado
 🔒 ➛ ¿Soy admin del grupo?
 
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
