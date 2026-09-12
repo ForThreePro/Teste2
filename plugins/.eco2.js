@@ -4,17 +4,19 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   let user = global.db.data.users[m.sender]
   if (!user) user = global.db.data.users[m.sender] = { coin: 0, bank: 0, items: {} }
 
-  // TRIVIA
+  // TRIVIA - COOLDOWN 30 SEG
   if (command === 'trivia') {
-    if (cooldowns.trivia[m.sender] && Date.now() - cooldowns.trivia[m.sender] < 10000)
-      return m.reply(`Espera ${Math.ceil((10000 - (Date.now() - cooldowns.trivia[m.sender])) / 1000)}s`)
+    if (cooldowns.trivia[m.sender] && Date.now() - cooldowns.trivia[m.sender] < 30000)
+      return m.reply(`Espera ${Math.ceil((30000 - (Date.now() - cooldowns.trivia[m.sender])) / 1000)}s`)
     const preguntas = [
       { q: '¿Cuántos días tiene una semana?', a: '7' },
       { q: '¿De qué color es el cielo despejado?', a: 'azul' },
       { q: '¿Cuánto es 5 + 5?', a: '10' },
       { q: '¿Qué animal dice miau?', a: 'gato' },
       { q: '¿Cuántas patas tiene un perro?', a: '4' },
-      { q: '¿Cuánto es 3 x 3?', a: '9' }
+      { q: '¿Cuánto es 3 x 3?', a: '9' },
+      { q: '¿Qué sale de día y da luz?', a: 'sol' },
+      { q: '¿Cuál es la primera letra?', a: 'a' }
     ]
     let trivia = preguntas[Math.floor(Math.random() * preguntas.length)]
     cooldowns.trivia[m.sender] = Date.now()
@@ -36,6 +38,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     user.coin -= monto
     let resultado = Math.random() < 0.5? 'red' : 'black'
     let colorElegido = color === 'rojo'? 'red' : color === 'negro'? 'black' : color
+    await m.reply(`🎰 *RULETA* 🎰\n\nApostaste: ${monto} 🪙 a ${colorElegido === 'red'? '🔴' : '⚫'}\n\nGirando...`)
+    await new Promise(resolve => setTimeout(resolve, 1500))
     if (resultado === colorElegido) {
       let ganancia = monto * 2
       user.coin += ganancia
@@ -75,10 +79,11 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     }
   }
 
-  // WORK
+  // WORK - COOLDOWN 1-5 MIN RANDOM
   if (['work', 'trabajar'].includes(command)) {
-    if (cooldowns.work[m.sender] && Date.now() - cooldowns.work[m.sender] < 300000)
-      return m.reply(`Ya trabajaste. Espera ${Math.ceil((300000 - (Date.now() - cooldowns.work[m.sender])) / 60000)} min`)
+    let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
+    if (cooldowns.work[m.sender] && Date.now() - cooldowns.work[m.sender] < tiempoEspera)
+      return m.reply(`Ya trabajaste. Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.work[m.sender])) / 60000)} min`)
     cooldowns.work[m.sender] = Date.now()
     const trabajos = [
       { texto: 'Programaste y ganaste', min: 80, max: 200 },
@@ -93,25 +98,43 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\nSaldo: ${user.coin} 🪙`)
   }
 
-  // ROBAR
+  // ROBAR - COOLDOWN 1-5 MIN RANDOM + AVISA AL ROBADO POR PRIVADO
   if (['robar', 'rob'].includes(command)) {
-    if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < 600000)
-      return m.reply(`Espera ${Math.ceil((600000 - (Date.now() - cooldowns.robar[m.sender])) / 60000)} min para robar de nuevo`)
+    let tiempoEspera = Math.floor(Math.random() * 240000) + 60000 // 1-5 min
+    if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < tiempoEspera)
+      return m.reply(`Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.robar[m.sender])) / 60000)} min para robar de nuevo`)
+
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
     if (!who) return m.reply(`Menciona a quien quieres robar`)
     if (who === m.sender) return m.reply('No te puedes robar a ti mismo')
     let target = global.db.data.users[who]
     if (!target || target.coin < 10) return m.reply(`@${who.split('@')[0]} no tiene nada`, null, { mentions: [who] })
+
     cooldowns.robar[m.sender] = Date.now()
     let exito = Math.random() < 0.6
+    let ladronName
+    try {
+      ladronName = conn.getName(m.sender)
+    } catch {
+      ladronName = 'Alguien'
+    }
+
     if (exito) {
       let robado = Math.min(Math.floor(Math.random() * target.coin * 0.5) + 5, target.coin)
       target.coin -= robado
       user.coin += robado
+
+      // AVISAR AL ROBADO POR PRIVADO
+      await conn.reply(who, `🚨 *TE ROBARON* 🚨\n\n@${m.sender.split('@')[0]} te robó *${robado} monedas* 🪙 de tu billetera\n\nTu saldo: ${target.coin} 🪙`, null, { mentions: [m.sender] })
+
       return m.reply(`🦹 *ROBO EXITOSO* 🦹\n\nLe robaste *${robado} monedas* a @${who.split('@')[0]}\n\nTu saldo: ${user.coin} 🪙`, null, { mentions: [who, m.sender] })
     } else {
       let multa = Math.floor(Math.random() * 50) + 20
       user.coin = Math.max(0, user.coin - multa)
+
+      // AVISAR AL QUE INTENTARON ROBAR
+      await conn.reply(who, `🚔 *INTENTO DE ROBO* 🚔\n\n@${m.sender.split('@')[0]} intentó robarte pero falló y pagó *${multa} monedas* de multa`, null, { mentions: [m.sender] })
+
       return m.reply(`🚔 *TE ATRAPARON* 🚔\n\nPagaste *${multa} monedas* de multa\n\nTu saldo: ${user.coin} 🪙`)
     }
   }
