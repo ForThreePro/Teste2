@@ -42,7 +42,7 @@ let handler = async (m, { conn }) => {
     }
 }
 
-handler.help = ['gemidos - Manda audio + mensaje']
+handler.help = ['gemidos']
 handler.tags = ['Nsfw']
 handler.command = /^(gemidos)$/i
 export default handler
