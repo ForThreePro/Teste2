@@ -10,13 +10,13 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   user.bank = Number(user.bank) || 0
   user.deuda = Number(user.deuda) || 0
 
-  // .PRESTAMO - PEDIR PRESTADO AL BANCO
+  // .PRESTAMO - INTERÉS FIJO 25% UNA SOLA VEZ
   if (command === 'prestamo') {
     if (user.deuda > 0) return m.reply(`🚔 Tienes *deuda con la policía* de ${user.deuda} 🪙\n\nPágala primero con ${usedPrefix}work o ${usedPrefix}pagardeuda`)
-    if (user.prestamo > 0) return m.reply(`🏦 Ya tienes un préstamo activo de *${user.prestamo} monedas*\n\nInterés acumulado: ${user.interes} monedas\n\nUsa ${usedPrefix}pagarprestamo <monto> para pagar`)
+    if (user.prestamo > 0) return m.reply(`🏦 Ya tienes un préstamo activo\n\nCapital: ${user.prestamo - user.interes} monedas\nInterés: ${user.interes} monedas\n*Total a pagar: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto> para pagar`)
 
     let monto = parseInt(text)
-    if (isNaN(monto) || monto < 100) return m.reply(`🏦 *PRÉSTAMO BANCARIO* 🏦\n\nMonto mínimo: 100 monedas\nMonto máximo: 10,000 monedas\nInterés: 5% diario\n\nUso: ${usedPrefix}prestamo <monto>`)
+    if (isNaN(monto) || monto < 100) return m.reply(`🏦 *PRÉSTAMO BANCARIO* 🏦\n\nMonto mínimo: 100 monedas\nMonto máximo: 10,000 monedas\nInterés: 25% fijo\n\nEjemplos:\n100 → Pagas 125\n200 → Pagas 250\n500 → Pagas 625\n1000 → Pagas 1250\n\nUso: ${usedPrefix}prestamo <monto>`)
     if (monto > 10000) return m.reply('Monto máximo: 10,000 monedas')
 
     // Calcular capacidad de préstamo según nivel de riqueza
@@ -24,11 +24,14 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let limitePrestamo = Math.max(100, totalRiqueza * 2)
     if (monto > limitePrestamo) return m.reply(`🏦 El banco solo te presta hasta *${limitePrestamo} monedas* según tu riqueza actual\n\nTotal: ${totalRiqueza} 🪙`)
 
-    user.prestamo = monto
-    user.bank += monto
-    user.interes = 0
+    let interesFijo = Math.floor(monto * 0.25) // 25% fijo
+    let totalPagar = monto + interesFijo
 
-    return m.reply(`🏦 *PRÉSTAMO APROBADO* 🏦\n\nRecibiste: *${monto} monedas* en tu banco\nInterés: 5% diario (${Math.floor(monto * 0.05)} monedas/día)\n\n⚠️ Paga con ${usedPrefix}pagarprestamo <monto>\n\nSaldo banco: ${user.bank} 🪙\nDeuda total: ${user.prestamo} 🪙`)
+    user.prestamo = totalPagar // Guardamos el total a pagar
+    user.interes = interesFijo // Guardamos solo el interés para mostrarlo
+    user.bank += monto
+
+    return m.reply(`🏦 *PRÉSTAMO APROBADO* 🏦\n\nRecibiste: *${monto} monedas* en tu banco\nInterés fijo: ${interesFijo} monedas (25%)\n*Total a pagar: ${totalPagar} monedas*\n\n⚠️ Paga con ${usedPrefix}pagarprestamo <monto>\n\nSaldo banco: ${user.bank} 🪙`)
   }
 
   // .PAGARPRESTAMO - PAGAR EL PRÉSTAMO
@@ -36,27 +39,26 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     if (user.prestamo === 0) return m.reply('✅ No tienes préstamos pendientes')
 
     let monto = parseInt(text)
-    if (isNaN(monto) || monto < 1) return m.reply(`🏦 *TU PRÉSTAMO* 🏦\n\nDeuda: ${user.prestamo} monedas\nInterés: ${user.interes} monedas\n*Total: ${user.prestamo + user.interes} monedas*\n\nUso: ${usedPrefix}pagarprestamo <monto>`)
+    if (isNaN(monto) || monto < 1) return m.reply(`🏦 *TU PRÉSTAMO* 🏦\n\nCapital: ${user.prestamo - user.interes} monedas\nInterés: ${user.interes} monedas\n*Total: ${user.prestamo} monedas*\n\nUso: ${usedPrefix}pagarprestamo <monto>`)
 
-    let totalDeuda = user.prestamo + user.interes
-    if (user.coin < monto) return m.reply(`No tienes suficiente. Billetera: ${user.coin} 🪙\nDeuda total: ${totalDeuda} 🪙`)
+    if (user.coin < monto) return m.reply(`No tienes suficiente. Billetera: ${user.coin} 🪙\nDeuda total: ${user.prestamo} 🪙`)
 
-    let aPagar = Math.min(monto, totalDeuda)
+    let aPagar = Math.min(monto, user.prestamo)
     user.coin -= aPagar
+    user.prestamo -= aPagar
 
-    // Primero se paga el interés, luego el capital
-    if (aPagar <= user.interes) {
-      user.interes -= aPagar
-    } else {
-      let resto = aPagar - user.interes
+    // Recalcular interés proporcional
+    if (user.prestamo === 0) {
       user.interes = 0
-      user.prestamo -= resto
-    }
-
-    if (user.prestamo === 0 && user.interes === 0) {
       return m.reply(`✅ *PRÉSTAMO PAGADO* ✅\n\nPagaste ${aPagar} monedas\nYa no tienes deudas con el banco\n\nTu saldo: ${user.coin} 🪙`)
     } else {
-      return m.reply(`💸 Pagaste ${aPagar} monedas\n\n🏦 *DEUDA RESTANTE* 🏦\nCapital: ${user.prestamo} monedas\nInterés: ${user.interes} monedas\n*Total: ${user.prestamo + user.interes} monedas*\n\nTu saldo: ${user.coin} 🪙`)
+      // Mantener proporción del interés
+      let capitalOriginal = user.prestamo + aPagar - user.interes
+      let interesOriginal = user.interes
+      let porcentajePagado = aPagar / (capitalOriginal + interesOriginal)
+      user.interes = Math.max(0, Math.floor(interesOriginal * (1 - porcentajePagado)))
+      
+      return m.reply(`💸 Pagaste ${aPagar} monedas\n\n🏦 *DEUDA RESTANTE* 🏦\nCapital: ${user.prestamo - user.interes} monedas\nInterés: ${user.interes} monedas\n*Total: ${user.prestamo} monedas*\n\nTu saldo: ${user.coin} 🪙`)
     }
   }
 
@@ -64,7 +66,8 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   if (['verprestamo', 'miprestamo'].includes(command)) {
     if (user.prestamo === 0) return m.reply('✅ No tienes préstamos activos\n\nUsa ' + usedPrefix + 'prestamo <monto> para pedir uno')
 
-    return m.reply(`🏦 *TU PRÉSTAMO BANCARIO* 🏦\n\n💰 Capital: ${user.prestamo} monedas\n📈 Interés acumulado: ${user.interes} monedas\n💵 *TOTAL A PAGAR: ${user.prestamo + user.interes} monedas*\n\n⚠️ El interés sube 5% diario\nUsa ${usedPrefix}pagarprestamo <monto> para pagar`)
+    let capital = user.prestamo - user.interes
+    return m.reply(`🏦 *TU PRÉSTAMO BANCARIO* 🏦\n\n💰 Capital prestado: ${capital} monedas\n📈 Interés fijo: ${user.interes} monedas (25%)\n💵 *TOTAL A PAGAR: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto> para pagar`)
   }
 
   // .INTERES - COBRAR INTERÉS DIARIO DEL BANCO
@@ -132,14 +135,15 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     texto += `🚔 Deuda policía: ${user.deuda} monedas\n\n`
 
     if (user.prestamo > 0) {
-      texto += `📊 *TU PRÉSTAMO*\nCapital: ${user.prestamo} monedas\nInterés: ${user.interes} monedas\nTotal: ${user.prestamo + user.interes} monedas\n\n`
+      let capital = user.prestamo - user.interes
+      texto += `📊 *TU PRÉSTAMO*\nCapital: ${capital} monedas\nInterés: ${user.interes} monedas\nTotal: ${user.prestamo} monedas\n\n`
     } else {
       texto += `✅ Sin préstamos activos\n\n`
     }
 
     texto += `📈 *SERVICIOS*\n`
     texto += `• ${usedPrefix}interes - Cobra 2% diario de tu banco\n`
-    texto += `• ${usedPrefix}prestamo <monto> - Pide prestado (5% interés diario)\n`
+    texto += `• ${usedPrefix}prestamo <monto> - Pide prestado (25% interés fijo)\n`
     texto += `• ${usedPrefix}pagarprestamo <monto> - Paga tu deuda\n`
     texto += `• ${usedPrefix}crimen - Intenta robar el banco (35% éxito)\n\n`
     texto += `💡 Tip: Deposita con ${usedPrefix}dall para ganar interés`
@@ -148,29 +152,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   }
 }
 
-// SISTEMA DE INTERÉS AUTOMÁTICO PARA PRÉSTAMOS
-// Se ejecuta cada vez que alguien usa un comando
-handler.before = async (m, { conn }) => {
-  if (!global.db.data.users[m.sender]) return
-  let user = global.db.data.users[m.sender]
-  user.prestamo = Number(user.prestamo) || 0
-  user.interes = Number(user.interes) || 0
-  user.ultimoInteresPrestamo = Number(user.ultimoInteresPrestamo) || 0
-
-  // Si tiene préstamo, acumular interés cada 24h
-  if (user.prestamo > 0) {
-    let ahora = Date.now()
-    let tiempoTranscurrido = ahora - user.ultimoInteresPrestamo
-    let diasPasados = Math.floor(tiempoTranscurrido / 86400000) // 24h en ms
-
-    if (diasPasados > 0) {
-      let interesNuevo = Math.floor(user.prestamo * 0.05 * diasPasados)
-      user.interes += interesNuevo
-      user.ultimoInteresPrestamo = ahora
-    }
-  }
-}
-
+// YA NO HAY SISTEMA DE INTERÉS AUTOMÁTICO
 handler.help = ['prestamo', 'pagarprestamo', 'verprestamo', 'interes', 'crimen', 'banco']
 handler.tags = ['economy']
 handler.command = ['prestamo', 'pagarprestamo', 'pp', 'verprestamo', 'miprestamo', 'interes', 'crimen', 'banco']
