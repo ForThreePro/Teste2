@@ -1,4 +1,4 @@
-let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner }) => {
+let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner, quoted }) => {
   
   // Verificar si es admin o owner
   if (!isAdmin &&!isOwner) return m.reply('😾 ¡Oye! Solo los admins pueden tocar mi lasaña... digo, el grupo')
@@ -40,11 +40,40 @@ let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner }) =
       return m.reply('😾 *¡Miau!* No pude cambiar la descripción\n\nDame admin o me voy a dormir...')
     }
   }
+
+  // NUEVO: .SETFOTO - CAMBIAR FOTO DEL GRUPO
+  if (['setfoto', 'setppgroup', 'setppgc'].includes(command)) {
+    let q = m.quoted ? m.quoted : m
+    let mime = (q.msg || q).mimetype || ''
+    
+    // Si es link en el texto
+    if (text && /https?:\/\//.test(text)) {
+      try {
+        await conn.updateProfilePicture(m.chat, { url: text })
+        return m.reply(`🍝 *¡FOTO CAMBIADA!* 🍝\n\n😼 Garfield aprobó la nueva foto del grupo\n\n*Espero que sea una foto de lasaña...*\n\n*Odio cuando no hay comida en las fotos*`)
+      } catch (e) {
+        return m.reply('😾 *¡Miau!* No pude cambiar la foto con ese link\n\nAsegúrate de que sea una imagen válida y que yo sea admin')
+      }
+    }
+    
+    // Si es respondiendo a imagen
+    if (/image/.test(mime)) {
+      try {
+        let img = await q.download()
+        await conn.updateProfilePicture(m.chat, img)
+        return m.reply(`🍝 *¡FOTO CAMBIADA!* 🍝\n\n😼 Nueva foto del grupo instalada\n\n*Si no es lasaña me decepciono...*\n\n*Los lunes y las fotos feas no me gustan*`)
+      } catch (e) {
+        return m.reply('😾 *¡Garfield frustrado!*\n\nNo pude cambiar la foto\n\nDame admin o me voy a comer lasaña')
+      }
+    } else {
+      return m.reply(`🍝 *CAMBIO DE FOTO* 🍝\n\n😼 *Formas de usar:*\n\n1. Responde a una imagen con ${usedPrefix}setfoto\n2. ${usedPrefix}setfoto <link de imagen>\n\n*No me hagas trabajar por gusto...*`)
+    }
+  }
 }
 
-handler.help = ['resetlink', 'setname', 'setdesc']
-handler.tags = ['grupo']
-handler.command = ['resetlink', 'revokelink', 'setname', 'setgroupname', 'setdesc', 'setgroupdesc']
+handler.help = ['resetlink', 'setname', 'setdesc', 'setfoto']
+handler.tags = ['group']
+handler.command = ['resetlink', 'revokelink', 'setname', 'setgroupname', 'setdesc', 'setgroupdesc', 'setfoto', 'setppgroup', 'setppgc']
 handler.group = true
 handler.admin = true
 handler.botAdmin = true
