@@ -10,7 +10,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   user.bank = Number(user.bank) || 0
   user.deuda = Number(user.deuda) || 0
 
-  // .PRESTAMO - INTERÉS FIJO 25% UNA SOLA VEZ
+  //.PRESTAMO - INTERÉS FIJO 25% UNA SOLA VEZ
   if (command === 'prestamo') {
     if (user.deuda > 0) return m.reply(`🚔 Tienes *deuda con la policía* de ${user.deuda} 🪙\n\nPágala primero con ${usedPrefix}work o ${usedPrefix}pagardeuda`)
     if (user.prestamo > 0) return m.reply(`🏦 Ya tienes un préstamo activo\n\nCapital: ${user.prestamo - user.interes} monedas\nInterés: ${user.interes} monedas\n*Total a pagar: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto> para pagar`)
@@ -34,7 +34,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`🏦 *PRÉSTAMO APROBADO* 🏦\n\nRecibiste: *${monto} monedas* en tu banco\nInterés fijo: ${interesFijo} monedas (25%)\n*Total a pagar: ${totalPagar} monedas*\n\n⚠️ Paga con ${usedPrefix}pagarprestamo <monto>\n\nSaldo banco: ${user.bank} 🪙`)
   }
 
-  // .PAGARPRESTAMO - PAGAR EL PRÉSTAMO
+  //.PAGARPRESTAMO - PAGAR EL PRÉSTAMO
   if (['pagarprestamo', 'pp'].includes(command)) {
     if (user.prestamo === 0) return m.reply('✅ No tienes préstamos pendientes')
 
@@ -57,12 +57,12 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       let interesOriginal = user.interes
       let porcentajePagado = aPagar / (capitalOriginal + interesOriginal)
       user.interes = Math.max(0, Math.floor(interesOriginal * (1 - porcentajePagado)))
-      
+
       return m.reply(`💸 Pagaste ${aPagar} monedas\n\n🏦 *DEUDA RESTANTE* 🏦\nCapital: ${user.prestamo - user.interes} monedas\nInterés: ${user.interes} monedas\n*Total: ${user.prestamo} monedas*\n\nTu saldo: ${user.coin} 🪙`)
     }
   }
 
-  // .VER PRESTAMO - VER INFO DEL PRÉSTAMO
+  //.VER PRESTAMO - VER INFO DEL PRÉSTAMO
   if (['verprestamo', 'miprestamo'].includes(command)) {
     if (user.prestamo === 0) return m.reply('✅ No tienes préstamos activos\n\nUsa ' + usedPrefix + 'prestamo <monto> para pedir uno')
 
@@ -70,7 +70,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`🏦 *TU PRÉSTAMO BANCARIO* 🏦\n\n💰 Capital prestado: ${capital} monedas\n📈 Interés fijo: ${user.interes} monedas (25%)\n💵 *TOTAL A PAGAR: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto> para pagar`)
   }
 
-  // .INTERES - COBRAR INTERÉS DIARIO DEL BANCO
+  //.INTERES - COBRAR INTERÉS DIARIO DEL BANCO
   if (command === 'interes') {
     let ahora = Date.now()
     let ultimoInteres = user.ultimoInteres || 0
@@ -94,7 +94,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     return m.reply(`🏦 *INTERÉS BANCARIO* 🏦\n\nGanaste: *${interesGanado} monedas* (2% de tu banco)\n\nSaldo banco: ${user.bank} 🪙\n\nVuelve mañana por más 💰`)
   }
 
-  // .CRIMEN - ROBAR AL BANCO CON RIESGO
+  //.CRIMEN - ROBAR AL BANCO CON RIESGO
   if (command === 'crimen') {
     if (user.deuda > 0) return m.reply(`🚔 Tienes *deuda con la policía* de ${user.deuda} 🪙\n\nPágala primero con ${usedPrefix}work o ${usedPrefix}pagardeuda`)
 
@@ -127,7 +127,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     }
   }
 
-  // .BANCO - VER INFO GENERAL DEL BANCO
+  //.BANCO - VER INFO GENERAL DEL BANCO
   if (command === 'banco') {
     let texto = `🏦 *BANCO CENTRAL* 🏦\n\n`
     texto += `💰 Tu saldo banco: ${user.bank} monedas\n`
@@ -150,11 +150,44 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
     return m.reply(texto)
   }
+
+  //.PERDONARPRESTAMO - SOLO ADMINS/OWNER
+  if (command === 'perdonarprestamo') {
+    // Verificar si es owner o admin
+    let isOwner = global.owner.map(v => v[0] + '@s.whatsapp.net').includes(m.sender)
+    let isAdmin = false
+    try {
+      let groupMetadata = await conn.groupMetadata(m.chat)
+      isAdmin = groupMetadata.participants.find(p => p.id === m.sender)?.admin
+    } catch {}
+
+    if (!isOwner &&!isAdmin) return m.reply('❌ Solo admins pueden usar este comando')
+
+    let who = m.mentionedJid[0]
+    if (!who) return m.reply(`Uso: ${usedPrefix}perdonarprestamo @user`)
+    who = who.replace(/@lid$/, '@s.whatsapp.net')
+
+    if (!global.db.data.users[who]) global.db.data.users[who] = { coin: 0, bank: 0, deuda: 0, prestamo: 0, interes: 0 }
+
+    let userTarget = global.db.data.users[who]
+    userTarget.prestamo = Number(userTarget.prestamo) || 0
+
+    if (userTarget.prestamo === 0) return m.reply(`@${who.split('@')[0]} no tiene préstamos activos`, null, { mentions: [who] })
+
+    let deudaPerdonada = userTarget.prestamo
+    userTarget.prestamo = 0
+    userTarget.interes = 0
+
+    try {
+      await conn.reply(who, `🏦 *PRÉSTAMO PERDONADO* 🏦\n\nUn admin te perdonó tu deuda de *${deudaPerdonada} monedas*\n\nYa no debes nada al banco ✅`, null, { mentions: [m.sender] })
+    } catch {}
+
+    return m.reply(`✅ *PRÉSTAMO PERDONADO* ✅\n\nLe perdonaste *${deudaPerdonada} monedas* a @${who.split('@')[0]}\n\nYa no tiene deuda con el banco`, null, { mentions: [who] })
+  }
 }
 
-// YA NO HAY SISTEMA DE INTERÉS AUTOMÁTICO
-handler.help = ['prestamo', 'pagarprestamo', 'verprestamo', 'interes', 'crimen', 'banco']
+handler.help = ['prestamo', 'pagarprestamo', 'verprestamo', 'interes', 'crimen', 'banco', 'perdonarprestamo']
 handler.tags = ['economy']
-handler.command = ['prestamo', 'pagarprestamo', 'pp', 'verprestamo', 'miprestamo', 'interes', 'crimen', 'banco']
+handler.command = ['prestamo', 'pagarprestamo', 'pp', 'verprestamo', 'miprestamo', 'interes', 'crimen', 'banco', 'perdonarprestamo']
 handler.group = true
 export default handler
