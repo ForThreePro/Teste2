@@ -2,11 +2,7 @@ import axios from 'axios'
 
 // VIDEOS - Se mandan primero
 let videos = [
-    'https://telegra.ph/file/d4b85856b2685b5013a8a.mp4', // Video 1
-    'https://telegra.ph/file/e278ca6dc7d26a2cfda46.mp4', // Video 2
-    'https://telegra.ph/file/f830f235f844e30d22e8e.mp4', // Video 3
-    'https://telegra.ph/file/07fe0023525be2b2579f9.mp4', // Video 4
-    'https://telegra.ph/file/99e036ac43a09e044a223.mp4'  // Video 5
+    'https://telegra.ph/file/e278ca6dc7d26a2cfda46.mp4' // Video 2
 ]
 
 // AUDIOS - Van después del video
