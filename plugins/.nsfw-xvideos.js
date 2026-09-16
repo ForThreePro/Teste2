@@ -1,4 +1,6 @@
-import axios from 'axios'
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
 // CONFIGURACIÓN API
 const API_BASE = 'https://api.stellarwa.xyz/nsfw'
@@ -117,6 +119,7 @@ async function downloadAndSendVideo(conn, m, videoUrl, title) {
     try {
         await m.reply('📥 Descargando archivo...')
         
+        // Descargar el video
         const resVideo = await apiClient.get(videoUrl, { 
             responseType: 'arraybuffer', 
             timeout: 120000
@@ -124,11 +127,30 @@ async function downloadAndSendVideo(conn, m, videoUrl, title) {
         
         const videoBuffer = Buffer.from(resVideo.data)
         
+        // Guardar temporalmente
+        const tempDir = './tmp'
+        if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true })
+        }
+        
+        const videoPath = path.join(tempDir, `${Date.now()}.mp4`)
+        fs.writeFileSync(videoPath, videoBuffer)
+        
+        // Enviar el video
         await conn.sendMessage(m.chat, {
-            video: videoBuffer,
+            video: { url: videoPath },
             mimetype: 'video/mp4',
             caption: `🎬 *${title}*\n\n😼`
         }, { quoted: m })
+        
+        // Eliminar archivo temporal
+        setTimeout(() => {
+            try {
+                fs.unlinkSync(videoPath)
+            } catch (err) {
+                console.error('Error al eliminar archivo temporal:', err)
+            }
+        }, 5000)
         
         return true
     } catch (error) {
@@ -163,8 +185,11 @@ async function sendAudio(conn, m, audioUrl) {
 
 // Handler principal
 let handler = async (m, { conn, text }) => {
-    // Si el usuario pasa una URL directa, la usa. Si no, busca con el query rotativo
-    const searchQuery = text || queries[indice % queries.length]
+    // URL específica proporcionada por el usuario
+    const specificUrl = 'https://www.xvideos.com/video.hdbvhbh92e7/mia_khalifa_-_h._out_with_my_fans_on_camster.com'
+    
+    // Si el usuario pasa una URL directa, la usa. Si no, usa la URL específica o busca con el query rotativo
+    const searchQuery = text || specificUrl || queries[indice % queries.length]
     const audioUrl = audios[indice % audios.length]
     const texto = mensajes[indice % mensajes.length] || '✅ Listo bro'
     
