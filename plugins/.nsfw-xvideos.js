@@ -39,6 +39,8 @@ const apiClient = axios.create({
 // Función para buscar videos
 async function searchVideos(query) {
     try {
+        console.log(`Buscando videos para: ${query}`)
+        
         const searchRes = await apiClient.get(`${API_BASE}/search/xvideos`, {
             params: {
                 query,
@@ -46,20 +48,36 @@ async function searchVideos(query) {
             }
         })
 
+        console.log('Respuesta de búsqueda:', searchRes.status, searchRes.data)
+
         if (!searchRes.data?.results?.length) {
+            console.log('No se encontraron resultados en la respuesta')
             throw new Error('No se encontraron resultados')
         }
 
         return searchRes.data.results[0]
     } catch (error) {
         console.error('Error en búsqueda:', error.message)
-        throw new Error('Error al buscar videos')
+        console.error('Detalles del error:', error.response?.data || 'Sin detalles adicionales')
+        
+        // Mensaje de error más específico
+        if (error.response?.status === 401) {
+            throw new Error('Error de autenticación con la API')
+        } else if (error.response?.status === 404) {
+            throw new Error('Endpoint no encontrado')
+        } else if (error.response?.status >= 500) {
+            throw new Error('Error del servidor de la API')
+        } else {
+            throw new Error(`Error al buscar videos: ${error.message}`)
+        }
     }
 }
 
 // Función para obtener URL de descarga
 async function getDownloadUrl(videoUrl) {
     try {
+        console.log(`Obteniendo URL de descarga para: ${videoUrl}`)
+        
         const downloadRes = await apiClient.get(`${API_BASE}/dl/xvideos`, {
             params: {
                 url: encodeURIComponent(videoUrl),
@@ -67,6 +85,8 @@ async function getDownloadUrl(videoUrl) {
             },
             timeout: 60000
         })
+
+        console.log('Respuesta de descarga:', downloadRes.status, downloadRes.data)
 
         if (!downloadRes.data?.download_url) {
             throw new Error('No se pudo obtener el link de descarga')
@@ -78,7 +98,17 @@ async function getDownloadUrl(videoUrl) {
         }
     } catch (error) {
         console.error('Error al obtener URL de descarga:', error.message)
-        throw new Error('Error al obtener el enlace de descarga')
+        console.error('Detalles del error:', error.response?.data || 'Sin detalles adicionales')
+        
+        if (error.response?.status === 401) {
+            throw new Error('Error de autenticación con la API')
+        } else if (error.response?.status === 404) {
+            throw new Error('Endpoint de descarga no encontrado')
+        } else if (error.response?.status >= 500) {
+            throw new Error('Error del servidor de la API al descargar')
+        } else {
+            throw new Error(`Error al obtener el enlace de descarga: ${error.message}`)
+        }
     }
 }
 
@@ -103,7 +133,7 @@ async function downloadAndSendVideo(conn, m, videoUrl, title) {
         return true
     } catch (error) {
         console.error('Error al descargar y enviar video:', error.message)
-        throw new Error('Error al descargar el video')
+        throw new Error(`Error al descargar el video: ${error.message}`)
     }
 }
 
@@ -182,7 +212,7 @@ let handler = async (m, { conn, text }) => {
         await m.react('✅')
         
     } catch (err) {
-        console.error(err)
+        console.error('Error general en el handler:', err)
         await m.react('❌')
         await m.reply(`Error: ${err.message || 'Falló la descarga'}`)
     }
