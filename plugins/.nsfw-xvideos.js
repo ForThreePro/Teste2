@@ -122,7 +122,7 @@ let handler = async (m, { conn, text }) => {
 }
 
 handler.help = ['xnxx <búsqueda|url>']
-handler.tags = ['nsfw', 'downloader']
+handler.tags = ['nsfw']
 handler.command = /^(xnxx|xnx|dlxnxx)$/i
 handler.limit = true
 handler.nsfw = true
