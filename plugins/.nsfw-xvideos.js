@@ -1,251 +1,175 @@
-import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
+import axios from 'axios'
 
-// CONFIGURACIÓN API
 const API_BASE = 'https://api.stellarwa.xyz/nsfw'
 const API_KEY = 'garfield-vip'
 
-// QUERIES PARA BÚSQUEDA (rota automáticamente)
+// Queries que rota automáticamente
 const queries = [
     'MIA KHALIFA',
-    'Lana Rhoades', 
+    'Lana Rhoades',
     'Riley Reid',
     'Abella Danger',
-    'Brandi Love'
+    'Brandi Love',
+    'Angela White',
+    'Emily Willis',
+    'Gia Derza'
 ]
 
-// AUDIOS - Opcional, se envía después del video
+// Audios opcionales
 const audios = [
     'https://files.evogb.win/UbhAVn.opus'
 ]
 
-// MENSAJES - Van al final
+// Mensajes finales
 const mensajes = [
     '🔥 Aquí tienes tu video bro',
     '😎 Disfruta crack',
-    '✅ Listo, descargado de xvideos'
+    '✅ Listo, descargado de xnxx',
+    '🎬 A disfrutar',
+    '💥 Video listo'
 ]
 
-// Variables globales
-let indice = 0 // Para rotar queries
+let indice = 0
 
-// Configuración de axios con timeout por defecto
 const apiClient = axios.create({
-    timeout: 30000,
+    timeout: 45000,
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
 })
 
-// Función para buscar videos
 async function searchVideos(query) {
-    try {
-        console.log(`Buscando videos para: ${query}`)
-        
-        const searchRes = await apiClient.get(`${API_BASE}/search/xvideos`, {
-            params: {
-                query,
-                key: API_KEY
-            }
-        })
+    const res = await apiClient.get(`${API_BASE}/search/xnxx`, {
+        params: { query, key: API_KEY }
+    })
 
-        console.log('Respuesta de búsqueda:', searchRes.status, searchRes.data)
+    if (!res.data?.resultados?.length) {
+        throw new Error('No se encontraron resultados')
+    }
 
-        if (!searchRes.data?.results?.length) {
-            console.log('No se encontraron resultados en la respuesta')
-            throw new Error('No se encontraron resultados')
-        }
+    // Elige aleatoriamente entre los primeros 5 resultados
+    const results = res.data.resultados.slice(0, 5)
+    return results[Math.floor(Math.random() * results.length)]
+}
 
-        return searchRes.data.results[0]
-    } catch (error) {
-        console.error('Error en búsqueda:', error.message)
-        console.error('Detalles del error:', error.response?.data || 'Sin detalles adicionales')
-        
-        // Mensaje de error más específico
-        if (error.response?.status === 401) {
-            throw new Error('Error de autenticación con la API')
-        } else if (error.response?.status === 404) {
-            throw new Error('Endpoint no encontrado')
-        } else if (error.response?.status >= 500) {
-            throw new Error('Error del servidor de la API')
-        } else {
-            throw new Error(`Error al buscar videos: ${error.message}`)
-        }
+async function getDownloadUrl(videoUrl) {
+    const res = await apiClient.get(`${API_BASE}/dl/xnxx`, {
+        params: {
+            url: videoUrl,
+            key: API_KEY
+        },
+        timeout: 60000
+    })
+
+    // La API de xnxx devuelve: resultado.videos.high / .low / .HLS
+    const videos = res.data?.resultado?.videos
+    if (!videos) {
+        throw new Error('No se pudo obtener el enlace de descarga')
+    }
+
+    // Preferimos high, si no existe usamos low
+    const downloadUrl = videos.high || videos.low
+    if (!downloadUrl) {
+        throw new Error('No hay enlace MP4 disponible')
+    }
+
+    return {
+        url: downloadUrl,
+        title: 'Video XNXX' // La API de xnxx no devuelve título en el dl
     }
 }
 
-// Función para obtener URL de descarga
-async function getDownloadUrl(videoUrl) {
+async function downloadAndSendVideo(conn, m, videoUrl, title) {
+    const res = await apiClient.get(videoUrl, {
+        responseType: 'arraybuffer',
+        timeout: 180000
+    })
+
+    const buffer = Buffer.from(res.data)
+    const sizeMB = (buffer.length / (1024 * 1024)).toFixed(1)
+
+    // WhatsApp tiene límite aproximado de \~100MB
+    if (buffer.length > 95 * 1024 * 1024) {
+        throw new Error(`El video es demasiado pesado (${sizeMB} MB)`)
+    }
+
+    await conn.sendMessage(m.chat, {
+        video: buffer,
+        mimetype: 'video/mp4',
+        caption: `🎬 *${title}*\n📦 ${sizeMB} MB`
+    }, { quoted: m })
+}
+
+async function sendAudio(conn, m, audioUrl) {
     try {
-        console.log(`Obteniendo URL de descarga para: ${videoUrl}`)
-        
-        const downloadRes = await apiClient.get(`${API_BASE}/dl/xvideos`, {
-            params: {
-                url: encodeURIComponent(videoUrl),
-                key: API_KEY
-            },
+        const res = await apiClient.get(audioUrl, {
+            responseType: 'arraybuffer',
             timeout: 60000
         })
 
-        console.log('Respuesta de descarga:', downloadRes.status, downloadRes.data)
-
-        if (!downloadRes.data?.download_url) {
-            throw new Error('No se pudo obtener el link de descarga')
-        }
-
-        return {
-            url: downloadRes.data.download_url,
-            title: downloadRes.data.title || 'Video'
-        }
-    } catch (error) {
-        console.error('Error al obtener URL de descarga:', error.message)
-        console.error('Detalles del error:', error.response?.data || 'Sin detalles adicionales')
-        
-        if (error.response?.status === 401) {
-            throw new Error('Error de autenticación con la API')
-        } else if (error.response?.status === 404) {
-            throw new Error('Endpoint de descarga no encontrado')
-        } else if (error.response?.status >= 500) {
-            throw new Error('Error del servidor de la API al descargar')
-        } else {
-            throw new Error(`Error al obtener el enlace de descarga: ${error.message}`)
-        }
-    }
-}
-
-// Función para descargar y enviar video
-async function downloadAndSendVideo(conn, m, videoUrl, title) {
-    try {
-        await m.reply('📥 Descargando archivo...')
-        
-        // Descargar el video
-        const resVideo = await apiClient.get(videoUrl, { 
-            responseType: 'arraybuffer', 
-            timeout: 120000
-        })
-        
-        const videoBuffer = Buffer.from(resVideo.data)
-        
-        // Guardar temporalmente
-        const tempDir = './tmp'
-        if (!fs.existsSync(tempDir)) {
-            fs.mkdirSync(tempDir, { recursive: true })
-        }
-        
-        const videoPath = path.join(tempDir, `${Date.now()}.mp4`)
-        fs.writeFileSync(videoPath, videoBuffer)
-        
-        // Enviar el video
         await conn.sendMessage(m.chat, {
-            video: { url: videoPath },
-            mimetype: 'video/mp4',
-            caption: `🎬 *${title}*\n\n😼`
-        }, { quoted: m })
-        
-        // Eliminar archivo temporal
-        setTimeout(() => {
-            try {
-                fs.unlinkSync(videoPath)
-            } catch (err) {
-                console.error('Error al eliminar archivo temporal:', err)
-            }
-        }, 5000)
-        
-        return true
-    } catch (error) {
-        console.error('Error al descargar y enviar video:', error.message)
-        throw new Error(`Error al descargar el video: ${error.message}`)
-    }
-}
-
-// Función para enviar audio
-async function sendAudio(conn, m, audioUrl) {
-    try {
-        const resAudio = await apiClient.get(audioUrl, { 
-            responseType: 'arraybuffer', 
-            timeout: 120000 
-        })
-        
-        const audioBuffer = Buffer.from(resAudio.data)
-        
-        await conn.sendMessage(m.chat, {
-            audio: audioBuffer,
+            audio: Buffer.from(res.data),
             mimetype: 'audio/ogg; codecs=opus',
             ptt: false
         }, { quoted: m })
-        
-        return true
-    } catch (error) {
-        console.error('Error al enviar audio:', error.message)
-        // No lanzamos error aquí para que el proceso continúe
-        return false
+    } catch (e) {
+        console.log('Error al enviar audio:', e.message)
     }
 }
 
-// Handler principal
 let handler = async (m, { conn, text }) => {
-    // URL específica proporcionada por el usuario
-    const specificUrl = 'https://www.xvideos.com/video.hdbvhbh92e7/mia_khalifa_-_h._out_with_my_fans_on_camster.com'
-    
-    // Si el usuario pasa una URL directa, la usa. Si no, usa la URL específica o busca con el query rotativo
-    const searchQuery = text || specificUrl || queries[indice % queries.length]
-    const audioUrl = audios[indice % audios.length]
-    const texto = mensajes[indice % mensajes.length] || '✅ Listo bro'
-    
-    // Incrementar índice para la siguiente llamada
-    indice = (indice + 1)
-    
+    const searchQuery = text?.trim() || queries[indice % queries.length]
+    const audioUrl = audios.length ? audios[indice % audios.length] : null
+    const finalMsg = mensajes[indice % mensajes.length]
+
+    indice++
+
     try {
         await m.react('⏳')
-        
+
         let videoUrl, videoTitle
-        
-        // Si el texto empieza con http, es URL directa. Si no, busca
+
         if (searchQuery.startsWith('http')) {
+            // URL directa
             videoUrl = searchQuery
             videoTitle = 'Video'
-            await m.reply('⬇️ Descargando video por URL...')
+            await m.reply('⬇️ Descargando video...')
         } else {
-            await m.reply(`🔍 Buscando: *${searchQuery}*...`)
-            
-            // BUSCAR EN LA API
-            const searchResult = await searchVideos(searchQuery)
-            videoUrl = searchResult.url || searchResult.video_url
-            videoTitle = searchResult.title || 'Video'
-            
-            await m.reply(`📹 Encontrado: *${videoTitle}*\n⬇️ Descargando...`)
+            // Búsqueda
+            await m.reply(`🔍 Buscando *${searchQuery}*...`)
+            const result = await searchVideos(searchQuery)
+            videoUrl = result.url
+            videoTitle = result.title || 'Video'
         }
-        
-        // DESCARGAR VIDEO DESDE LA API DE DESCARGA
-        const { url: directVideoUrl, title: downloadTitle } = await getDownloadUrl(videoUrl)
-        
-        // 1. DESCARGAR Y ENVIAR VIDEO
-        await downloadAndSendVideo(conn, m, directVideoUrl, downloadTitle)
-        
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Pausa 1s
-        
-        // 2. ENVIAR AUDIO (si existe)
+
+        // Obtener link de descarga
+        const { url: directUrl, title } = await getDownloadUrl(videoUrl)
+
+        // Descargar y enviar video
+        await downloadAndSendVideo(conn, m, directUrl, title || videoTitle)
+
+        // Enviar audio (si hay)
         if (audioUrl) {
+            await new Promise(r => setTimeout(r, 800))
             await sendAudio(conn, m, audioUrl)
-            await new Promise(resolve => setTimeout(resolve, 500))
         }
-        
-        // 3. ENVIAR MENSAJE FINAL
-        await conn.reply(m.chat, texto, m)
-        
+
+        // Mensaje final
+        await new Promise(r => setTimeout(r, 400))
+        await conn.reply(m.chat, finalMsg, m)
+
         await m.react('✅')
-        
+
     } catch (err) {
-        console.error('Error general en el handler:', err)
+        console.error(err)
         await m.react('❌')
-        await m.reply(`Error: ${err.message || 'Falló la descarga'}`)
+        await m.reply(`❌ Error: ${err.message || 'No se pudo descargar el video'}`)
     }
 }
 
-handler.help = ['xvideos <query|url> - Busca y descarga videos']
+handler.help = ['xnxx <búsqueda|url>']
 handler.tags = ['nsfw', 'downloader']
-handler.command = /^(xvideos|xvid|dlvid)$/i
+handler.command = /^(xnxx|xnx|dlxnxx)$/i
 handler.limit = true
 handler.nsfw = true
 
