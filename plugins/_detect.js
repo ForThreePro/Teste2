@@ -16,7 +16,7 @@ export async function before(m, { conn }) {
 
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
         let author = update.author || update.participants[0]
-        let catalogoImg = { url: 'https://files.evogb.win/UHUtT3.jpg' }
+        let catalogoImg = { url: 'https://files.evogb.win/QFXQtu.jpg' }
 
         for (let user of update.participants) {
           if (update.action === 'promote') {
