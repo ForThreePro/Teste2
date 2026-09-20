@@ -1,81 +1,84 @@
+import moment from 'moment-timezone'
 import crypto from 'crypto'
+moment.locale('es')
 
 let handler = async (m, { conn, command }) => {
-  if (!m.quoted) return m.reply(`🍕 *Responde a un sticker*\n\n.setabrir - ese sticker ABRIRÁ\n.setcerrar - ese sticker CERRARÁ`)
-
-  let q = m.quoted
-  if (q.mtype !== 'stickerMessage') return m.reply('🍕 Eso no es un sticker')
-
-  try {
-    let buffer = await q.download()
-    let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+    const react = async (text) => {
+        try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
+    }
 
     if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
     let chat = global.db.data.chats[m.chat]
 
-    if (command == 'setabrir') {
-      chat.stickerAbrir = hash
-      return conn.reply(m.chat, `✅ *STICKER PARA ABRIR GUARDADO* 🟢\n${hash.slice(0, 20)}...\n\nAhora ese sticker ABRE el grupo`, m)
-    }
-    if (command == 'setcerrar') {
-      chat.stickerCerrar = hash
-      return conn.reply(m.chat, `✅ *STICKER PARA CERRAR GUARDADO* 🔴\n${hash.slice(0, 20)}...\n\nAhora ese sticker CIERRA el grupo`, m)
+    // SETEAR STICKERS
+    if (command === 'setabrir' || command === 'setcerrar') {
+        if (!m.quoted || m.quoted.mtype!== 'stickerMessage') return m.reply('🍕 Responde a un sticker con.setabrir o.setcerrar')
+        let buffer = await conn.downloadMediaMessage(m.quoted)
+        let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+        if (command === 'setabrir') {
+            chat.stickerAbrir = hash
+            await react('✅')
+            return m.reply(`✅ Sticker para ABRIR guardado 🟢`)
+        } else {
+            chat.stickerCerrar = hash
+            await react('✅')
+            return m.reply(`✅ Sticker para CERRAR guardado 🔴`)
+        }
     }
 
-  } catch (e) {
-    m.reply(`❌ Error: ${e.message}`)
-  }
+    // SI MANDA UN STICKER, VERIFICAR SI ES EL CONFIGURADO (SIN BEFORE)
+    if (m.mtype === 'stickerMessage') {
+        try {
+            let buffer = await conn.downloadMediaMessage(m)
+            let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+            let groupMetadata = await conn.groupMetadata(m.chat)
+            let sender = groupMetadata.participants.find(p => p.id === m.sender)
+            if (sender?.admin!== 'admin' && sender?.admin!== 'superadmin') return
+
+            if (chat.stickerAbrir && hash === chat.stickerAbrir) command = 'abrir'
+            else if (chat.stickerCerrar && hash === chat.stickerCerrar) command = 'cerrar'
+            else return // no es el sticker configurado
+        } catch { return }
+    }
+
+    // ABRIR / CERRAR
+    let isClose, estado, icon, reactEmoji
+    if (command === 'abrir') {
+        isClose = 'not_announcement'; estado = 'ABIERTO'; icon = '🔓'; reactEmoji = '🔓'
+    }
+    if (command === 'cerrar') {
+        isClose = 'announcement'; estado = 'CERRADO'; icon = '🔒'; reactEmoji = '🔒'
+    }
+    if (!isClose) return
+
+    try {
+        await conn.groupSettingUpdate(m.chat, isClose)
+        await react(reactEmoji)
+        let msg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+
+⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ${estado} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZADO\`\` ${icon} —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🍕
+${icon} ➛ Estado: *${estado}*
+👑 ➛ Por: @${m.sender.split('@')[0]}
+
+━━━━━━━━━━━
+🍕 *GARFIELD BOT* 🍕
+━━━━━━━━━━━`
+        await conn.sendMessage(m.chat, { text: msg, mentions: [m.sender] }, { quoted: m })
+    } catch (e) {
+        await react('❌')
+        m.reply('❌ No soy admin')
+    }
 }
 
-handler.before = async function (m, { conn }) {
-  if (!m.isGroup) return
-  if (m.mtype !== 'stickerMessage') return
-
-  let chat = global.db.data.chats[m.chat]
-  if (!chat || (!chat.stickerAbrir && !chat.stickerCerrar)) return
-
-  try {
-    let groupMetadata = await conn.groupMetadata(m.chat)
-
-    let sender = groupMetadata.participants.find(p => p.id === m.sender)
-    let isSenderAdmin = sender?.admin === 'admin' || sender?.admin === 'superadmin'
-    if (!isSenderAdmin) return
-
-    let botJid = conn.user.jid
-    let bot = groupMetadata.participants.find(p => p.id === botJid || p.id.includes(botJid.split('@')[0]))
-    let isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin'
-    if (!isBotAdmin) return
-
-    let buffer = await m.download()
-    let hash = crypto.createHash('sha256').update(buffer).digest('hex')
-
-    console.log('[STICKER] Recibido:', hash.slice(0, 10), '| Abrir:', chat.stickerAbrir?.slice(0, 10), '| Cerrar:', chat.stickerCerrar?.slice(0, 10))
-
-    if (chat.stickerAbrir && hash === chat.stickerAbrir) {
-      if (groupMetadata.announce === true) {
-        await conn.groupSettingUpdate(m.chat, 'not_announcement')
-        await conn.sendMessage(m.chat, { text: `🟢 *GRUPO ABIERTO*\n🍕 Por @${m.sender.split('@')[0]}`, mentions: [m.sender] }, { quoted: m })
-      }
-      return
-    }
-
-    if (chat.stickerCerrar && hash === chat.stickerCerrar) {
-      if (groupMetadata.announce === false || !groupMetadata.announce) {
-        await conn.groupSettingUpdate(m.chat, 'announcement')
-        await conn.sendMessage(m.chat, { text: `🔴 *GRUPO CERRADO*\n🍕 Por @${m.sender.split('@')[0]}`, mentions: [m.sender] }, { quoted: m })
-      }
-      return
-    }
-
-  } catch (e) {
-    console.log('Error sticker abrir/cerrar:', e)
-  }
-}
-
-handler.help = ['setabrir', 'setcerrar']
-handler.tags = ['group']
-handler.command = ['setabrir', 'setcerrar', 'setopen', 'setclose']
-handler.admin = true
+handler.help = ['abrir', 'cerrar', 'setabrir', 'setcerrar']
+handler.tags = ['grupo']
+handler.command = ['abrir', 'cerrar', 'setabrir', 'setcerrar']
 handler.group = true
 
 export default handler
