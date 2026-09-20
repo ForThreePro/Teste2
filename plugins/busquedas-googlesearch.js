@@ -13,7 +13,7 @@ let handler = async (m, { conn, text }) => {
 
     if (!text) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ BUSCAR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -22,18 +22,19 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ ¿Qué quieres buscar?
+😼 ➛ Garfield: dime que buscar pe
 
 ── *💡 EJEMPLO* ╏ 🍕
 ➛.google garfield comiendo lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
     await react('🔍')
-    await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -43,9 +44,10 @@ let handler = async (m, { conn, text }) => {
 ── *📊 ESTADO* ╏ 🍕
 🔍 ➛ Buscando: *${text}*
 ⏳ ➛ Obteniendo resultados...
+😼 ➛ Garfield buscando con hambre
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
     try {
@@ -54,7 +56,7 @@ let handler = async (m, { conn, text }) => {
 
         if (!results.length) {
             await react('❌')
-            let vacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let vacio = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐒𝐈𝐍 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ BUSCAR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -63,14 +65,15 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ 🍕
 📭 ➛ No encontré resultados para: *${text}*
+😴 ➛ Garfield: ni lasaña hay
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
         }
 
-        let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -93,13 +96,14 @@ ${results.map((v, i) => {
 ── *📋 INFORMACIÓN* ╏ 🍕
 👤 ➛ Solicitado por: ${user}
 👥 ➛ Grupo: *${groupName}*
+😼 ➛ Buscado por Garfield
 
 ── *💡 TIP* ╏ 🍕
 ➛.ytmp4 + link
 ➛.ytmp3 + link
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: txt, mentions: [m.sender] }, { quoted: m })
@@ -108,7 +112,7 @@ ${results.map((v, i) => {
     } catch (e) {
         console.error(e)
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ BUSCAR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -118,9 +122,10 @@ ${results.map((v, i) => {
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ No se pudo realizar la búsqueda
 🔧 ➛ Intenta más tarde
+😴 ➛ Garfield se quedó dormido buscando
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
