@@ -8,17 +8,15 @@ const DB_FOLDER = './src/database/listas'
 if (!fs.existsSync(DB_FOLDER)) fs.mkdirSync(DB_FOLDER, { recursive: true })
 
 let handler = async (m, { conn, text }) => {
-    const chatId = m.chat // ID del grupo para separar listas
+    const chatId = m.chat
     const db = path.join(DB_FOLDER, `${chatId}.json`)
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
-    // Crear archivo del grupo si no existe
     if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
 
     let data = JSON.parse(fs.readFileSync(db))
 
-    // Fecha y día de Perú
     let now = moment.tz('America/Lima')
     let fechaFormato = now.format('dddd, DD/MM/YYYY')
     let diaSemana = now.format('dddd').toLowerCase()
@@ -29,10 +27,9 @@ let handler = async (m, { conn, text }) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
-    //.verlista = MOSTRAR TODOS LOS DÍAS LUNES A SÁBADO
     if (m.message?.extendedTextMessage?.text?.includes('verlista') || m.text?.includes('verlista')) {
         await react('📋')
-        let tabla = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let tabla = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 𝐒𝐄𝐌𝐀𝐍𝐀𝐋 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fechaFormato}
@@ -42,6 +39,7 @@ let handler = async (m, { conn, text }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 📅 ➛ Periodo: *Lunes a Sábado*
 🕒 ➛ Actualizado: *${fechaFormato}*
+😼 ➛ Garfield controlando la lista
 
 ━━━━━━━━━━━
 `
@@ -51,7 +49,7 @@ let handler = async (m, { conn, text }) => {
             tabla += `── *${dia.toUpperCase()}* ╏ 🍕\n`
 
             if (anotadosDelDia.length === 0) {
-                tabla += `📭 ➛ Sin anotados\n\n`
+                tabla += `📭 ➛ Sin anotados - Garfield durmiendo\n\n`
             } else {
                 anotadosDelDia.forEach((v, i) => {
                     tabla += `${i+1}️⃣ ➛ *${v.nombre}* [${v.rol}]\n`
@@ -62,17 +60,17 @@ let handler = async (m, { conn, text }) => {
         })
         tabla += `━━━━━━━━━━━
 📦 ➛ Total: *${data.length}* registro${data.length !== 1 ? 's' : ''}
+😼 ➛ Lista supervisada por Garfield
 
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}`
         return conn.sendMessage(m.chat, { text: tabla.trim(), mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
-    //.lista = ANOTAR
     if (m.message?.extendedTextMessage?.text?.includes('lista') || m.text?.includes('lista')) {
         if (!diasSemana.includes(diaSemana)) {
             await react('⛔')
-            let fueraHorario = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let fueraHorario = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐅𝐔𝐄𝐑𝐀 𝐃𝐄 𝐇𝐎𝐑𝐀𝐑𝐈𝐎 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fechaFormato}
@@ -82,16 +80,17 @@ let handler = async (m, { conn, text }) => {
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Solo se puede anotar de
 ❌ ➛ *Lunes a Sábado*
+😴 ➛ Domingo Garfield descansa
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: fueraHorario }, { quoted: m })
         }
 
         if (!text) {
             await react('❌')
-            let formato = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let formato = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐅𝐎𝐑𝐌𝐀𝐓𝐎 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fechaFormato}
@@ -103,9 +102,10 @@ let handler = async (m, { conn, text }) => {
 
 ── *💡 EJEMPLO* ╏ 🍕
 ➛ .lista Garfield/+51 927 174 369/Bot
+🍝 ➛ Premio: lasaña infinita
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: formato }, { quoted: m })
         }
@@ -113,7 +113,7 @@ let handler = async (m, { conn, text }) => {
         let [nombre, numero, rol] = text.split('/').map(v => v.trim())
         if (!nombre ||!numero ||!rol) {
             await react('❌')
-            let faltan = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let faltan = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐅𝐀𝐋𝐓𝐀𝐍 𝐃𝐀𝐓𝐎𝐒 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fechaFormato}
@@ -122,12 +122,13 @@ let handler = async (m, { conn, text }) => {
 
 ── *📖 FORMATO* ╏ 🍕
 ➛ Nombre/Numero/Rol
+😿 ➛ Garfield: "Faltan datos como falta lasaña"
 
 ── *💡 EJEMPLO* ╏ 🍕
 ➛ fetsy/618282/bot
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: faltan }, { quoted: m })
         }
@@ -135,7 +136,7 @@ let handler = async (m, { conn, text }) => {
         let yaAnotado = data.find(v => v.numero === numero && v.dia === fechaFormato)
         if (yaAnotado) {
             await react('⚠️')
-            let duplicado = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let duplicado = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐘𝐀 𝐀𝐍𝐎𝐓𝐀𝐃𝐎 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fechaFormato}
@@ -145,9 +146,10 @@ let handler = async (m, { conn, text }) => {
 ── *📝 AVISO* ╏ 🍕
 ⚠️ ➛ ${nombre} ya fue anotado hoy
 📅 ➛ *${fechaFormato}*
+😼 ➛ Garfield dice: ya está en la lista
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: duplicado }, { quoted: m })
         }
@@ -156,7 +158,7 @@ let handler = async (m, { conn, text }) => {
         fs.writeFileSync(db, JSON.stringify(data, null, 2))
         await react('✅')
 
-        let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐍𝐎𝐓𝐀𝐃𝐎 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fechaFormato}
@@ -168,9 +170,10 @@ let handler = async (m, { conn, text }) => {
 📱 ➛ Número: *${numero}*
 💼 ➛ Rol: *${rol}*
 📅 ➛ Día: *${fechaFormato}*
+😼 ➛ Aprobado por Garfield
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
     }
