@@ -3,7 +3,6 @@ import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@
 import moment from 'moment-timezone'
 moment.locale('es')
 
-// FUNCION PARA REACCIONES
 const react = async (conn, m, text) => {
   try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
 }
@@ -13,20 +12,21 @@ var handler = async (m, { conn, args }) => {
   const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
   if (!args[0]) {
-    let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 📱 ࣪ ꕀ.tiktok ˚. ᵎᵎ
-> *"Bajando videos como Garfield baja lasaña"*
+> *"Bajando videos como Garfield baja lasaña un lunes"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 📱 ➛ Descarga videos de TikTok sin marca de agua
 📱 ➛ Con botones interactivos
+😼 ➛ Garfield viendo TikTok con lasaña
 
 ── *📖 USO* ╏ 🍕
 ➛.*tiktok* <link de tiktok>
@@ -41,7 +41,7 @@ var handler = async (m, { conn, args }) => {
 📱 ➛ www.tiktok.com
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
@@ -50,7 +50,7 @@ var handler = async (m, { conn, args }) => {
   const url = args[0]
   if (!url.match(/(https?:\/\/)?(www\.)?(vm\.|vt\.|www\.)?tiktok\.com\//)) {
     await react(conn, m, '❌')
-    let menuError = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let menuError = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -59,19 +59,20 @@ var handler = async (m, { conn, args }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ El enlace no es válido
+😿 ➛ Garfield: "Eso no es TikTok, es trampa"
 
 ── *📖 USO* ╏ 🍕
 ➛ Solo links de: *tiktok.com*
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
   }
 
   try {
     await react(conn, m, "⏳")
-    await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -81,10 +82,11 @@ var handler = async (m, { conn, args }) => {
 ── *📊 ESTADO* ╏ 🍕
 🔍 ➛ Analizando link de TikTok...
 📥 ➛ Obteniendo video HD...
-⬇️ ➛ Preparando descarga sin marca de agua...
+⬇️ ➛ Preparando descarga sin marca...
+😼 ➛ Garfield buscando el botón...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
     const tiktokData = await tiktokdl(url)
@@ -100,7 +102,7 @@ var handler = async (m, { conn, args }) => {
       key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false },
       message: {
         locationMessage: {
-          name: `🍕 GARFIELD BOT`,
+          name: `😼 LUX X YALLICO - GARFIELD EDITION 🍕`,
           jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer())
         }
       }
@@ -113,7 +115,7 @@ var handler = async (m, { conn, args }) => {
         message: {
           interactiveMessage: proto.Message.InteractiveMessage.fromObject({
             body: {
-              text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+              text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -125,11 +127,13 @@ var handler = async (m, { conn, args }) => {
 👤 ➛ Autor: *@${author}*
 ❤️ ➛ Likes: *${likes}*
 💬 ➛ Comentarios: *${comments}*
+😼 ➛ Garfield le dio like
 
 ── *📥 DESCARGA* ╏ 🍕
-⬇️ ➛ Video sin marca de agua`
+⬇️ ➛ Video sin marca de agua
+🍝 ➛ Listo para ver comiendo lasaña`
             },
-            footer: { text: 'Descarga sin marca de agua ✨ | GARFIELD BOT' },
+            footer: { text: 'Sin marca de agua ✨ | LUX X YALLICO - GARFIELD EDITION 😼' },
             header: { hasMediaAttachment: true, videoMessage: media.videoMessage },
             nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
               buttons: [
@@ -148,22 +152,24 @@ var handler = async (m, { conn, args }) => {
   } catch (error) {
     await react(conn, m, "❌")
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let menuErr = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
-⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
+⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${error.message}
+😴 ➛ Garfield se durmió intentando
 
 ── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Verifica que el video sea público
 🔧 ➛ Intenta con otro link
+🍕 ➛ Garfield dice: prueba otra vez
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
   }
