@@ -4,11 +4,9 @@ moment.locale('es')
 let detectEventsRegistered = false
 
 export async function before(m, { conn }) {
-  // Registrar los eventos UNA sola vez
   if (!detectEventsRegistered) {
     detectEventsRegistered = true
 
-    // EVENTO PARA ADMIN - ESTE ES EL QUE SI FUNCIONA
     conn.ev.on('group-participants.update', async (update) => {
       try {
         let chat = global.db.data.chats[update.id]
@@ -20,7 +18,7 @@ export async function before(m, { conn }) {
 
         for (let user of update.participants) {
           if (update.action === 'promote') {
-            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓 ﹒ ADMIN ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -30,9 +28,10 @@ export async function before(m, { conn }) {
 ── *👤 ACCION* ╏ 🍕
 👑 ➛ Por: @${author.split('@')[0]}
 🎖️ ➛ Nuevo admin: @${user.split('@')[0]}
+😼 ➛ Garfield lo aprueba: "Que cuide mi lasaña"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(update.id, {
               image: catalogoImg,
@@ -42,7 +41,7 @@ export async function before(m, { conn }) {
           }
 
           if (update.action === 'demote') {
-            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓 ﹒ ADMIN ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -52,9 +51,10 @@ export async function before(m, { conn }) {
 ── *👤 ACCION* ╏ 🍕
 👑 ➛ Por: @${author.split('@')[0]}
 💔 ➛ Ex-admin: @${user.split('@')[0]}
+😴 ➛ Garfield: "Se quedó sin lasaña"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(update.id, {
               image: catalogoImg,
@@ -68,7 +68,6 @@ export async function before(m, { conn }) {
       }
     })
 
-    // EVENTO PARA NOMBRE, FOTO, DESCRIPCIÓN, LINK
     conn.ev.on('groups.update', async (updates) => {
       try {
         for (let update of updates) {
@@ -80,7 +79,7 @@ export async function before(m, { conn }) {
           let catalogoImg = { url: 'https://files.evogb.win/UHUtT3.jpg' }
 
           if (update.subject) {
-            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓 ﹒ NOMBRE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -90,9 +89,10 @@ export async function before(m, { conn }) {
 ── *👤 ACCION* ╏ 🍕
 👑 ➛ Por: @${author.split('@')[0]}
 📝 ➛ Nuevo: *${update.subject}*
+😼 ➛ Garfield: "Odio los lunes y los cambios"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(update.id, {
               image: catalogoImg,
@@ -102,7 +102,7 @@ export async function before(m, { conn }) {
           }
 
           if (update.desc) {
-            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓 ﹒ DESCRIPCION ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -112,9 +112,10 @@ export async function before(m, { conn }) {
 ── *👤 ACCION* ╏ 🍕
 👑 ➛ Por: @${author.split('@')[0]}
 📝 ➛ Nueva: ${update.desc.slice(0, 300) || 'Vacía'}
+🍝 ➛ Lasaña descripción
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(update.id, {
               image: catalogoImg,
@@ -124,7 +125,7 @@ export async function before(m, { conn }) {
           }
 
           if (update.icon || update.picture) {
-            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓 ﹒ FOTO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -134,9 +135,10 @@ export async function before(m, { conn }) {
 ── *👤 ACCION* ╏ 🍕
 👑 ➛ Por: @${author.split('@')[0]}
 🖼️ ➛ Foto cambiada
+😼 ➛ Garfield revisando nueva foto
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(update.id, {
               image: catalogoImg,
@@ -146,7 +148,7 @@ export async function before(m, { conn }) {
           }
 
           if (update.inviteCode) {
-            let txt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let txt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓 ﹒ LINK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -156,9 +158,10 @@ export async function before(m, { conn }) {
 ── *👤 ACCION* ╏ 🍕
 👑 ➛ Por: @${author.split('@')[0]}
 🔗 ➛ Nuevo: https://chat.whatsapp.com/${update.inviteCode}
+🍕 ➛ Link fresco como lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(update.id, {
               image: catalogoImg,
@@ -172,7 +175,5 @@ export async function before(m, { conn }) {
       }
     })
   }
-
-  // Esto sigue para compatibilidad pero ya no es necesario para admin
   return true
 }
