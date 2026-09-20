@@ -21,11 +21,10 @@ let handler = async (m, { conn, args, command }) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
-  // SET - SOLO GUARDA TEXTO
   if (command.startsWith('set')) {
     await react('📝')
     if (!text) {
-      let uso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let uso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐌𝐄𝐍𝐒𝐀𝐉𝐄 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -39,6 +38,7 @@ let handler = async (m, { conn, args, command }) => {
 👤 ➛ @user = Menciona al usuario
 👥 ➛ @group = Nombre del grupo
 📄 ➛ @desc = Descripción del grupo
+😼 ➛ @garfield = Frase de Garfield random
 
 ── *💡 EJEMPLOS* ╏ 🍕
 ➛.setwelcome Bienvenido @user a @group
@@ -46,13 +46,13 @@ let handler = async (m, { conn, args, command }) => {
 ➛.setkick @user fue kickeado de @group
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
     }
 
     chat[key] = text
-    let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐆𝐔𝐀𝐑𝐃𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -61,21 +61,21 @@ let handler = async (m, { conn, args, command }) => {
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 ✅ ➛ Mensaje de *${type}* guardado
+😼 ➛ Garfield aprobó el texto
 
 ── *📝 VISTA PREVIA* ╏ 🍕
 💬 ➛ ${text}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   }
 
-  // DEL - SOLO BORRA TEXTO
   if (command.startsWith('del')) {
     await react('🗑️')
     if (!chat[key]) {
-      let vacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let vacio = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐍𝐎 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -84,15 +84,16 @@ let handler = async (m, { conn, args, command }) => {
 
 ── *📝 AVISO* ╏ 🍕
 📭 ➛ No hay un mensaje de *${type}* personalizado
+😴 ➛ Garfield dice: no hay nada configurado
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
     }
 
     delete chat[key]
-    let del = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let del = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -102,9 +103,10 @@ let handler = async (m, { conn, args, command }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Mensaje de *${type}* eliminado
 ✅ ➛ Volverá al mensaje por defecto
+😼 ➛ Garfield borró el texto y se fue a dormir
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: del }, { quoted: m })
   }
