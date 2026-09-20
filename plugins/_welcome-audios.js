@@ -11,7 +11,6 @@ let handler = async (m, { conn, command }) => {
   let q = m.quoted || m
   let mime = (q.msg || q).mimetype || ''
 
-  // Detectar tipo: welcome / bye / kick
   let type = ''
   if (command.includes('welcome')) type = 'welcome'
   else if (command.includes('bye')) type = 'bye'
@@ -22,12 +21,11 @@ let handler = async (m, { conn, command }) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
-  // SET AUDIO - SOLO RESPONDIENDO
   if (command.startsWith('audio')) {
     await react('🎵')
 
     if (!m.quoted) {
-      let uso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let uso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐔𝐃𝐈𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -36,6 +34,7 @@ let handler = async (m, { conn, command }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Debes responder a un audio
+😼 ➛ Garfield dice: responde al audio pe
 
 ── *📖 USO* ╏ 🍕
 ➛ Envía o reenvía un audio
@@ -45,20 +44,20 @@ let handler = async (m, { conn, command }) => {
 ➛ Manda un audio → responde → .${command}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
     }
 
     if (!mime ||!/audio/.test(mime)) {
       await react('❌')
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ Responde a un audio válido pe`, { quoted: m })
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Responde a un audio válido pe - Garfield quiere escuchar`, { quoted: m })
     }
 
     let buffer = await q.download()
-    chat[`audio${type}`] = buffer.toString('base64') // guardamos en base64
+    chat[`audio${type}`] = buffer.toString('base64')
 
-    let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐆𝐔𝐀𝐑𝐃𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -68,18 +67,18 @@ let handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 ✅ ➛ Audio de *${type}* guardado
 🔊 ➛ Se reproducirá cuando alguien ${type === 'welcome'? 'entre' : type === 'bye'? 'salga' : 'sea kickeado'}
+😼 ➛ Garfield aprobó el audio
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   }
 
-  // DEL AUDIO
   if (command.startsWith('delaudio')) {
     await react('🗑️')
     if (!chat[`audio${type}`]) {
-      let vacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let vacio = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐍𝐎 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -88,15 +87,16 @@ let handler = async (m, { conn, command }) => {
 
 ── *📝 AVISO* ╏ 🍕
 📭 ➛ No hay un audio de *${type}* configurado
+😴 ➛ Garfield dice: no hay nada que borrar
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
     }
 
     delete chat[`audio${type}`]
-    let del = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let del = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -106,9 +106,10 @@ let handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Audio de *${type}* eliminado
 ✅ ➛ Ya no se reproducirá
+😼 ➛ Garfield lo borró durmiendo
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: del }, { quoted: m })
   }
