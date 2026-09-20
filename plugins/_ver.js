@@ -5,7 +5,7 @@ let handler = async (m, { conn }) => {
 const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
 if (!m.quoted) {
-  let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+  let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VER ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -14,15 +14,16 @@ if (!m.quoted) {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Responde a una imagen/video ViewOnce
+😼 ➛ Garfield: "Ni veo si no respondes"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
   return conn.reply(m.chat, error, m)
 }
 
 if (!m?.quoted || !m?.quoted?.viewOnce) {
-  let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+  let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VER ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -31,16 +32,17 @@ if (!m?.quoted || !m?.quoted?.viewOnce) {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ El mensaje no es ViewOnce
+😴 ➛ Garfield dice: "Eso no se borra solo"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
   return conn.reply(m.chat, error, m)
 }
 
 let buffer = await m.quoted.download(false);
 
-let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐒𝐁𝐋𝐎𝐐𝐔𝐄𝐀𝐃𝐎 ﹒ VIEWONCE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -49,9 +51,11 @@ let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 ✅ ➛ Imagen/Video desbloqueado
+😼 ➛ Garfield lo vio todo
+🍕 ➛ Nada se esconde de la lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
 if (/videoMessage/.test(m.quoted.mtype)) {
