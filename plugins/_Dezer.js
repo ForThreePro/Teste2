@@ -22,14 +22,14 @@ const handler = async (m, { conn, command }) => {
         let mime = (q.msg || q).mimetype || ''
 
         if (!mime ||!/audio|video/.test(mime)) {
-            let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐃𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🎵 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Hasta Garfield reconoce música"*
+> *"Hasta Garfield reconoce música mientras come lasaña"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`BUSCADOR\`\` 🔍 —˙𖦹.꒷
 
@@ -44,9 +44,10 @@ const handler = async (m, { conn, command }) => {
 
 ── *⏱️ NOTA* ╏ 🍕
 📦 ➛ Analiza los primeros *${CLIP_SECONDS}s* de audio
+😼 ➛ Garfield escucha mejor con lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
@@ -56,7 +57,7 @@ const handler = async (m, { conn, command }) => {
         let buffer = await q.download()
         if (!buffer) throw new Error('Error al descargar el archivo')
 
-        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -67,9 +68,10 @@ const handler = async (m, { conn, command }) => {
 🔍 ➛ Analizando ${CLIP_SECONDS}s de audio...
 📤 ➛ Subiendo a servidor temporal...
 🎶 ➛ Buscando coincidencia...
+😼 ➛ Garfield afinando sus bigotes...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
         let clip = await prepareClip(buffer, CLIP_SECONDS)
@@ -96,7 +98,7 @@ const handler = async (m, { conn, command }) => {
         if(command === 'song'){
             await conn.sendMessage(m.chat, {
                 image: thumb,
-                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+                caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -109,12 +111,14 @@ const handler = async (m, { conn, command }) => {
 👁️ ➛ Vistas: *${vistas}*
 ⏱️ ➛ Duración: *${timestamp}*
 🔗 ➛ Link: ${shortUrl}
+😼 ➛ Encontrado por Garfield
 
 ── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Enviando audio...
+🍝 ➛ Preparando lasaña sonora...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             }, { quoted: m })
 
@@ -130,10 +134,10 @@ const handler = async (m, { conn, command }) => {
             await m.react('📝')
             const lyricsRes = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(song.artist)}/${encodeURIComponent(song.title)}`).then(r => r.json())
             let lyrics = lyricsRes.lyrics || 'No se encontró la letra'
-            if(lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga'
+            if(lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga, como siesta de Garfield 😴'
 
             await conn.sendMessage(m.chat, {
-                text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+                text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐋𝐄𝐓𝐑𝐀 ﹒ LETRA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -142,6 +146,7 @@ const handler = async (m, { conn, command }) => {
 
 ── *📊 CANCIÓN* ╏ 🍕
 📌 ➛ *${title}* - *${author.name}*
+😼 ➛ Garfield tararea esto
 
 ── *📜 LETRA* ╏ 🍕
 \`\`${lyrics}\`\`
@@ -150,7 +155,7 @@ const handler = async (m, { conn, command }) => {
 ⬇️ ➛ Enviando audio...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             }, { quoted: m })
 
@@ -166,7 +171,7 @@ const handler = async (m, { conn, command }) => {
     } catch(e) {
         await m.react('❌')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        let menuError = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let menuError = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -175,13 +180,15 @@ const handler = async (m, { conn, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${e.message}
+😿 ➛ Garfield no pudo reconocerlo, estaba dormido
 
 ── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa un audio/video más claro
 🔧 ➛ Asegúrate que tenga música con voz
+🍝 ➛ Prueba con más lasaña... digo, más volumen
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
     }
