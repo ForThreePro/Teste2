@@ -37,7 +37,6 @@ let handler = async (m, { conn, participants }) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
-    // Funcion para hacer fetch con headers
     const stellarFetch = async (url) => {
         return await fetch(url, {
             timeout: 30000,
@@ -55,27 +54,27 @@ let handler = async (m, { conn, participants }) => {
         let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}`
         try {
             await react('😏')
-            await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 😏\n\nGenerando...`, mentions: [who] })
+            await conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n𐔌 ꒱ ***HORNY*** 𐔌 ꒱ 😏\n\nGenerando... Garfield mirando 👀`, mentions: [who] })
             let res = await stellarFetch(apiUrl)
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `🔥 @${getMention(who)}`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `🔥 @${getMention(who)}\n\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`❌ Error 500: La API bloqueó la petición. Intenta de nuevo`)
+            m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Error 500: La API se fue a comer lasaña. Intenta de nuevo`)
         }
     }
 
     // ===== SHIP =====
     if (m.text?.includes('ship')) {
-        if (!m.isGroup) return m.reply(`❌ Solo grupos`)
+        if (!m.isGroup) return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Solo grupos pe, como Garfield solo en grupo con lasaña`)
         let members = participants.map(u => toJid(u.id))
         let user1, user2
         if (m.mentionedJid.length >= 2) { user1 = toJid(m.mentionedJid[0]); user2 = toJid(m.mentionedJid[1]) }
         else { user1 = members[Math.floor(Math.random() * members.length)]; user2 = members[Math.floor(Math.random() * members.length)]; while(user1 === user2) user2 = members[Math.floor(Math.random() * members.length)] }
 
         await react('💘')
-        await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\nCalculando...`, mentions: [user1, user2] })
+        await conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n𐔌 ꒱ ***SHIP*** 𐔌 ꒱ 💘\n\nCalculando amor... Garfield shippea 🍝`, mentions: [user1, user2] })
         try {
             let avatar1 = await getAvatar(user1); let avatar2 = await getAvatar(user2)
             let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
@@ -83,10 +82,10 @@ let handler = async (m, { conn, participants }) => {
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
             let porcentaje = Math.floor(Math.random() * 101)
-            await conn.sendMessage(m.chat, { image: buffer, caption: `💘 ${porcentaje}%`, mentions: [user1, user2] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `💘 ${porcentaje}% - Garfield dice: ${porcentaje > 70? 'pura lasaña juntos' : 'mejor amigos con lasaña'}\n\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, mentions: [user1, user2] })
         } catch (e) {
             await react('❌')
-            m.reply(`❌ Error 500: La API bloqueó la petición`)
+            m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Error 500: La API se quedó dormida como Garfield`)
         }
     }
 
@@ -98,15 +97,15 @@ let handler = async (m, { conn, participants }) => {
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
 
         await react('🔍')
-        await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\nGenerando...`, mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n𐔌 ꒱ ***SE BUSCA*** 𐔌 ꒱ 🚨\n\nGenerando... Se robó la lasaña de Garfield 🚨`, mentions: [who] })
         try {
             let res = await stellarFetch(apiUrl)
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `🚨 @${getMention(who)}`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `🚨 @${getMention(who)} - Buscado por robar lasaña\n\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`❌ Error 500: ${e.message}`)
+            m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Error 500: ${e.message}`)
         }
     }
 
@@ -122,15 +121,15 @@ let handler = async (m, { conn, participants }) => {
         let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}`
 
         await react('📊')
-        await conn.sendMessage(m.chat, { text: `𐔌 ꒱ ***TARJETA*** 𐔌 ꒱ 📊\n\nGenerando...`, mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n𐔌 ꒱ ***TARJETA*** 𐔌 ꒱ 📊\n\nGenerando nivel... Garfield nivel lasaña 🍝`, mentions: [who] })
         try {
             let res = await stellarFetch(apiUrl)
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `📊 Nivel: ${level}`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `📊 Nivel: ${level} - Nivel Garfield: Pro en comer\n\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`❌ Error 500: ${e.message}`)
+            m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Error 500: ${e.message}`)
         }
     }
 }
