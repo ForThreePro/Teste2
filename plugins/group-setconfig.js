@@ -13,33 +13,41 @@ let handler = async (m, { conn, command }) => {
 
     // SETEAR STICKERS
     if (command === 'setabrir' || command === 'setcerrar') {
-        if (!m.quoted || m.quoted.mtype!== 'stickerMessage') return m.reply('🍕 Responde a un sticker con.setabrir o.setcerrar')
-        let buffer = await conn.downloadMediaMessage(m.quoted)
-        let hash = crypto.createHash('sha256').update(buffer).digest('hex')
-        if (command === 'setabrir') {
-            chat.stickerAbrir = hash
-            await react('✅')
-            return m.reply(`✅ Sticker para ABRIR guardado 🟢`)
-        } else {
-            chat.stickerCerrar = hash
-            await react('✅')
-            return m.reply(`✅ Sticker para CERRAR guardado 🔴`)
+        if (!m.quoted || m.quoted.mtype !== 'stickerMessage') return m.reply('🍕 Responde a un sticker con .setabrir o .setcerrar')
+        try {
+            let buffer = await m.quoted.download()
+            let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+            if (command === 'setabrir') {
+                chat.stickerAbrir = hash
+                await react('✅')
+                return m.reply(`✅ *STICKER PARA ABRIR GUARDADO* 🟢\n${hash.slice(0,15)}...`)
+            } else {
+                chat.stickerCerrar = hash
+                await react('✅')
+                return m.reply(`✅ *STICKER PARA CERRAR GUARDADO* 🔴\n${hash.slice(0,15)}...`)
+            }
+        } catch (e) {
+            console.log(e)
+            return m.reply(`❌ Error: ${e.message}`)
         }
     }
 
-    // SI MANDA UN STICKER, VERIFICAR SI ES EL CONFIGURADO (SIN BEFORE)
+    // SI MANDA UN STICKER, VERIFICAR SI ES EL CONFIGURADO
     if (m.mtype === 'stickerMessage') {
         try {
-            let buffer = await conn.downloadMediaMessage(m)
+            if (!chat.stickerAbrir && !chat.stickerCerrar) return
+            let buffer = await m.download()
             let hash = crypto.createHash('sha256').update(buffer).digest('hex')
-            let groupMetadata = await conn.groupMetadata(m.chat)
-            let sender = groupMetadata.participants.find(p => p.id === m.sender)
-            if (sender?.admin!== 'admin' && sender?.admin!== 'superadmin') return
+            
+            console.log('STICKER RECIBIDO:', hash.slice(0,10), 'ABRIR:', chat.stickerAbrir?.slice(0,10), 'CERRAR:', chat.stickerCerrar?.slice(0,10))
 
             if (chat.stickerAbrir && hash === chat.stickerAbrir) command = 'abrir'
             else if (chat.stickerCerrar && hash === chat.stickerCerrar) command = 'cerrar'
-            else return // no es el sticker configurado
-        } catch { return }
+            else return
+        } catch (e) {
+            console.log('Error sticker:', e)
+            return
+        }
     }
 
     // ABRIR / CERRAR
@@ -79,6 +87,9 @@ ${icon} ➛ Estado: *${estado}*
 handler.help = ['abrir', 'cerrar', 'setabrir', 'setcerrar']
 handler.tags = ['grupo']
 handler.command = ['abrir', 'cerrar', 'setabrir', 'setcerrar']
+handler.all = true
+handler.admin = false
+handler.botAdmin = false
 handler.group = true
 
 export default handler
