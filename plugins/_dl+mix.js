@@ -7,7 +7,7 @@ moment.locale('es')
 // ===== CONFIG API STELLAR =====
 const api = {
     url: 'https://api.stellarwa.xyz',
-    key: 'proyectsV2' // Solo esta key
+    key: 'proyectsV2'
 }
 
 function generateUniqueFilename(mime) {
@@ -30,9 +30,8 @@ async function uploadToUguu(buffer, mime) {
 }
 
 async function upscaleImage(url) {
-  // CAMBIO: scale=4 para HDx4
   const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&scale=4&key=${api.key}`
-  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 90000 }) // +30s por el HDx4
+  const res = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 90000 })
   if (!res.data) throw new Error('Stellar HDx4 no devolvió imagen')
   return Buffer.from(res.data)
 }
@@ -51,20 +50,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const mime = (q.msg || q).mimetype || ''
 
     if (!mime) {
-        let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐇𝐄𝐑𝐀𝐌𝐈𝐄𝐍𝐓𝐀 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🖼️ ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"HDx4: Para que se vea pro como Garfield"*
+> *"HDx4: Para que se vea pro como Garfield después de su siesta"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`IA\`\` ✨ —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 🖼️ ➛ Mejora la calidad de una imagen a *HD 4x*
 🖼️ ➛ Elimina el fondo automáticamente
+😼 ➛ Garfield supervisando en HD
 
 ── *📖 USO* ╏ 🍕
 1️⃣ ➛ Responde a una imagen con:.*${command}*
@@ -77,16 +77,17 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
 ── *⚠️ NOTA* ╏ 🍕
 ⏱️ ➛ HDx4 tarda un poco más pero vale la pena
+🍝 ➛ Como esperar la lasaña perfecta
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
     if (!/image\/(jpe?g|png)/.test(mime)) {
-        let menuError = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let menuError = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -95,19 +96,20 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ Solo se aceptan imágenes JPG/PNG
+😿 ➛ Garfield: "Ese formato no es lasaña"
 
 ── *📖 USO* ╏ 🍕
 ➛ Responde a una imagen con:.*${command}*
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
     }
 
     try {
         await m.react('⏳')
-        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -119,22 +121,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 🗑️ ➛ Eliminando fondo...
 📤 ➛ Subiendo resultado...
 ⏱️ ➛ Esto puede tardar 20-40s
+😴 ➛ Garfield tomando siesta mientras procesa...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
-        // Proceso completo
         const buffer = await q.download()
         const uploadedUrl = await uploadToUguu(buffer, mime)
-        const hdBuffer = await upscaleImage(uploadedUrl) // HDx4
+        const hdBuffer = await upscaleImage(uploadedUrl)
         const hdUrl = await uploadToUguu(hdBuffer, 'image/png')
         const finalBuffer = await removeBgFromUrl(hdUrl)
 
-        // Mensaje 1: Imagen
         await conn.sendMessage(m.chat, {
             image: finalBuffer,
-            caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -145,21 +146,22 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 📌 ➛ Calidad: *HD 4x*
 📌 ➛ Fondo: *Eliminado*
 📌 ➛ Formato: *PNG Transparente*
+😼 ➛ Aprobado por Garfield
 
 ── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ También se envió como documento
+🍝 ➛ Listo para tu colección
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         }, { quoted: m })
 
-        // Mensaje 2: Documento
         await conn.sendMessage(m.chat, {
             document: finalBuffer,
             fileName: 'image-hdx4-nobg.png',
             mimetype: 'image/png',
-            caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐎𝐂𝐔𝐌𝐄𝐍𝐓𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -169,9 +171,10 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 ── *📊 INFO* ╏ 🍕
 📄 ➛ Imagen PNG sin fondo HDx4
 ✨ ➛ Lista para usar en diseños
+😼 ➛ Garfield dice: "Ahora sí se ve pro"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         }, { quoted: m })
 
@@ -180,7 +183,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     } catch (err) {
         await m.react('❌')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let menuErr = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -189,19 +192,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${err.message || err}
+😴 ➛ Garfield se quedó dormido procesando
 
 ── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa una imagen clara JPG/PNG
 🔧 ➛ Máx 5MB recomendado para HDx4
+🍕 ➛ Intenta con menos lasaña... digo, peso
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
     }
 }
 
-handler.help = ['removebg', 'rbg', 'nobg']
+handler.help = ['removebg']
 handler.tags = ['tools']
 handler.command = /^(removebg|rbg|nobg)$/i
 export default handler
