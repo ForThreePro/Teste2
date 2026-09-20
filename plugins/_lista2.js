@@ -8,13 +8,12 @@ const DB_FOLDER = './src/database/listas'
 if (!fs.existsSync(DB_FOLDER)) fs.mkdirSync(DB_FOLDER, { recursive: true })
 
 let handler = async (m, { conn }) => {
-    const chatId = m.chat // ID del grupo
+    const chatId = m.chat
     const db = path.join(DB_FOLDER, `${chatId}.json`)
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY')
     const hora = moment.tz('America/Lima').format('hh:mm:ss a')
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
-    // Si el archivo no existe, crearlo vacío
     if (!fs.existsSync(db)) fs.writeFileSync(db, JSON.stringify([]))
 
     let data = JSON.parse(fs.readFileSync(db))
@@ -26,7 +25,7 @@ let handler = async (m, { conn }) => {
 
     if (total === 0) {
         await react('📭')
-        let vacia = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let vacia = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐎𝐑𝐑𝐀𝐑 𝐋𝐈𝐒𝐓𝐀 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -36,9 +35,10 @@ let handler = async (m, { conn }) => {
 ── *📝 AVISO* ╏ 🍕
 📭 ➛ La lista de este grupo ya está vacía
 📭 ➛ No hay registros para borrar
+😴 ➛ Garfield: "Ni siquiera hay lasaña para borrar"
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: vacia }, { quoted: m })
     }
@@ -46,7 +46,7 @@ let handler = async (m, { conn }) => {
     await react('🗑️')
     fs.writeFileSync(db, JSON.stringify([]))
 
-    let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐎𝐑𝐑𝐀𝐃𝐎 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha} ${hora}
@@ -57,13 +57,15 @@ let handler = async (m, { conn }) => {
 🗑️ ➛ Se eliminaron: *${total}* registro${total > 1 ? 's' : ''}
 📅 ➛ Rango: *Lunes a Sábado*
 ⏰ ➛ Hora: *${hora}*
+😼 ➛ Garfield se comió la lista
 
 ── *📦 ESTADO* ╏ 🍕
 ✅ ➛ Lista de este grupo reiniciada
+🍝 ➛ Lista limpia como plato de lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
-*Admin*: Comando ejecutado
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+*Admin*: Comando ejecutado por Garfield
 ━━━━━━━━━━━`
 
     return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
