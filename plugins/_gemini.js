@@ -11,20 +11,21 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
     if (!text) {
-        let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐈𝐀 𝐕𝐎𝐙 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🤖 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Hablando como Garfield con voz seria"*
+> *"Hablando como Garfield después de 3 lasañas"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`IA\`\` 🤖 —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 🤖 ➛ Responde con IA usando Gemini
 🔊 ➛ Convierte la respuesta a audio PTT
+😼 ➛ Voz de Garfield serio
 
 ── *📖 USO* ╏ 🍕
 ➛.${command} <tu pregunta>
@@ -33,16 +34,17 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 ── *⚙️ NOTAS* ╏ 🍕
 📏 ➛ Máx 2 líneas de respuesta
 🗣️ ➛ Voz en español latino
+🍝 ➛ Garfield opina corto y al grano
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
     await m.react('⏳')
-    await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -53,24 +55,23 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 🧠 ➛ Consultando a Gemini...
 🗣️ ➛ Generando voz...
 📤 ➛ Enviando audio...
+😼 ➛ Garfield despertando de siesta...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
     try {
-        // 1. PEDIR RESPUESTA A GEMINI BIEN PERUANO
         let aiUrl = `https://api.stellarwa.xyz/ai/gemini?text=${encodeURIComponent(text + ". Responde de forma normal, clara, profesional y amable. Sin jerga. Máximo 2 líneas")}&key=proyectsV2`
         let aiRes = await fetch(aiUrl)
         let aiJson = await aiRes.json()
 
-        let respuesta = aiJson.result || aiJson.data || aiJson.response || "No te entendí pe causa"
+        let respuesta = aiJson.result || aiJson.data || aiJson.response || "No te entendí pe causa, Garfield tiene hambre"
 
         if(respuesta.length > 200) respuesta = respuesta.substring(0, 200) + "..."
 
-        // 2. CONVERTIR A AUDIO - SUENA MÁS GRAVE CON ES
         let url = googleTTS.getAudioUrl(respuesta, {
-            lang: 'es', // español latino suena más de hombre
+            lang: 'es',
             slow: false,
             host: 'https://translate.google.com',
             timeout: 10000,
@@ -80,16 +81,16 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-         .audioCodec('libopus')
-         .toFormat('opus')
-         .outputOptions([
+        .audioCodec('libopus')
+        .toFormat('opus')
+        .outputOptions([
                     '-avoid_negative_ts make_zero',
                     '-ac 1',
                     '-b:a 64k'
                 ])
-         .on('end', () => resolve(true))
-         .on('error', (err) => reject(err))
-         .save(tmpFilePath)
+        .on('end', () => resolve(true))
+        .on('error', (err) => reject(err))
+        .save(tmpFilePath)
         })
 
         let audioBuffer = fs.readFileSync(tmpFilePath)
@@ -107,7 +108,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         console.log(e)
         await m.react('❌')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -116,13 +117,15 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${e.message}
+😴 ➛ Garfield se durmió con el error
 
 ── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Intenta con un texto más corto
 🔧 ➛ Verifica tu conexión
+🍕 ➛ Garfield dice: menos texto, más lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
     }
 }
