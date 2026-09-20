@@ -12,10 +12,10 @@ const handler = async (m, { conn, args, isAdmin, isOwner }) => {
 
   if (/on/i.test(args[0])) {
     chat.bienvenida = true
-    return conn.sendMessage(m.chat, { text: '🟢 Bienvenida activada' }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: '😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n🟢 Bienvenida activada - Garfield despertó' }, { quoted: m })
   } else if (/off/i.test(args[0])) {
     chat.bienvenida = false
-    return conn.sendMessage(m.chat, { text: '🔴 Bienvenida desactivada' }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: '😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n🔴 Bienvenida desactivada - Garfield a dormir' }, { quoted: m })
   }
 }
 
@@ -57,17 +57,39 @@ handler.before = async function (m, { conn, groupMetadata }) {
     case WAMessageStubType.GROUP_PARTICIPANT_ADD:
       audio = chat.audiowelcome
       txt = chat.customWelcome? chat.customWelcome.replace(/@user/gi, userTag).replace(/@group/gi, groupName).replace(/@desc/gi, groupDesc) :
-`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n👋 ➛ ${userTag} llegó a *${groupName}*\n👥 ➛ Miembro N°: *${membersCount}*`
+`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐁𝐈𝐄𝐍𝐕𝐄𝐍𝐈𝐃𝐎 ﹒ WELCOME ：✿ 。
+
+👋 ➛ ${userTag} llegó a *${groupName}*
+👥 ➛ Miembro N°: *${membersCount}*
+🍝 ➛ Garfield dice: trae lasaña
+
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`
       break
     case WAMessageStubType.GROUP_PARTICIPANT_LEAVE:
       audio = chat.audiobye
       txt = chat.customBye? chat.customBye.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
-`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n💤 ➛ ${userTag} salió de *${groupName}*`
+`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐃𝐄𝐒𝐏𝐄𝐃𝐈𝐃𝐀 ﹒ BYE ：✿ 。
+
+💤 ➛ ${userTag} salió de *${groupName}*
+😴 ➛ Garfield: "Uno menos que pide lasaña"
+
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`
       break
     case WAMessageStubType.GROUP_PARTICIPANT_REMOVE:
       audio = chat.audiokick
       txt = chat.customKick? chat.customKick.replace(/@user/gi, userTag).replace(/@group/gi, groupName) :
-`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n🥊 ➛ ${userTag} fue expulsado de *${groupName}*`
+`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐄𝐗𝐏𝐔𝐋𝐒𝐀𝐃𝐎 ﹒ KICK ：✿ 。
+
+🥊 ➛ ${userTag} fue expulsado de *${groupName}*
+😼 ➛ Garfield: "Se robó mi lasaña"
+
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`
       break
   }
 
@@ -78,7 +100,6 @@ handler.before = async function (m, { conn, groupMetadata }) {
       await conn.sendMessage(m.chat, { text: txt, mentions: [userJid] })
     }
 
-    // ENVIAR COMO AUDIO MP3 NORMAL
     if (audio) {
       try {
         let audioBuffer = typeof audio === 'string'? Buffer.from(audio, 'base64') : audio
