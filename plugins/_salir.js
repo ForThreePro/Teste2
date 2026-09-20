@@ -8,7 +8,7 @@ let handler = async (m, { conn }) => {
     let groupName = await conn.getName(m.chat)
 
     if (!m.isGroup) {
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ SALIR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -17,17 +17,17 @@ let handler = async (m, { conn }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Este comando solo funciona en grupos
+😴 ➛ Garfield no sale de su cama, solo de grupos
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
-    // SOLO TU NUMERO: +51 927 174 369
     let miNumero = '51927174369@s.whatsapp.net'
     if (user!== miNumero) {
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐂𝐄𝐒𝐎 𝐃𝐄𝐍𝐄𝐆𝐀𝐃𝐎 ﹒ SALIR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -36,22 +36,22 @@ let handler = async (m, { conn }) => {
 
 ── *📝 AVISO* ╏ 🍕
 🔒 ➛ Este comando es exclusivo del dueño
+😼 ➛ Solo Garfield mayor puede irse a comer
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
-    // AGARRA TU FOTO DE PERFIL
     let pp
     try {
         pp = await conn.profilePictureUrl(user, 'image')
     } catch {
-        pp = 'https://telegra.ph/file/24fa902ead26340eff1d2.jpg'
+        pp = 'https://files.evogb.win/YhR5LZ.jpg'
     }
 
-    let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐒𝐏𝐄𝐃𝐈𝐃𝐀 ﹒ ADIOS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -60,19 +60,22 @@ let handler = async (m, { conn }) => {
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 👋 ➛ *${nombre}* se despide de: *${groupName}*
+😼 ➛ Garfield se va por más lasaña
 
 ── *📝 MENSAJE* ╏ 🍕
 ✨ ➛ Gracias por la confianza depositada
 ✨ ➛ Cada momento compartido en este grupo
 ✨ ➛ Por elegirnos como su Bot #1 de WhatsApp 2026
-🍕 ➛ Me llevo los mejores recuerdos
+🍕 ➛ Me llevo los mejores recuerdos y olor a lasaña
 💌 ➛ Si necesitan volver a contar conmigo, aquí estaré
+😴 ➛ Odio los lunes, pero amo este grupo
 
 ── *📞 SOPORTE* ╏ 🍕
 📱 ➛ Soporte 24/7: *+51 927 174 369*
+🍝 ➛ Soporte con lasaña incluida
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
@@ -81,12 +84,11 @@ let handler = async (m, { conn }) => {
         mentions: [user]
     })
 
-    // COUNTDOWN ANTES DE SALIR
-    await conn.sendMessage(m.chat, { text: `🍕 Saliendo en 3...` })
+    await conn.sendMessage(m.chat, { text: `😼 Saliendo en 3... Garfield terminando lasaña` })
     await new Promise(r => setTimeout(r, 1000))
-    await conn.sendMessage(m.chat, { text: `🍕 Saliendo en 2...` })
+    await conn.sendMessage(m.chat, { text: `🍕 Saliendo en 2... Guardando siesta` })
     await new Promise(r => setTimeout(r, 1000))
-    await conn.sendMessage(m.chat, { text: `🍕 Saliendo en 1...` })
+    await conn.sendMessage(m.chat, { text: `😴 Saliendo en 1... Adiós, odio los lunes!` })
     await new Promise(r => setTimeout(r, 1000))
 
     await conn.groupParticipantsUpdate(m.chat, [user], "remove")
