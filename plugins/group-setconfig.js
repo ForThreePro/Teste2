@@ -4,8 +4,8 @@ let handler = async (m, { conn, command }) => {
     if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
     let chat = global.db.data.chats[m.chat]
 
-    if (command === 'setabrir') {
-        if (!m.quoted) return m.reply('🍕 Responde a un sticker con .setabrir')
+    if (command === 'setabrir' || command === 'setcerrar') {
+        if (!m.quoted) return m.reply(`🍕 Responde a un sticker con .${command}`)
         try {
             let q = m.quoted
             let fileSha256 = q.msg?.fileSha256 || q.message?.stickerMessage?.fileSha256
@@ -14,9 +14,16 @@ let handler = async (m, { conn, command }) => {
                 fileSha256 = crypto.createHash('sha256').update(buffer).digest()
             }
             let hash = Buffer.from(fileSha256).toString('base64')
-            chat.stickerAbrir = hash
-            console.log('[SETABRIR] Guardado:', hash)
-            return m.reply(`✅ *STICKER DE ABRIR GUARDADO* 🟢\nHash: ${hash.slice(0,10)}...\n\nAhora cierra el grupo y manda ese sticker`)
+
+            if (command === 'setabrir') {
+                chat.stickerAbrir = hash
+                console.log('[SETABRIR] Guardado:', hash)
+                return m.reply(`✅ *STICKER ABRIR GUARDADO* 🟢\nHash: ${hash.slice(0,10)}...`)
+            } else {
+                chat.stickerCerrar = hash
+                console.log('[SETCERRAR] Guardado:', hash)
+                return m.reply(`✅ *STICKER CERRAR GUARDADO* 🔴\nHash: ${hash.slice(0,10)}...`)
+            }
         } catch (e) {
             console.log(e)
             return m.reply(`❌ Error: ${e.message}`)
@@ -24,25 +31,32 @@ let handler = async (m, { conn, command }) => {
     }
 }
 
-// ESTA PARTE ES LA QUE ABRE EL GRUPO - SE EJECUTA SIEMPRE
 handler.before = async function(m, { conn }) {
     if (m.mtype !== 'stickerMessage') return
     if (!m.isGroup) return
-    if (!global.db.data.chats[m.chat]?.stickerAbrir) return
+    if (!global.db.data.chats[m.chat]) return
+    let chat = global.db.data.chats[m.chat]
+    if (!chat.stickerAbrir && !chat.stickerCerrar) return
 
     try {
-        let chat = global.db.data.chats[m.chat]
         let fileSha256 = m.msg?.fileSha256 || m.message?.stickerMessage?.fileSha256
         if (!fileSha256) return
         let hash = Buffer.from(fileSha256).toString('base64')
 
-        console.log('[CHECK] Recibido:', hash.slice(0,10), '| Guardado:', chat.stickerAbrir.slice(0,10), '| Igual:', hash === chat.stickerAbrir)
+        console.log('[CHECK] Recibido:', hash.slice(0,10), '| Abrir:', chat.stickerAbrir?.slice(0,10), '| Cerrar:', chat.stickerCerrar?.slice(0,10))
 
-        if (hash === chat.stickerAbrir) {
-            console.log('[ABRIENDO GRUPO CON STICKER]')
+        if (chat.stickerAbrir && hash === chat.stickerAbrir) {
+            console.log('[ABRIENDO GRUPO]')
             await conn.groupSettingUpdate(m.chat, 'not_announcement')
             await conn.sendMessage(m.chat, { 
                 text: `🔓 *GRUPO ABIERTO CON STICKER* 🟢\nPor: @${m.sender.split('@')[0]}`, 
+                mentions: [m.sender] 
+            })
+        } else if (chat.stickerCerrar && hash === chat.stickerCerrar) {
+            console.log('[CERRANDO GRUPO]')
+            await conn.groupSettingUpdate(m.chat, 'announcement')
+            await conn.sendMessage(m.chat, { 
+                text: `🔒 *GRUPO CERRADO CON STICKER* 🔴\nPor: @${m.sender.split('@')[0]}`, 
                 mentions: [m.sender] 
             })
         }
@@ -51,9 +65,9 @@ handler.before = async function(m, { conn }) {
     }
 }
 
-handler.help = ['setabrir']
+handler.help = ['setabrir', 'setcerrar']
 handler.tags = ['grupo']
-handler.command = ['setabrir']
+handler.command = ['setabrir', 'setcerrar']
 handler.group = true
 handler.admin = true
 handler.botAdmin = true
