@@ -14,13 +14,12 @@ var handler = async (m, { conn }) => {
     if (!sessionPath) return m.reply('🧐 *No encontré la carpeta de sesión*')
 
     await conn.sendMessage(m.chat, { react: { text: '🧹', key: m.key } })
-    await m.reply(`😴 *Limpiando archivos basura de sesión...*`)
+    await m.reply(`😴 *Garfield limpiando... hasta Odie ayuda hoy* 🍝`)
 
     let files = await fs.readdir(sessionPath)
     let filesDeleted = 0
 
     for (const file of files) {
-        // SOLO BORRAR: pre-keys, sender-key, session
         if (
             file.startsWith('pre-key-') ||
             file.startsWith('sender-key') ||
@@ -36,7 +35,7 @@ var handler = async (m, { conn }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
-    let menu = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let menu = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ FIX ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -49,7 +48,8 @@ var handler = async (m, { conn }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 🧹 ➛ Elimina archivos de caché basura de la sesión
-🔒 ➛ No borra \`creds\` ni \`app-state\` para que el bot no se desconecte
+🔒 ➛ No borra \`creds\` ni \`app-state\` para que no se desconecte
+😼 ➛ Garfield supervisando: *"Más rápido, que hay lasaña esperando"*
 
 ── *📖 USO* ╏ 🍕
 👑 ➛ Usar solo en el número principal del bot
@@ -57,14 +57,14 @@ var handler = async (m, { conn }) => {
 
 ── *📊 RESULTADO* ╏ 🍕
 ✅ ➛ Archivos eliminados: *${filesDeleted}*
-💎 ➛ Estado: *${filesDeleted === 0? 'Todo limpio' : 'Limpieza completada'}*
+💎 ➛ Estado: *${filesDeleted === 0? 'Todo limpio - Garfield feliz 😸' : 'Limpieza completada - Hora de la siesta 😴'}*
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
 *Version*: 2.6 PRO
 
-> "Si no hay lasaña, limpio todo" 😼
+> "Odio los lunes, pero amo una sesión limpia" 😼🍝
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
