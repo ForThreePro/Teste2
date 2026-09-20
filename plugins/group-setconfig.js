@@ -1,95 +1,46 @@
-import moment from 'moment-timezone'
 import crypto from 'crypto'
-moment.locale('es')
+
+async function getBuffer(conn, m) {
+    try { if (m.download) { let b = await m.download(); if (b) return b } } catch {}
+    try { if (m.quoted?.download) { let b = await m.quoted.download(); if (b) return b } } catch {}
+    try { if (conn.downloadMediaMessage) { let b = await conn.downloadMediaMessage(m); if (b) return b } } catch {}
+    return null
+}
 
 let handler = async (m, { conn, command }) => {
-    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const react = async (text) => {
-        try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
-    }
-
     if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
     let chat = global.db.data.chats[m.chat]
 
-    // SETEAR STICKERS
-    if (command === 'setabrir' || command === 'setcerrar') {
-        if (!m.quoted || m.quoted.mtype !== 'stickerMessage') return m.reply('🍕 Responde a un sticker con .setabrir o .setcerrar')
-        try {
-            let buffer = await m.quoted.download()
-            let hash = crypto.createHash('sha256').update(buffer).digest('hex')
-            if (command === 'setabrir') {
-                chat.stickerAbrir = hash
-                await react('✅')
-                return m.reply(`✅ *STICKER PARA ABRIR GUARDADO* 🟢\n${hash.slice(0,15)}...`)
-            } else {
-                chat.stickerCerrar = hash
-                await react('✅')
-                return m.reply(`✅ *STICKER PARA CERRAR GUARDADO* 🔴\n${hash.slice(0,15)}...`)
-            }
-        } catch (e) {
-            console.log(e)
-            return m.reply(`❌ Error: ${e.message}`)
-        }
+    // CONFIGURAR
+    if (command === 'setabrir') {
+        if (!m.quoted) return m.reply('🍕 Responde a un sticker con .setabrir')
+        let buffer = await getBuffer(conn, m.quoted)
+        if (!buffer) return m.reply('❌ No pude descargar el sticker')
+        let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+        chat.stickerAbrir = hash
+        return m.reply(`✅ *STICKER DE ABRIR GUARDADO* 🟢\n\nAhora manda ese sticker y se abrirá el grupo`)
     }
 
-    // SI MANDA UN STICKER, VERIFICAR SI ES EL CONFIGURADO
+    // SI ES STICKER, ABRIR
     if (m.mtype === 'stickerMessage') {
-        try {
-            if (!chat.stickerAbrir && !chat.stickerCerrar) return
-            let buffer = await m.download()
-            let hash = crypto.createHash('sha256').update(buffer).digest('hex')
-            
-            console.log('STICKER RECIBIDO:', hash.slice(0,10), 'ABRIR:', chat.stickerAbrir?.slice(0,10), 'CERRAR:', chat.stickerCerrar?.slice(0,10))
-
-            if (chat.stickerAbrir && hash === chat.stickerAbrir) command = 'abrir'
-            else if (chat.stickerCerrar && hash === chat.stickerCerrar) command = 'cerrar'
-            else return
-        } catch (e) {
-            console.log('Error sticker:', e)
-            return
+        if (!chat.stickerAbrir) return
+        let buffer = await getBuffer(conn, m)
+        if (!buffer) return
+        let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+        
+        if (hash === chat.stickerAbrir) {
+            await conn.groupSettingUpdate(m.chat, 'not_announcement')
+            await conn.sendMessage(m.chat, { text: `🔓 *GRUPO ABIERTO* 🟢\nPor: @${m.sender.split('@')[0]}`, mentions: [m.sender] })
         }
-    }
-
-    // ABRIR / CERRAR
-    let isClose, estado, icon, reactEmoji
-    if (command === 'abrir') {
-        isClose = 'not_announcement'; estado = 'ABIERTO'; icon = '🔓'; reactEmoji = '🔓'
-    }
-    if (command === 'cerrar') {
-        isClose = 'announcement'; estado = 'CERRADO'; icon = '🔒'; reactEmoji = '🔒'
-    }
-    if (!isClose) return
-
-    try {
-        await conn.groupSettingUpdate(m.chat, isClose)
-        await react(reactEmoji)
-        let msg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
-
-⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ${estado} ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZADO\`\` ${icon} —˙𖦹.꒷
-
-── *📊 INFORMACIÓN* ╏ 🍕
-${icon} ➛ Estado: *${estado}*
-👑 ➛ Por: @${m.sender.split('@')[0]}
-
-━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
-━━━━━━━━━━━`
-        await conn.sendMessage(m.chat, { text: msg, mentions: [m.sender] }, { quoted: m })
-    } catch (e) {
-        await react('❌')
-        m.reply('❌ No soy admin')
     }
 }
 
-handler.help = ['abrir', 'cerrar', 'setabrir', 'setcerrar']
+handler.help = ['setabrir']
 handler.tags = ['grupo']
-handler.command = ['abrir', 'cerrar', 'setabrir', 'setcerrar']
+handler.command = ['setabrir']
 handler.all = true
-handler.admin = false
-handler.botAdmin = false
 handler.group = true
+handler.admin = true
+handler.botAdmin = true
 
 export default handler
