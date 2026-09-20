@@ -1,80 +1,81 @@
+import crypto from 'crypto'
+
 let handler = async (m, { conn, command }) => {
-  if (!m.quoted) return m.reply(`🍕 Responde a un sticker con:\n.setabrir\n.setcerrar`)
-  
+  if (!m.quoted) return m.reply(`🍕 *Responde a un sticker*\n\n.setabrir - ese sticker ABRIRÁ\n.setcerrar - ese sticker CERRARÁ`)
+
   let q = m.quoted
-  if (!q || q.mtype !== 'stickerMessage' && q.type !== 'stickerMessage') {
-    return m.reply('🍕 Eso no es un sticker')
-  }
+  if (q.mtype !== 'stickerMessage') return m.reply('🍕 Eso no es un sticker')
 
-  // Saca el hash de donde sea que venga
-  let hash = q.fileSha256 || q.msg?.fileSha256 || q.message?.stickerMessage?.fileSha256
-  if (hash) hash = hash.toString('base64') || Buffer.from(hash).toString('base64')
-  
-  if (!hash) return m.reply('🍕 No pude leer el hash del sticker, manda el sticker de nuevo')
-
-  if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
-  let chat = global.db.data.chats[m.chat]
-
-  if (command == 'setabrir' || command == 'setopen') {
-    chat.openSticker = hash
-    return conn.reply(m.chat, `✅ *GUARDADO PARA ABRIR* 🟢\nHash: ${hash.slice(0, 20)}...`, m)
-  }
-  if (command == 'setcerrar' || command == 'setclose') {
-    chat.closeSticker = hash
-    return conn.reply(m.chat, `✅ *GUARDADO PARA CERRAR* 🔴\nHash: ${hash.slice(0, 20)}...`, m)
-  }
-}
-
-export async function before(m, { conn, participants, isAdmin, isBotAdmin }) {
   try {
-    if (!m.isGroup) return
-    if (m.mtype !== 'stickerMessage') return
+    let buffer = await q.download()
+    let hash = crypto.createHash('sha256').update(buffer).digest('hex')
 
+    if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
     let chat = global.db.data.chats[m.chat]
-    if (!chat || (!chat.openSticker && !chat.closeSticker)) return
 
-    // SACAR HASH DEL STICKER ENVIADO - 3 FORMAS
-    let hash = m.fileSha256 || m.msg?.fileSha256 || m.message?.stickerMessage?.fileSha256
-    if (!hash) return
-    
-    let hashStr = typeof hash === 'string' ? hash : hash.toString('base64') || Buffer.from(hash).toString('base64')
-
-    // Verificación de admin real (por si isAdmin falla)
-    let senderAdmin = isAdmin || participants.find(p => p.id === m.sender)?.admin
-    if (!senderAdmin) return
-
-    if (!isBotAdmin) {
-      let botId = conn.user.jid
-      let botAdmin = participants.find(p => p.id === botId)?.admin
-      if (!botAdmin) return
+    if (command == 'setabrir') {
+      chat.stickerAbrir = hash
+      return conn.reply(m.chat, `✅ *STICKER PARA ABRIR GUARDADO* 🟢\n${hash.slice(0, 20)}...\n\nAhora ese sticker ABRE el grupo`, m)
     }
-
-    console.log('[STICKER GROUP] Hash recibido:', hashStr.slice(0, 20))
-    console.log('[STICKER GROUP] Hash abrir:', chat.openSticker?.slice(0, 20))
-    console.log('[STICKER GROUP] Hash cerrar:', chat.closeSticker?.slice(0, 20))
-
-    if (chat.openSticker && hashStr === chat.openSticker) {
-      console.log('ABRIENDO GRUPO')
-      await conn.groupSettingUpdate(m.chat, 'not_announcement')
-      await conn.reply(m.chat, `🟢 *GRUPO ABIERTO* 🍕\nPor sticker de @${m.sender.split('@')[0]}`, m, { mentions: [m.sender] })
-    }
-
-    if (chat.closeSticker && hashStr === chat.closeSticker) {
-      console.log('CERRANDO GRUPO')
-      await conn.groupSettingUpdate(m.chat, 'announcement')
-      await conn.reply(m.chat, `🔴 *GRUPO CERRADO* 🍕\nPor sticker de @${m.sender.split('@')[0]}`, m, { mentions: [m.sender] })
+    if (command == 'setcerrar') {
+      chat.stickerCerrar = hash
+      return conn.reply(m.chat, `✅ *STICKER PARA CERRAR GUARDADO* 🔴\n${hash.slice(0, 20)}...\n\nAhora ese sticker CIERRA el grupo`, m)
     }
 
   } catch (e) {
-    console.log('[STICKER GROUP ERROR]', e)
+    m.reply(`❌ Error: ${e.message}`)
+  }
+}
+
+handler.before = async function (m, { conn }) {
+  if (!m.isGroup) return
+  if (m.mtype !== 'stickerMessage') return
+
+  let chat = global.db.data.chats[m.chat]
+  if (!chat || (!chat.stickerAbrir && !chat.stickerCerrar)) return
+
+  try {
+    let groupMetadata = await conn.groupMetadata(m.chat)
+
+    let sender = groupMetadata.participants.find(p => p.id === m.sender)
+    let isSenderAdmin = sender?.admin === 'admin' || sender?.admin === 'superadmin'
+    if (!isSenderAdmin) return
+
+    let botJid = conn.user.jid
+    let bot = groupMetadata.participants.find(p => p.id === botJid || p.id.includes(botJid.split('@')[0]))
+    let isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin'
+    if (!isBotAdmin) return
+
+    let buffer = await m.download()
+    let hash = crypto.createHash('sha256').update(buffer).digest('hex')
+
+    console.log('[STICKER] Recibido:', hash.slice(0, 10), '| Abrir:', chat.stickerAbrir?.slice(0, 10), '| Cerrar:', chat.stickerCerrar?.slice(0, 10))
+
+    if (chat.stickerAbrir && hash === chat.stickerAbrir) {
+      if (groupMetadata.announce === true) {
+        await conn.groupSettingUpdate(m.chat, 'not_announcement')
+        await conn.sendMessage(m.chat, { text: `🟢 *GRUPO ABIERTO*\n🍕 Por @${m.sender.split('@')[0]}`, mentions: [m.sender] }, { quoted: m })
+      }
+      return
+    }
+
+    if (chat.stickerCerrar && hash === chat.stickerCerrar) {
+      if (groupMetadata.announce === false || !groupMetadata.announce) {
+        await conn.groupSettingUpdate(m.chat, 'announcement')
+        await conn.sendMessage(m.chat, { text: `🔴 *GRUPO CERRADO*\n🍕 Por @${m.sender.split('@')[0]}`, mentions: [m.sender] }, { quoted: m })
+      }
+      return
+    }
+
+  } catch (e) {
+    console.log('Error sticker abrir/cerrar:', e)
   }
 }
 
 handler.help = ['setabrir', 'setcerrar']
 handler.tags = ['group']
-handler.command = ['setabrir', 'setopen', 'setcerrar', 'setclose', 'setabrirgrupo', 'setcerrargrupo']
+handler.command = ['setabrir', 'setcerrar', 'setopen', 'setclose']
 handler.admin = true
 handler.group = true
-handler.botAdmin = true
 
 export default handler
