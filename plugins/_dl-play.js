@@ -3,7 +3,6 @@ import yts from 'yt-search'
 import moment from 'moment-timezone'
 moment.locale('es')
 
-// FUNCION PARA REACCIONES
 const react = async (conn, m, text) => {
   try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
 }
@@ -14,20 +13,21 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     try {
         if (!text.trim()) {
-            let menuUso = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🎵 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Buscando música como Garfield busca lasaña"*
+> *"Buscando música como Garfield busca su lasaña a las 3AM"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 🎵 ➛ Busca y descarga música de YouTube
 🎵 ➛ Envía el audio en MP3
+😼 ➛ Garfield DJ en la casa
 
 ── *📖 USO* ╏ 🍕
 ➛.*${command}* <nombre de canción>
@@ -39,16 +39,17 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *⏱️ LÍMITE* ╏ 🍕
 📦 ➛ Máx duración: *30 minutos*
+🍝 ➛ Como una siesta corta de Garfield
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
         }
 
         await react(conn, m, '🔍')
-        await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -59,9 +60,10 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 🔍 ➛ Buscando canción...
 📥 ➛ Obteniendo información...
 ⬇️ ➛ Preparando descarga...
+😼 ➛ Garfield afinando oídos...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
         const videoMatch = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/))([a-zA-Z0-9_-]{11})/)
@@ -76,13 +78,12 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         const vistas = formatViews(views)
         const canal = author.name
         const shortUrl = `https://youtu.be/${videoId}`
-
         const thumb = (await conn.getFile(thumbnail)).data
 
         const [_, mediaUrl] = await Promise.all([
             conn.sendMessage(m.chat, {
                 image: thumb,
-                caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+                caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -95,12 +96,14 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 👁️ ➛ Vistas: *${vistas}*
 ⏱️ ➛ Duración: *${timestamp}*
 🔗 ➛ Link: ${shortUrl}
+😼 ➛ Encontrado por Garfield
 
 ── *📥 DESCARGA* ╏ 🍕
 ⬇️ ➛ Enviando audio...
+🍝 ➛ Preparando tu lasaña musical...
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             }, { quoted: m }),
             getMediaUrl(shortUrl)
@@ -120,7 +123,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     } catch (e) {
         await react(conn, m, '❌')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        let menuErr = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let menuErr = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -129,13 +132,15 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🍕
 ❌ ➛ ${e.message}
+😴 ➛ Garfield se durmió buscando
 
 ── *💡 SOLUCIÓN* ╏ 🍕
 🔧 ➛ Usa un nombre o link válido
 🔧 ➛ Máx 30 minutos de duración
+🍕 ➛ Intenta con otro sabor de lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
     }
