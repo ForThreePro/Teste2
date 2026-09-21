@@ -11,15 +11,14 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     if (!(isAdmin || isOwner)) {
       await react('❌')
       return conn.sendMessage(m.chat, {
-        text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo admins pueden usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`
+        text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo admins pueden usar este comando\n😼 ➛ Garfield solo obedece a los admins pe\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`
       }, { quoted: m })
     }
 
-    const customMessage = args.join(' ') || '📢 INVOCACIÓN GENERAL'
+    const customMessage = args.join(' ') || '📢 INVOCACIÓN GENERAL - GARFIELD EDITION'
     const groupMetadata = await conn.groupMetadata(m.chat).catch(() => ({ subject: 'Grupo', participants: [] }))
     const groupName = groupMetadata.subject
 
-    // Lista de banderas por prefijo
     const countryFlags = [
       { prefijo: '502', bandera: '🇬🇹' }, { prefijo: '503', bandera: '🇸🇻' },
       { prefijo: '504', bandera: '🇭🇳' }, { prefijo: '505', bandera: '🇳🇮' },
@@ -52,7 +51,6 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
       return '🚩'
     }
 
-    // Agrupar participantes por bandera
     const grouped = {}
     for (const mem of participants) {
       const flag = getCountryFlag(mem)
@@ -60,20 +58,19 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
       grouped[flag].push(mem)
     }
 
-    // Ordenar las banderas según el orden definido
     const orderedFlags = countryFlags.map(c => c.bandera).concat(['🚩'])
 
-    // TU IMAGEN GARFIELD
     const catalogoImg = { url: 'https://files.evogb.win/QFXQtu.jpg' }
 
-    let messageText = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let messageText = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐈𝐍𝐕𝐎𝐂𝐀𝐂𝐈𝐎𝐍 ﹒ GENERAL ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`TAGALL\`\` 📢 —˙𖦹.꒷
+😼 Garfield los está llamando... ¡Despierten! 🍝
 
-── *📊 INFORMACIÓN* ╏ 🍕
+── *📊 INFO GARFIELD* ╏ 🍕
 👥 ➛ Grupo: *${groupName}*
 👤 ➛ Integrantes: *${participants.length}*
 💬 ➛ Mensaje: *${customMessage}*
@@ -92,11 +89,12 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     }
 
     messageText += `
-── *📝 NOTA* ╏ 🍕
+── *📝 NOTA* ╏ 😼
 📢 ➛ Todos fueron mencionados
+🍕 ➛ Lux X Yallico - Garfield Edition los invocó
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
@@ -110,7 +108,7 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
   } catch (error) {
     console.error("[ERROR EN TODOS]:", error)
     await react('❌')
-    let errorMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let errorMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -119,9 +117,10 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Ocurrió un error al ejecutar el comando
+😴 ➛ Garfield se quedó dormido
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     conn.sendMessage(m.chat, { text: errorMsg }, { quoted: m })
   }
