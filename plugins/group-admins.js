@@ -9,7 +9,7 @@ const handler = async (m, { conn, command }) => {
 
   if (!m.mentionedJid[0] &&!m.quoted) {
     await react('❌')
-    let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐃𝐌𝐈𝐍𝐈𝐒𝐓𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ PROMOTE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -19,6 +19,7 @@ const handler = async (m, { conn, command }) => {
 ── *📖 USO* ╏ 🍕
 ➛ Menciona a un usuario
 ➛ Responde al mensaje del usuario
+😼 ➛ Garfield: menciona pe
 
 ── *💡 EJEMPLOS* ╏ 🍕
 ➛.promote @user
@@ -26,9 +27,10 @@ const handler = async (m, { conn, command }) => {
 
 ── *📝 AVISO* ╏ 🍕
 🔒 ➛ Solo admins
+😼 ➛ Solo los que traen lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
   }
@@ -42,7 +44,7 @@ const handler = async (m, { conn, command }) => {
     await conn.groupParticipantsUpdate(m.chat, [user], action)
   } catch {
     await react('❌')
-    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ADMIN ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -52,15 +54,16 @@ const handler = async (m, { conn, command }) => {
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ No se pudo completar la acción
 🔒 ➛ Verifica permisos del bot
+😴 ➛ Garfield dice: el bot no es admin pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
 
   let msgAccion = action === 'promote'
-? `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+? `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐏𝐑𝐎𝐌𝐎𝐕𝐈𝐃𝐎 ﹒ NUEVO ADMIN ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -70,11 +73,12 @@ const handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 👑 ➛ Nuevo Admin: @${user.split('@')[0]}
 👤 ➛ Por: @${m.sender.split('@')[0]}
+😼 ➛ Garfield aprobó al nuevo admin
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-    : `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    : `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐆𝐑𝐀𝐃𝐀𝐃𝐎 ﹒ QUITAR ADMIN ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -84,9 +88,10 @@ const handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 📉 ➛ Ya no es Admin: @${user.split('@')[0]}
 👤 ➛ Por: @${m.sender.split('@')[0]}
+😼 ➛ Garfield le quitó el poder
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
   await conn.sendMessage(m.chat, { text: msgAccion, mentions: [user, m.sender] }, { quoted: m })
