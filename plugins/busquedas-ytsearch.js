@@ -14,7 +14,7 @@ let handler = async (m, { conn, text }) => {
 
     if (!text) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -23,18 +23,19 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ ¿Qué deseas buscar en YouTube?
+😼 ➛ Garfield dice: escribe algo pe
 
 ── *💡 EJEMPLO* ╏ 🍕
 ➛.ytsearch Bad Bunny
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
     await react('🔍')
-    await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -44,9 +45,10 @@ let handler = async (m, { conn, text }) => {
 ── *📊 ESTADO* ╏ 🍕
 🔍 ➛ Buscando: *${text}*
 ⏳ ➛ Conectando a StellarWA...
+😼 ➛ Garfield buscando mientras come
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
 
     try {
@@ -54,7 +56,7 @@ let handler = async (m, { conn, text }) => {
 
         if (!data.status ||!data.result || data.result.length === 0) {
             await react('❌')
-            let vacio = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let vacio = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐒𝐈𝐍 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -63,9 +65,10 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ 🍕
 📭 ➛ No se encontraron resultados para: *${text}*
+😴 ➛ Garfield no encontró ni las migajas
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
         }
@@ -78,7 +81,7 @@ let handler = async (m, { conn, text }) => {
 👤 ➛ Canal: *${v.author}*
 🔗 ➛ ${v.url}`).join('\n\n')
 
-        let caption = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let caption = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐎𝐏 𝟓 ﹒ RESULTADOS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -94,13 +97,14 @@ ${res}
 ── *📋 INFORMACIÓN* ╏ 🍕
 👤 ➛ Solicitado por: ${user}
 👥 ➛ Grupo: *${groupName}*
+😼 ➛ Buscado por Garfield
 
 ── *💡 TIP* ╏ 🍕
 ➛.ytmp4 + link
 ➛.ytmp3 + link
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: caption, mentions: [m.sender] }, { quoted: m })
@@ -108,7 +112,7 @@ ${res}
     } catch (e) { 
         console.error(e)
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -118,9 +122,10 @@ ${res}
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Error al conectar con StellarWA
 🔧 ➛ Intenta más tarde
+😼 ➛ Garfield dice: el api se fue a dormir
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
