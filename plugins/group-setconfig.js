@@ -11,7 +11,7 @@ let handler = async (m, { conn, command }) => {
     }
 
     if (command === 'setabrir' || command === 'setcerrar') {
-        if (!m.quoted) return m.reply('😼🍕 Responde a un sticker con .setabrir o .setcerrar')
+        if (!m.quoted) return m.reply('😼🍕 Responde a un sticker con .setabrir o .setcerrar - Garfield quiere su sticker pe')
         try {
             let q = m.quoted
             let fileSha256 = q.msg?.fileSha256 || q.message?.stickerMessage?.fileSha256
