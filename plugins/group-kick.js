@@ -11,7 +11,7 @@ let handler = async (m, { conn, participants }) => {
 
     if (!mentionedJid) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐗𝐏𝐔𝐋𝐒𝐀𝐑 ﹒ USUARIO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -21,12 +21,13 @@ let handler = async (m, { conn, participants }) => {
 ── *📖 USO* ╏ 🍕
 ➛ Menciona a un usuario
 ➛ Responde al mensaje del usuario
+😼 ➛ Garfield: apunta bien pe
 
 ── *📝 AVISO* ╏ 🍕
 🔒 ➛ Solo admins
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -41,25 +42,25 @@ let handler = async (m, { conn, participants }) => {
 
         if (mentionedJid === conn.user.jid) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo eliminarme a mí mismo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo eliminarme a mí mismo\n😼 ➛ Garfield no se auto-banea\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
         }
         if (mentionedJid === ownerGroup) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al propietario del grupo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al propietario del grupo\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
         }
         if (mentionedJid === ownerBot) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al dueño del bot\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar al dueño del bot\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
         }
         if (isAdmin) {
             await react('❌')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar a un administrador\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo expulsar a un administrador\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
         }
 
         await react('👢')
         await conn.groupParticipantsUpdate(m.chat, [mentionedJid], 'remove')
 
-        let kickMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let kickMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐗𝐏𝐔𝐋𝐒𝐀𝐃𝐎 ﹒ USUARIO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -69,14 +70,15 @@ let handler = async (m, { conn, participants }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 👢 ➛ Usuario: @${mentionedJid.split('@')[0]}
 👑 ➛ Por: @${m.sender.split('@')[0]}
+😼 ➛ Garfield le dio su patada de lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: kickMsg, mentions: [mentionedJid, m.sender] }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ KICK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -86,9 +88,10 @@ let handler = async (m, { conn, participants }) => {
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Se ha producido un problema
 🔧 ➛ ${e.message}
+😴 ➛ Garfield se quedó dormido
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
