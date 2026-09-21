@@ -9,10 +9,12 @@ let handler = async (m, { conn, command, participants }) => {
         try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
     }
 
+    // Funciona con @user y respondiendo
     let mentionedJid = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
+
     if (!mentionedJid) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐒𝐈𝐋𝐄𝐍𝐂𝐈𝐀𝐑 ﹒ USUARIO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -22,13 +24,16 @@ let handler = async (m, { conn, command, participants }) => {
 ── *📖 USO* ╏ 🍕
 ➛ Menciona a un usuario
 ➛ Responde al mensaje del usuario
+😼 ➛ Garfield: etiqueta o responde pe
 
 ── *💡 COMANDOS* ╏ 🍕
 ➛.mute @user
 ➛.unmute @user
+➛ Responde con.mute
+➛ Responde con.unmute
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -36,22 +41,22 @@ let handler = async (m, { conn, command, participants }) => {
     let isUserAdmin = participants.find(p => p.id === mentionedJid)?.admin
     if (isUserAdmin) {
         await react('❌')
-        return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ MUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedes silenciar a un administrador\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+        return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ MUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedes silenciar a un administrador\n😼 ➛ Garfield protege a los admins\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
     }
     if (mentionedJid === conn.user.jid) {
         await react('❌')
-        return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ MUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo silenciarme a mí mismo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+        return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ MUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No puedo silenciarme a mí mismo\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
     }
 
     if (command === "mute") {
         if (mutedUsers.has(mentionedJid)) {
             await react('⚠️')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ MUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Este usuario ya está silenciado\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ MUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Este usuario ya está silenciado\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
         }
         mutedUsers.add(mentionedJid)
         await react('🔇')
 
-        let muteMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let muteMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐒𝐈𝐋𝐄𝐍𝐂𝐈𝐀𝐃𝐎 ﹒ USUARIO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -64,20 +69,21 @@ let handler = async (m, { conn, command, participants }) => {
 
 ── *📝 NOTA* ╏ 🍕
 🗑️ ➛ Sus mensajes serán eliminados automáticamente
+😼 ➛ Garfield lo mandó a dormir
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: muteMsg, mentions: [mentionedJid, m.sender] }, { quoted: m })
     } else if (command === "unmute") {
         if (!mutedUsers.has(mentionedJid)) {
             await react('⚠️')
-            return conn.sendMessage(m.chat, { text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ UNMUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Este usuario no está silenciado\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕` }, { quoted: m })
+            return conn.sendMessage(m.chat, { text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ UNMUTE ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Este usuario no está silenciado\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼` }, { quoted: m })
         }
         mutedUsers.delete(mentionedJid)
         await react('🔊')
 
-        let unmuteMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let unmuteMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐃𝐄𝐒𝐈𝐋𝐄𝐍𝐂𝐈𝐀𝐃𝐎 ﹒ USUARIO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -90,9 +96,10 @@ let handler = async (m, { conn, command, participants }) => {
 
 ── *📝 NOTA* ╏ 🍕
 ✅ ➛ Ya puede volver a enviar mensajes
+😼 ➛ Garfield lo perdonó
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: unmuteMsg, mentions: [mentionedJid, m.sender] }, { quoted: m })
     }
