@@ -9,7 +9,7 @@ let handler = async (m, { conn }) => {
 
   if (!m.quoted) {
     await react('❌')
-    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐑 ﹒ MENSAJE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -18,12 +18,14 @@ let handler = async (m, { conn }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Responde al mensaje que deseas eliminar
+😼 ➛ Garfield dice: responde al mensaje pe
 
 ── *💡 EJEMPLO* ╏ 🍕
 ➛ Responde a un mensaje + .del
+➛ Responde a un mensaje + .delete
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
@@ -38,7 +40,7 @@ let handler = async (m, { conn }) => {
     await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
   }
 
-  let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+  let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ MENSAJE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -48,14 +50,15 @@ let handler = async (m, { conn }) => {
 ── *📊 INFORMACIÓN* ╏ 🍕
 🗑️ ➛ Mensaje eliminado
 👤 ➛ Por: @${m.sender.split('@')[0]}
+😼 ➛ Garfield lo borró durmiendo
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
   conn.sendMessage(m.chat, { text: ok, mentions: [m.sender] }, { quoted: m })
 }
 
-handler.help = ['del']
+handler.help = ['del','delete']
 handler.tags = ['grupo']
 handler.command = /^del(ete)?$/i
 handler.admin = true
