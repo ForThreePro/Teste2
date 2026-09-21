@@ -14,7 +14,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 
   if (!args[0]) {
     await react('❌')
-    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ ON/OFF ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -23,6 +23,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Falta activar o desactivar
+😼 ➛ Garfield dice: pon on o off pe
 
 ── *💡 USO* ╏ 🍕
 ➛.welcome on / off
@@ -31,7 +32,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 ➛.detect on / off
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
@@ -86,7 +87,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
   }
 
   if (fail) {
-    let lock = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let lock = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐂𝐄𝐒𝐎 𝐃𝐄𝐍𝐄𝐆𝐀𝐃𝐎 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -95,9 +96,10 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 
 ── *📝 AVISO* ╏ 🍕
 🔒 ➛ No tienes permisos para esto
+😼 ➛ Garfield: solo admins pueden tocar esto
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: lock }, { quoted: m })
   }
@@ -107,7 +109,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
   let estadoTexto = isEnable? 'Activado' : 'Desactivado'
   let estadoEmoji = isEnable? '🟢' : '🔴'
 
-  let statusTxt = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+  let statusTxt = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ ${type.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -118,9 +120,10 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 ⚙️ ➛ Función: *${type}*
 ${estadoEmoji} ➛ Estado: *${estadoTexto}*
 👑 ➛ Por: @${m.sender.split('@')[0]}
+😼 ➛ Garfield ${isEnable? 'aprobó 🍕' : 'se fue a dormir 😴'}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
   await conn.sendMessage(m.chat, {
