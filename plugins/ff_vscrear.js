@@ -1,3 +1,4 @@
+
 import moment from 'moment-timezone'
 moment.locale('es')
 
@@ -6,7 +7,7 @@ let vs = global.vsData = global.vsData || {}
 const crear = async (m, { conn, args, usedPrefix, command }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     if (args.length < 2) {
-      let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ VS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -15,9 +16,10 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 
 ── *📝 USO* ╏ 🍕
 ➛${usedPrefix + command} 14 PE APOS
+😼 ➛ Garfield dice: pon hora y país pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       return conn.reply(m.chat, error, m);
     }
@@ -29,7 +31,7 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
     const pais = args[1].toUpperCase();
     const diferenciasHorarias = { CL: 2, AR: 2, PE: 0, BO: 2 };
     if (!(pais in diferenciasHorarias)) {
-      let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ PAIS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -38,9 +40,10 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 
 ── *📝 AVISO* ╏ 🍕
 ⚠️ ➛ Usa PE, CL, AR o BO
+😼 ➛ Garfield solo conoce esos países
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       return conn.reply(m.chat, error, m);
     }
@@ -64,20 +67,19 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
     let cantidad = command.includes('6')? 6 : 4
     let tipo = command.includes('fem')? 'FEM' : command.includes('masc')? 'MASC' : 'MIXTO'
 
-    // DISEÑOS GARFIELD
     let diseño = {}
-    if(tipo === 'FEM'){ // KAWAII GARFIELD
-        diseño = { header: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n🌸⃟💕 ${groupName} 💕⃟🌸\nㅤ ˗ˏˋ ꒰ 😻 ꒱ ˎˊ˗`, icon: '😻', suplente: '🧁' }
+    if(tipo === 'FEM'){
+        diseño = { header: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n🌸⃟💕 ${groupName} 💕⃟🌸\nㅤ ˗ˏˋ ꒰ 😻 ꒱ ˎˊ˗`, icon: '😻', suplente: '🧁' }
     }
-    if(tipo === 'MASC'){ // LUXURY GARFIELD
-        diseño = { header: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n👑˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗👑\n✧･ﾟ: *✧･ﾟ:* 🍗 *:･ﾟ✧*:･ﾟ✧`, icon: '🍗', suplente: '🥂' }
+    if(tipo === 'MASC'){
+        diseño = { header: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n👑˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗👑\n✧･ﾟ: *✧･ﾟ:* 🍗 *:･ﾟ✧*:･ﾟ✧`, icon: '🍗', suplente: '🥂' }
     }
-    if(tipo === 'MIXTO'){ // GALAXY GARFIELD
-        diseño = { header: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n🌌⃟✨ ${groupName} ✨⃟🌌\n　★彡.　☆`, icon: '🍕', suplente: '☄️' }
+    if(tipo === 'MIXTO'){
+        diseño = { header: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n🌌⃟✨ ${groupName} ✨⃟🌌\n　★彡.　☆`, icon: '🍕', suplente: '☄️' }
     }
 
     vs[m.chat] = vs[m.chat] || { salas: [], tipo, diseño, groupName }
-    if(vs[m.chat].tipo!== tipo) vs[m.chat] = { salas: [], tipo, diseño, groupName } // reinicia si cambia de tipo
+    if(vs[m.chat].tipo!== tipo) vs[m.chat] = { salas: [], tipo, diseño, groupName }
 
     vs[m.chat].salas.push({
         jugadores: [],
@@ -96,17 +98,17 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 const anotar = async (m, { conn, args, usedPrefix, command }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     if (!vs[m.chat] ||!vs[m.chat].salas.length) {
-      return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ ➛ No hay VS activa\n━━━━━━━━━━━`, m)
+      return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ ➛ No hay VS activa\n😴 ➛ Garfield dice: crea una primero\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, m)
     }
     let salaNum = parseInt(args[0]) - 1
     if(isNaN(salaNum)) salaNum = 0
 
     let sala = vs[m.chat].salas[salaNum]
-    if(!sala) return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ ➛ Sala ${args[0]} no existe\n━━━━━━━━━━━`, m)
+    if(!sala) return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ ➛ Sala ${args[0]} no existe\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, m)
 
     let users = m.mentionedJid || []
     if(users.length === 0) {
-      return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n❌ ➛ Menciona a alguien\nEj:.anotar 1 @pepito @juana\n━━━━━━━━━━━`, m)
+      return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ ➛ Menciona a alguien\nEj:.anotar 1 @pepito @juana\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`, m)
     }
 
     for(let user of users){
@@ -114,15 +116,15 @@ const anotar = async (m, { conn, args, usedPrefix, command }) => {
         sala.suplentes = sala.suplentes.filter(v => v!== user)
 
         if (command === 'anotar') {
-            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⚠️ ➛ Sala ${salaNum+1} llena\n━━━━━━━━━━━`, m)
+            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⚠️ ➛ Sala ${salaNum+1} llena\n🍕 Garfield: ya no entra nadie más\n━━━━━━━━━━━`, m)
             sala.jugadores.push(user)
         }
         if (command === 'suplente') {
-            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⚠️ ➛ Suplentes sala ${salaNum+1} llenos\n━━━━━━━━━━━`, m)
+            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⚠️ ➛ Suplentes sala ${salaNum+1} llenos\n━━━━━━━━━━━`, m)
             sala.suplentes.push(user)
         }
         if (command === 'salir') {
-            await conn.reply(m.chat, `🍕 ➛ @${user.split('@')[0]} salió de la sala ${salaNum+1}`, m, { mentions: [user] })
+            await conn.reply(m.chat, `😼 ➛ @${user.split('@')[0]} salió de la sala ${salaNum+1} - Garfield lo sacó`, m, { mentions: [user] })
         }
     }
     await actualizarLista(m.chat, conn, usedPrefix)
@@ -160,7 +162,8 @@ ${todasSalas}
 │ React:
 │ ${d.icon} = Quiero JUGAR
 │ ${d.suplente} = Quiero SUPLENTE
-╰───────────────────`;
+╰───────────────────
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`;
 
     let mentions = []
     data.salas.forEach(s => mentions.push(...s.jugadores,...s.suplentes))
@@ -186,6 +189,6 @@ handler.help = [
 handler.tags = ['freefire']
 handler.command = /^(v[46](fem|masc|mixto)|anotar|suplente|salir)$/i
 handler.group = true
-handler.admin = true // solo admin puede crear y anotar
+handler.admin = true
 
 export default handler
