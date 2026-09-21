@@ -12,7 +12,7 @@ let handler = async (m, { conn }) => {
         let link = await conn.groupInviteCode(m.chat)
         let groupMetadata = await conn.groupMetadata(m.chat)
 
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐋𝐈𝐍𝐊 ﹒ DEL GRUPO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -21,6 +21,7 @@ let handler = async (m, { conn }) => {
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 👥 ➛ Grupo: *${groupMetadata.subject}*
+😼 ➛ Garfield te pasa el link
 
 ── *🔗 ENLACE* ╏ 🍕
 https://chat.whatsapp.com/${link}
@@ -28,15 +29,16 @@ https://chat.whatsapp.com/${link}
 ── *📝 NOTAS* ╏ 🍕
 🔒 ➛ Solo admins pueden resetear el link
 ⚠️ ➛ No lo compartas con desconocidos
+🍕 ➛ Lux X Yallico lo aprueba
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: texto }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ LINK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -46,9 +48,10 @@ https://chat.whatsapp.com/${link}
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ No pude obtener el link
 🔒 ➛ ¿Soy admin del grupo?
+😴 ➛ Garfield dice: hazme admin pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
