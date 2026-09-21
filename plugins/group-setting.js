@@ -11,47 +11,51 @@ let handler = async (m, { conn, command }) => {
     let estado
     let icon
     let reactEmoji
+    let garfieldMsg
 
     if (command === 'abrir') {
         isClose = 'not_announcement'
         estado = 'ABIERTO'
         icon = '🔓'
-        reactEmoji = '🔓'
+        reactEmoji = '😼'
+        garfieldMsg = '😼 Garfield despertó... ¡Hora de chismear y comer lasaña! 🍝'
     } 
     if (command === 'cerrar') {
         isClose = 'announcement'
         estado = 'CERRADO'
         icon = '🔒'
-        reactEmoji = '🔒'
+        reactEmoji = '😴'
+        garfieldMsg = '😴 Garfield se fue a dormir... ¡Shhh! 🍕'
     }
 
     try {
         await conn.groupSettingUpdate(m.chat, isClose)
         await react(reactEmoji)
 
-        let msg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let msg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ${estado} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ACTUALIZADO\`\` ${icon} —˙𖦹.꒷
+${garfieldMsg}
 
-── *📊 INFORMACIÓN* ╏ 🍕
+── *📊 INFO GARFIELD* ╏ 🍕
 ${icon} ➛ Estado: *${estado}*
 👑 ➛ Por: @${m.sender.split('@')[0]}
 
 ── *📝 NOTA* ╏ 🍕
 ${command === 'cerrar' 
-? '🔒 ➛ Solo admins pueden enviar mensajes' 
-: '💬 ➛ Todos pueden enviar mensajes'}
+? '🔒 ➛ Solo admins pueden enviar mensajes\n😴 ➛ Garfield está en siesta' 
+: '💬 ➛ Todos pueden enviar mensajes\n🍕 ➛ Incluso Odie puede hablar'}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         await conn.sendMessage(m.chat, { text: msg, mentions: [m.sender] }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ GRUPO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -61,9 +65,10 @@ ${command === 'cerrar'
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ No se pudo cambiar el estado
 🔒 ➛ ¿Soy admin del grupo?
+😼 ➛ Garfield dice: hazme admin pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
