@@ -16,7 +16,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
     // OWNER
     if (command === 'owner' || command === 'creator') {
         let owner = '51927174369@s.whatsapp.net'
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐎𝐖𝐍𝐄𝐑 ﹒ CONTACTO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -26,24 +26,26 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 ── *📊 CONTACTO* ╏ 🍕
 👑 ➛ Owner: @${owner.split('@')[0]}
 📱 ➛ Número: +51 927 174 369
+😼 ➛ Estado: Comiendo lasaña
 
 ── *📝 NOTA* ╏ 🍕
 💬 ➛ Contacta solo para cosas importantes
+🍕 ➛ Lux X Yallico a tu servicio
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('👑')
         return conn.sendMessage(m.chat, { text: texto, mentions: [owner] }, { quoted: m })
     }
 
     // PING
     if (command === 'ping' || command === 'p') {
         let start = new Date * 1
-        await conn.reply(m.chat, `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐏𝐈𝐍𝐆 ﹒ CALCULANDO ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📊 ESTADO* ╏ 🍕\n⏳ ➛ Calculando...`, m)
+        await conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐏𝐈𝐍𝐆 ﹒ CALCULANDO ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📊 ESTADO* ╏ 🍕\n⏳ ➛ Calculando... 😼\n🍝 ➛ Garfield está corriendo...`, m)
         let end = new Date * 1
         let speed = end - start
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐏𝐈𝐍𝐆 ﹒ VELOCIDAD ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -53,14 +55,15 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 ── *📊 ESTADÍSTICAS* ╏ 🍕
 📡 ➛ Velocidad: ${speed}ms
 ✅ ➛ Estado: Activo
+😼 ➛ Garfield: Más rápido que Odie
 
 ── *📝 NOTA* ╏ 🍕
-🌐 ➛ Servidor estable
+🌐 ➛ Servidor estable y con lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('⚡')
         return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
     }
 
@@ -69,7 +72,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         if (fs.existsSync(tmpPath)) {
             fs.readdirSync(tmpPath).forEach(file => fs.unlinkSync(`${tmpPath}/${file}`))
         }
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐋𝐈𝐌𝐏𝐈𝐄𝐙𝐀 ﹒ CACHE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -79,20 +82,21 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 ── *📊 RESULTADO* ╏ 🍕
 🗑️ ➛ Caché temporal eliminado
 💾 ➛ Memoria liberada con éxito
+😼 ➛ Garfield limpió su plato
 
 ── *📝 NOTA* ╏ 🍕
-✅ ➛ El bot está más ligero
+✅ ➛ El bot está más ligero que Garfield un lunes
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('🗑️')
         return m.reply(texto)
     }
 
     if (command === 'cpu') {
         let cpu = os.loadavg()[0].toFixed(2)
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐂𝐏𝐔 ﹒ PROCESADOR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -101,21 +105,22 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ── *📊 ESTADÍSTICAS* ╏ 🍕
 💻 ➛ Carga CPU: ${cpu}%
+😼 ➛ Garfield dice: no me hagan trabajar mucho
 
 ── *📝 NOTA* ╏ 🍕
 ⚠️ ➛ Si supera 90% el bot va lento
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('💻')
         return m.reply(texto)
     }
 
     if (command === 'ram') {
         const used = process.memoryUsage()
         let ram = (used.heapUsed / 1024 / 1024).toFixed(2)
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐑𝐀𝐌 ﹒ MEMORIA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -124,21 +129,22 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ── *📊 ESTADÍSTICAS* ╏ 🍕
 💾 ➛ Consumo RAM: ${ram} MB
+🍝 ➛ Equivale a ${Math.floor(ram/5)} lasañas en memoria
 
 ── *📝 NOTA* ╏ 🍕
 📊 ➛ Memoria usada por el proceso
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('💾')
         return m.reply(texto)
     }
 
     if (command === 'uptime') {
         let _uptime = process.uptime() * 1000
         let uptime = clockString(_uptime)
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐔𝐏𝐓𝐈𝐌𝐄 ﹒ TIEMPO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -147,14 +153,16 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ── *📊 ESTADÍSTICAS* ╏ 🍕
 ⏱️ ➛ Tiempo activo: ${uptime}
+😼 ➛ Garfield despierto desde hace: ${uptime}
 
 ── *📝 NOTA* ╏ 🍕
 🔄 ➛ Desde que se inició el bot
+🍕 ➛ Sin siestas... por ahora
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('⏱️')
         return m.reply(texto)
     }
 
@@ -165,12 +173,13 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         let cpu = os.loadavg()[0].toFixed(2)
         let ram = (used.heapUsed / 1024 / 1024).toFixed(2)
 
-        let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐈𝐍𝐅𝐎 ﹒ SISTEMA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`REPORTE\`\` 📊 —˙𖦹.꒷
+😼 Garfield presenta el informe
 
 ── *📊 ESTADÍSTICAS* ╏ 🍕
 ⏱️ ➛ Uptime: ${muptime}
@@ -179,12 +188,13 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
 ── *📝 DETALLES* ╏ 🍕
 👑 ➛ Desarrollado por: Sebastián Barboza
-✅ ➛ Estado: Operativo
+✨ ➛ Edición: Lux X Yallico - Garfield
+✅ ➛ Estado: Operativo y con lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
-        await react('✅')
+        await react('📊')
         return m.reply(texto)
     }
 
@@ -194,7 +204,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
         if (!txt) {
             await react('❌')
-            let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐓𝐒 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -204,12 +214,13 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 ── *📖 USO* ╏ 🍕
 ➛ Escribe el texto que deseas convertir
 ➛ O responde a un mensaje
+😼 ➛ Garfield quiere escucharte
 
 ── *💡 EJEMPLO* ╏ 🍕
 ➛ ${usedPrefix}tts Hola, ¿cómo estás?
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return m.reply(texto)
         }
@@ -228,16 +239,16 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
 
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-       .audioCodec('libopus')
-       .toFormat('opus')
-       .outputOptions([
+      .audioCodec('libopus')
+      .toFormat('opus')
+      .outputOptions([
                     '-avoid_negative_ts make_zero',
                     '-ac 1',
                     '-b:a 64k'
                 ])
-       .on('end', () => resolve(true))
-       .on('error', (err) => reject(err))
-       .save(tmpFilePath)
+      .on('end', () => resolve(true))
+      .on('error', (err) => reject(err))
+      .save(tmpFilePath)
         })
 
         let audioBuffer = fs.readFileSync(tmpFilePath)
