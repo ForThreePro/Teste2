@@ -5,28 +5,27 @@ moment.locale('es')
 
 let handler = async (m, { conn, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-  
+
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
   const error = (msg) => {
-    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐂𝐎𝐍𝐕𝐄𝐑𝐓𝐈𝐃𝐎𝐑 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 😼
 ❌ ➛ ${msg}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
   }
 
-  // TOVID
   if (['tovid', 'tovideo'].includes(command)) {
     if (!m.quoted) return error('Responde a un *sticker animado*')
     let mime = m.quoted.mimetype || ''
@@ -35,7 +34,7 @@ let handler = async (m, { conn, command }) => {
       await react('⏳')
       let media = await m.quoted.download()
       let out = await webp2mp4(media)
-      await conn.sendFile(m.chat, out, 'video.mp4', `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      await conn.sendFile(m.chat, out, 'video.mp4', `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐎𝐕𝐈𝐃𝐄𝐎 ﹒ COMPLETADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -45,10 +44,10 @@ let handler = async (m, { conn, command }) => {
 ── *📊 ESTADO* ╏ 🍕
 ✅ ➛ Conversión completada
 🎬 ➛ Sticker animado a Video MP4
-👤 ➛ GARFIELD BOT V2.6
+👤 ➛ LUX X YALLICO 😼
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`, m)
       await react('✅')
     } catch (e) {
@@ -58,7 +57,6 @@ let handler = async (m, { conn, command }) => {
     }
   }
 
-  // TOMP3
   if (['tomp3', 'toaudio'].includes(command)) {
     let q = m.quoted ? m.quoted : m
     let mime = (m.quoted ? m.quoted : m.msg).mimetype || ''
@@ -67,7 +65,7 @@ let handler = async (m, { conn, command }) => {
       await react('⏳')
       let media = await q.download?.()
       let audio = await toAudio(media, 'mp4')
-      await conn.sendFile(m.chat, audio.data, 'audio.mp3', `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      await conn.sendFile(m.chat, audio.data, 'audio.mp3', `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐎𝐌𝐏𝟑 ﹒ COMPLETADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -77,10 +75,10 @@ let handler = async (m, { conn, command }) => {
 ── *📊 ESTADO* ╏ 🍕
 ✅ ➛ Audio extraído
 🎵 ➛ Formato: MP3
-👤 ➛ GARFIELD BOT V2.6
+👤 ➛ LUX X YALLICO 😼
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`, m, null, { mimetype: 'audio/mp4' })
       await react('✅')
     } catch (e) {
@@ -90,7 +88,6 @@ let handler = async (m, { conn, command }) => {
     }
   }
 
-  // TOIMG
   if (['toimg', 'stickerimg', 'simg'].includes(command)) {
     let q = m.quoted ? m.quoted : m
     let isSticker = q.mtype === 'stickerMessage' || (q.mimetype || '').includes('webp')
@@ -100,7 +97,7 @@ let handler = async (m, { conn, command }) => {
       let media = await q.download()
       await conn.sendMessage(m.chat, { 
         image: media, 
-        caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐎𝐈𝐌𝐆 ﹒ COMPLETADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -110,10 +107,10 @@ let handler = async (m, { conn, command }) => {
 ── *📊 ESTADO* ╏ 🍕
 ✅ ➛ Conversión completada
 🖼️ ➛ Sticker a Imagen JPG
-👤 ➛ GARFIELD BOT V2.6
+👤 ➛ LUX X YALLICO 😼
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━` 
       }, { quoted: m })
       await react('✅')
