@@ -57,6 +57,58 @@ ${icon} ➛ Tipo: *${estado}*
             return m.reply(`❌ Error: ${e.message}`)
         }
     }
+
+    if (['resetsticker','delsticker','clearsticker','delabrir','delcerrar'].includes(command)) {
+        let borrado = []
+        if (['resetsticker','delsticker','clearsticker','delabrir'].includes(command) && chat.stickerAbrir) {
+            delete chat.stickerAbrir
+            borrado.push('🟢 ABRIR')
+        }
+        if (['resetsticker','delsticker','clearsticker','delcerrar'].includes(command) && chat.stickerCerrar) {
+            delete chat.stickerCerrar
+            borrado.push('🔴 CERRAR')
+        }
+
+        if (!borrado.length) {
+            await react('❌')
+            return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐒𝐓𝐈𝐂𝐊𝐄𝐑 ﹒ RESET ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`VACIO\`\` ⚠️ —˙𖦹.꒷
+
+── *📝 AVISO* ╏ 😼
+❌ ➛ No hay stickers configurados
+💡 ➛ Usa .setabrir / .setcerrar
+
+━━━━━━━━━━━
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+━━━━━━━━━━━`)
+        }
+
+        await react('🗑️')
+        let msg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐒𝐓𝐈𝐂𝐊𝐄𝐑 ﹒ ELIMINADO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`RESETEADO\`\` 🗑️ —˙𖦹.꒷
+😼 Garfield tiró el sticker a la basura, configura uno nuevo pe
+
+── *📊 BORRADOS* ╏ 🍕
+${borrado.map(b => `🗑️ ➛ ${b}`).join('\n')}
+👑 ➛ Por: @${m.sender.split('@')[0]}
+
+── *📝 NOTA* ╏ 😼
+🔒 ➛ Ya no se abrirá ni cerrará con sticker
+💡 ➛ Configura de nuevo con .setabrir / .setcerrar
+
+━━━━━━━━━━━
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+━━━━━━━━━━━`
+        return conn.sendMessage(m.chat, { text: msg, mentions: [m.sender] }, { quoted: m })
+    }
 }
 
 handler.before = async function(m, { conn }) {
@@ -116,9 +168,9 @@ ${nota}
     }
 }
 
-handler.help = ['setabrir', 'setcerrar']
+handler.help = ['setabrir', 'setcerrar', 'resetsticker', 'delabrir', 'delcerrar']
 handler.tags = ['grupo']
-handler.command = ['setabrir', 'setcerrar']
+handler.command = ['setabrir', 'setcerrar', 'resetsticker', 'delsticker', 'clearsticker', 'delabrir', 'delcerrar']
 handler.group = true
 handler.admin = true
 handler.botAdmin = true
