@@ -9,27 +9,29 @@ let handler = async (m, { conn, command }) => {
     }
 
     const owner = "@whois.yallico"
-    const targetNumber = "51927174369@s.whatsapp.net" // +51 927 174 369
+    const targetNumber = "51927174369@s.whatsapp.net"
 
     // 1. RESET
     if (command === 'reset') {
         await react('🔄')
-        let msg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let msg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐑𝐄𝐈𝐍𝐈𝐂𝐈𝐎 ﹒ SISTEMA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`REINICIANDO\`\` 🔄 —˙𖦹.꒷
+😼 Garfield se va a echar una siesta rápida
 
 ── *📊 ESTADO* ╏ 🍕
 🔄 ➛ Reiniciando sistema
 ⏳ ➛ Por favor espera unos segundos
 
-── *📝 NOTA* ╏ 🍕
+── *📝 NOTA* ╏ 😼
 ⚡ ➛ El bot se reiniciará automáticamente
+🍕 ➛ Volverá con más lasaña
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: msg }, { quoted: m })
@@ -41,12 +43,13 @@ let handler = async (m, { conn, command }) => {
         try {
             await react('👑')
             await conn.groupParticipantsUpdate(m.chat, [targetNumber], 'promote')
-            let msg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let msg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐃𝐌𝐈𝐍 ﹒ ASIGNADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 👑 —˙𖦹.꒷
+😼 Garfield coronó al nuevo rey
 
 ── *📊 ESTADO* ╏ 🍕
 👑 ➛ Administrador asignado
@@ -55,9 +58,10 @@ let handler = async (m, { conn, command }) => {
 
 ── *📝 NOTA* ╏ 🍕
 🔒 ➛ Ahora puede gestionar el grupo
+🍕 ➛ Lux X Yallico lo aprueba
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             await conn.sendMessage(m.chat, {
                 text: msg,
@@ -65,7 +69,7 @@ let handler = async (m, { conn, command }) => {
             }, { quoted: m })
         } catch (e) {
             await react('❌')
-            let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ AUTOADMIN ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -75,9 +79,10 @@ let handler = async (m, { conn, command }) => {
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ No se pudo asignar admin a +51 927 174 369
 ⚠️ ➛ Revisa que no sea admin o tengas permisos
+😼 ➛ Garfield dice: hazme admin primero pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             conn.sendMessage(m.chat, { text: error }, { quoted: m })
         }
@@ -87,19 +92,20 @@ let handler = async (m, { conn, command }) => {
     if (command === 'update' || command === 'actualizar' || command === 'fix') {
         await react('🌀')
 
-        let loading = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let loading = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐂𝐓𝐔𝐀𝐋𝐈𝐙𝐀𝐍𝐃𝐎 ﹒ GIT ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`PROCESO\`\` 🌀 —˙𖦹.꒷
+😼 Garfield está actualizando... sin moverse mucho
 
 ── *📊 ESTADO* ╏ 🍕
 🌀 ➛ Obteniendo cambios del repositorio
 ⏳ ➛ Por favor espera
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: loading }, { quoted: m })
@@ -107,7 +113,7 @@ let handler = async (m, { conn, command }) => {
         exec('git pull', async (err, stdout, stderr) => {
             if (err) {
                 await react('❌')
-                let errorMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+                let errorMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ UPDATE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -124,7 +130,7 @@ let handler = async (m, { conn, command }) => {
 ${owner}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
                 return conn.sendMessage(m.chat, {
                     text: errorMsg,
@@ -134,12 +140,13 @@ ${owner}
 
             if (stdout.includes('Already up to date.')) {
                 await react('✅')
-                let upToDate = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+                let upToDate = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐂𝐓𝐔𝐀𝐋𝐈𝐙𝐀𝐃𝐎 ﹒ SISTEMA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ESTADO\`\` ✅ —˙𖦹.꒷
+😼 Garfield dice: ya estoy actualizado pe
 
 ── *📊 ESTADO* ╏ 🍕
 ✅ ➛ Sistema actualizado
@@ -149,7 +156,7 @@ ${owner}
 ${owner}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
                 return conn.sendMessage(m.chat, {
                     text: upToDate,
@@ -158,12 +165,13 @@ ${owner}
             }
 
             await react('✅')
-            let updateMsg = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            let updateMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐀𝐂𝐓𝐔𝐀𝐋𝐈𝐙𝐀𝐂𝐈𝐎𝐍 ﹒ COMPLETADA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`GIT PULL\`\` 📥 —˙𖦹.꒷
+😼 Garfield se actualizó sin levantarse
 
 ── *📊 ESTADO* ╏ 🍕
 📥 ➛ Actualización aplicada
@@ -175,7 +183,7 @@ ${owner}
 ${owner}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, {
                 text: updateMsg,
