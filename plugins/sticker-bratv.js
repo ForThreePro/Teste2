@@ -23,14 +23,14 @@ const handler = async (m, { conn, text }) => {
   try {
     let userId = m.sender
     let packstickers = global.db.data.users[userId] || {}
-    let texto1 = packstickers.text1 || global.packsticker || 'GARFIELD BOT'
-    let texto2 = packstickers.text2 || global.packsticker2 || 'V2.6'
+    let texto1 = packstickers.text1 || global.packsticker || 'LUX X YALLICO'
+    let texto2 = packstickers.text2 || global.packsticker2 || 'GARFIELD EDITION 😼'
 
     text = m.quoted?.text || text
     if (!text) {
       await react('❌')
       return conn.sendMessage(m.chat, {
-        text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐑𝐀𝐓𝐕 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -39,10 +39,11 @@ const handler = async (m, { conn, text }) => {
 
 ── *📖 USO* ╏ 🍕
 ➛ Responde a un mensaje o escribe texto
-➛ Ejemplo:.bratv Hola
+➛ Ejemplo:.bratv Lux X Yallico
+😼 ➛ Garfield animará tu texto pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       }, { quoted: m })
     }
@@ -57,12 +58,13 @@ const handler = async (m, { conn, text }) => {
     console.error("[BRATV ERROR]:", e)
     await react('❌')
     conn.sendMessage(m.chat, {
-      text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐑𝐀𝐓𝐕 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+😼 Garfield se quedó dormido y la API también
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ Se produjo un problema
@@ -72,7 +74,7 @@ const handler = async (m, { conn, text }) => {
 \`\`${e.message}\`\`
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     }, { quoted: m })
   }
