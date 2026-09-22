@@ -10,24 +10,23 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     }
 
     const error = (msg) => {
-        return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐒𝐓𝐈𝐂𝐊𝐄𝐑 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 😼
 ❌ ➛ ${msg}
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
     }
 
     await react('⏳')
 
-    // 1. WM / TAKE / ROBAR
     if (command === 'wm' || command === 'take' || command === 'robar') {
         if (!m.quoted) return error('Responde a un *sticker*')
         let [packname,...author] = text.split('|')
@@ -38,8 +37,8 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         if (!img) return error('Responde a un *sticker*')
 
         try {
-            let pack = packname || 'GARFIELD BOT'
-            let auth = author || 'V2.6'
+            let pack = packname || 'LUX X YALLICO'
+            let auth = author || 'GARFIELD EDITION 😼'
             let stiker = await addExif(img, pack, auth)
             await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
             await react('✅')
@@ -50,7 +49,6 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         }
     }
 
-    // 2. S / STICKER / STIKER
     if (command === 's' || command === 'sticker' || command === 'stiker') {
         let q = m.quoted? m.quoted : m
         let mime = (q.msg || q).mimetype || q.mediaType || ''
@@ -58,15 +56,14 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
 
         await react('🖌️')
         let img = await q.download()
-        let pack = global.packsticker || 'GARFIELD BOT'
-        let auth = global.packsticker2 || 'V2.6'
+        let pack = global.packsticker || 'LUX X YALLICO'
+        let auth = global.packsticker2 || 'GARFIELD EDITION 😼'
         let stiker = await sticker(img, false, pack, auth)
 
         await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
         await react('✅')
     }
 
-    // 3. QC / QUOTLY
     if (command === 'qc' || command === 'quotly') {
         let mentionedJid = m.mentionedJid && m.mentionedJid[0]? m.mentionedJid[0] : null
         let authorName, txt, pp
@@ -118,7 +115,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
             await react('🎨')
             const json = await axios.post('https://btzqc.betabotz.eu.org/generate', obj, { headers: { 'Content-Type': 'application/json' }})
             const buffer = Buffer.from(json.data.result.image, 'base64')
-            const stiker = await sticker(buffer, false, 'GARFIELD BOT', 'V2.6')
+            const stiker = await sticker(buffer, false, 'LUX X YALLICO', 'GARFIELD EDITION 😼')
 
             if (stiker) {
                 await conn.sendFile(m.chat, stiker, 'quotly.webp', '', m)
@@ -133,7 +130,6 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         }
     }
 
-    // 4. EMOJIMIX / MIX
     if (command === 'emojimix' || command === 'mix') {
         let [emoji1, emoji2] = text.split(/[&+\s]+/)
         if (!emoji1 ||!emoji2) return error(`Uso: *${usedPrefix}emojimix* 😃+🔥`)
