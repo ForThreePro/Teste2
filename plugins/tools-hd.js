@@ -3,7 +3,6 @@ import FormData from 'form-data'
 import moment from 'moment-timezone'
 moment.locale('es')
 
-// ===== CONFIG API STELLAR =====
 const api = {
     url: 'https://api.stellarwa.xyz',
     key: 'proyectsV2'
@@ -18,7 +17,7 @@ function generateUniqueFilename(mime) {
 
 async function uploadToUguu(buffer, mime) {
   const body = new FormData()
-  body.append('files[]', buffer, generateUniqueFilename(mime))
+  body.append('files[]', buffer, generateUniqueFilename(mime || 'image/jpeg'))
 
   const res = await fetch('https://uguu.se/upload.php', {
     method: 'POST',
@@ -35,7 +34,7 @@ async function uploadToUguu(buffer, mime) {
 
 async function getEnhancedBuffer(url) {
   const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&key=${api.key}`
-  const res = await fetch(apiUrl, { timeout: 60000 })
+  const res = await fetch(apiUrl, { timeout: 90000 })
   if (!res.ok) throw `Error ${res.status}: ${await res.text()}`
   return Buffer.from(await res.arrayBuffer())
 }
@@ -51,7 +50,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     if (!mime) {
       await react('❌')
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐇𝐃 ﹒ MEJORADOR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -61,67 +60,119 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 ── *📖 COMO USAR* ╏ 🍕
 ➛ Responde a una imagen con: *${usedPrefix + command}*
 ➛ Soporta: jpg, jpeg, png
+😼 ➛ Garfield la pondrá en 4K pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
     }
 
     if (!/image\/(jpe?g|png)/.test(mime)) {
       await react('❌')
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐇𝐃 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`FORMATO INVALIDO\`\` ❌ —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 😼
 ❌ ➛ El formato *${mime}* no es compatible
 💡 ➛ Solo jpg, jpeg, png
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
     }
 
     try {
       await react('⏳')
-      await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      let statusMsg = await conn.sendMessage(m.chat, {
+        text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐇𝐃 ﹒ PROCESANDO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`MEJORANDO\`\` 🖼️ —˙𖦹.꒷
 
-── *📊 ESTADO* ╏ 🍕
-⏳ ➛ Subiendo imagen a Uguu...
-⚡ ➛ Mejorando calidad 2x con Stellar...
+── *📊 ESTADO* ╏ 😼
+⏳ ➛ [1/4] Subiendo imagen...
+⚡ ➛ Objetivo: 2K → 4K automático
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
-━━━━━━━━━━━`)
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+━━━━━━━━━━━`
+      }, { quoted: m })
 
       const buffer = await q.download()
-      const uploadedUrl = await uploadToUguu(buffer, mime)
-      const enhancedBuffer = await getEnhancedBuffer(uploadedUrl)
+
+      // PASO 1: SUBIR ORIGINAL
+      const uploadedUrl1 = await uploadToUguu(buffer, mime)
 
       await conn.sendMessage(m.chat, {
-        image: enhancedBuffer,
-        caption: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐇𝐃 ﹒ PROCESANDO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`FASE 1/2\`\` 🖼️ —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 😼
+✅ ➛ [1/4] Imagen subida
+⏳ ➛ [2/4] Mejorando a 2K...
+⚡ ➛ API: Stellar
+
+━━━━━━━━━━━
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+━━━━━━━━━━━`,
+        edit: statusMsg.key
+      })
+
+      // PASO 2: 2K
+      const buffer2K = await getEnhancedBuffer(uploadedUrl1)
+
+      await conn.sendMessage(m.chat, {
+        text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+
+⤷ ┇ 𝐇𝐃 ﹒ PROCESANDO ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`FASE 2/2\`\` 🚀 —˙𖦹.꒷
+
+── *📊 ESTADO* ╏ 😼
+✅ ➛ [2/4] Mejorada a 2K
+⏳ ➛ [3/4] Subiendo 2K...
+⏳ ➛ [4/4] Mejorando a 4K...
+🍕 ➛ Casi lista la lasaña en HD
+
+━━━━━━━━━━━
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+━━━━━━━━━━━`,
+        edit: statusMsg.key
+      })
+
+      // PASO 3: SUBIR 2K PARA RE-ESCALAR A 4K
+      const uploadedUrl2 = await uploadToUguu(buffer2K, 'image/jpeg')
+      const buffer4K = await getEnhancedBuffer(uploadedUrl2)
+
+      await conn.sendMessage(m.chat, {
+        image: buffer4K,
+        caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐇𝐃 ﹒ RESULTADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`LISTO\`\` ✅ —˙𖦹.꒷
+😼 Garfield la dejó en 4K sin moverse
 
 ── *📊 DETALLES* ╏ 🍕
-✨ ➛ Calidad: Mejorada 2x
-🔧 ➛ API: Stellar
-👤 ➛ Autor: GARFIELD BOT V2.6
+✨ ➛ Fase 1: Original → 2K
+🚀 ➛ Fase 2: 2K → 4K Ultra HD
+🔧 ➛ API: Stellar x2
+👤 ➛ Autor: LUX X YALLICO 😼
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
       }, { quoted: m })
 
@@ -129,24 +180,25 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     } catch (err) {
       await react('❌')
-      await m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+      await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐇𝐃 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+😼 Se le quemó la lasaña a la API
 
 ── *📝 AVISO* ╏ 🍕
 ❌ ➛ ${err.message || err}
-💡 ➛ La API puede estar saturada
+💡 ➛ La API puede estar saturada, intenta de nuevo
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
     }
 }
 
-handler.help = ['hd', 'upscale']
+handler.help = ['hd', 'upscale', '4k']
 handler.tags = ['tools']
-handler.command = ['hd', 'upscale', 'remini']
+handler.command = ['hd', 'upscale', 'remini', '4k']
 export default handler
