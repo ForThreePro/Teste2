@@ -33,7 +33,7 @@ handler.before = async function (m, { conn, groupMetadata }) {
   const userJid = m.messageStubParameters?.[0] || m.participant
   if (!userJid) return!0
 
-  const DEFAULT_IMG = 'https://files.evogb.win/QFXQtu.jpg'
+  const DEFAULT_IMG = 'https://files.evogb.win/EvvgAh.jpg'
   let imgBuffer = null
   try {
     let userPP = await conn.profilePictureUrl(userJid, 'image')
