@@ -17,7 +17,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   if (!txt) {
     await react('❌')
-    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐑𝐀𝐓 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -26,10 +26,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📖 USO* ╏ 🍕
 ➛ Escribe el texto para generar el sticker
-➛ Ejemplo: ${usedPrefix}${command} whois
+➛ Ejemplo: ${usedPrefix}${command} Lux X Yallico
+
+── *💡 NOTA* ╏ 😼
+🍕 ➛ Garfield hará tu sticker pe
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
   }
 
@@ -42,13 +45,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!response.ok) throw new Error(`API ${response.status}`)
 
     let inputBuffer = await response.buffer()
-    
+
     let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.gif`)
     let tmpOutput = path.join(tmpdir(), `brat-${Date.now()}.webp`)
 
     fs.writeFileSync(tmpInput, inputBuffer)
 
-    // FIX: Quitamos el pad y usamos solo scale + background
     await new Promise((resolve, reject) => {
       ffmpeg(tmpInput)
         .frames(1)
@@ -71,8 +73,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     await conn.sendMessage(m.chat, {
       sticker: stickerBuffer,
-      packname: 'GARFIELD BOT',
-      author: 'V2.6'
+      packname: 'LUX X YALLICO',
+      author: 'GARFIELD EDITION 😼'
     }, { quoted: m })
 
     if (fs.existsSync(tmpInput)) fs.unlinkSync(tmpInput)
@@ -82,19 +84,20 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   } catch (e) {
     console.error("[BRAT ERROR]:", e)
     await react('❌')
-    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐁𝐑𝐀𝐓 ﹒ ERROR ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+😼 Se le cayó la lasaña a la API
 
 ── *📝 DETALLE* ╏ 🍕
 ❌ ➛ ${e.message}
 💡 ➛ Ejecuta: apt install ffmpeg -y
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`)
   }
 }
