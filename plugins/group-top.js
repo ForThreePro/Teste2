@@ -12,12 +12,12 @@ function handler(m, { groupMetadata, command, conn, text }) {
     }
 
     if (!groupMetadata) {
-        return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Este comando solo funciona en grupos\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+        return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Este comando solo funciona en grupos\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
     }
 
     if (!text) {
         await react('❌')
-        let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐎𝐏 ﹒ RANKING ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -26,14 +26,16 @@ function handler(m, { groupMetadata, command, conn, text }) {
 
 ── *📖 USO* ╏ 🍕
 ➛.top <motivo del ranking>
+😼 ➛ Garfield elige a los ganadores
 
 ── *💡 EJEMPLOS* ╏ 🍕
 ➛.top Mejores en PVP
 ➛.top Más activos
 ➛.top Más tóxicos
+➛.top Más tragones como Garfield
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -41,7 +43,7 @@ function handler(m, { groupMetadata, command, conn, text }) {
     let ps = groupMetadata.participants.map(v => v.id)
     if (ps.length < 10) {
         await react('⚠️')
-        return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Se necesitan mínimo 10 miembros en el grupo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+        return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Se necesitan mínimo 10 miembros en el grupo\n😼 ➛ Garfield necesita más competencia\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
     }
 
     let a = ps.getRandom()
@@ -61,12 +63,13 @@ function handler(m, { groupMetadata, command, conn, text }) {
 
     let vn = `https://hansxd.nasihosting.com/sound/sound${k}.mp3`
 
-    let top = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let top = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐑𝐀𝐍𝐊𝐈𝐍𝐆 ﹒ ${text.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`TOP 10\`\` ${x} —˙𖦹.꒷
+😼 Garfield presenta a los elegidos
 
 ── *🏅 RANKING* ╏ 🍕
 ${x} *1.* ${user(a)}
@@ -80,11 +83,12 @@ ${x} *8.* ${user(h)}
 ${x} *9.* ${user(i)}
 ${x} *10.* ${user(j)}
 
-── *📝 NOTA* ╏ 🍕
+── *📝 NOTA* ╏ 😼
 🎲 ➛ Ranking 100% aleatorio y divertido
+🍕 ➛ Aprobado por Garfield
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
 
     m.reply(top, null, { mentions: [a, b, c, d, e, f, g, h, i, j] })
