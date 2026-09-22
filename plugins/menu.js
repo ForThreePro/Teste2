@@ -25,13 +25,15 @@ const FRASES_GARFIELD = [
 "5 minutos más durmiendo",
 "Hoy toca comer hasta explotar",
 "Si no hay lasaña, me voy",
-"La pereza es mi superpoder"
+"La pereza es mi superpoder",
+"Lux X Yallico - Donde Garfield manda 😼",
+"Más vago que Garfield un lunes"
 ]
 
 let handler = async (m, { conn }) => {
 try {
 let start = performance.now()
-await conn.sendMessage(m.chat, { react: { text: '🍕', key: m.key } })
+await conn.sendMessage(m.chat, { react: { text: '😼', key: m.key } })
 
 const fecha = moment.tz('America/Lima').format('dddd')
 const fecha2 = moment.tz('America/Lima').format('DD [de] MMMM [de] YYYY')
@@ -71,9 +73,9 @@ const estadoBot = dias > 0? `Estable • ${dias}d ${horas}h` : `Estable • ${ho
 const EMOJIS_EXTRA = ['📌', '🎯', '🎨', '💎', '🔮', '🚀', '💡', '🎪', '🎭', '🏆']
 let emojiIndex = 0
 
-let menuTexto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+let menuTexto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
-⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 2.6 PRO ：✿ 。
+⤷ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 3.0 GARFIELD EDITION ：✿ 。
 ꒰ ◞⁺⊹ ．estado: *${estadoBot}* • Ping: ${ping}ms
 
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
@@ -87,15 +89,16 @@ ${CANAL_LINK}
 ──🔥 *TOP COMANDOS* ╏ Más usados
 ${TOP_COMANDOS.map((c,i) => `${i+1}. ${c}`).join(' | ')}
 
-──愛 *INFORMACION* ╏ 🍕
+──🍕 *INFORMACION* ╏ 😼
 *Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
 *Owner*: @${ownerNum}
 *RAM*: ${ram}mb/${totalram}gb
+*Edición*: Lux X Yallico x Garfield
 
  ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
 *${fecha}* ─ ${fecha2} ─ ${hora}
 
-> ❍ 𝖴𝗌𝖺. 𝖺𝗇𝗍𝖾𝗌 𝖽𝖾 𝖼𝖺𝖽𝖺 𝖼𝗈𝗆𝖺𝗇𝖽𝗈
+> ❍ Usa. antes de cada comando 😼
 
 `
 
@@ -110,7 +113,6 @@ for (const tag of tagsOrdenados) {
   const icono = ICONOS_CATEGORIA[tag] || EMOJIS_EXTRA[emojiIndex++ % EMOJIS_EXTRA.length]
   const nombreCat = CATEGORY_META[tag] || tag.toUpperCase()
 
-  // CAMBIO: NOMBRE + CONTADOR + EMOJI
   menuTexto += `.⃟𖥔 ݁. 𖦹˙— \`\`${nombreCat}\`\` [${cmds.length}] ${icono} —˙𖦹.꒷\n`
   for (const c of cmds) {
     menuTexto += ` ${icono} ➛.${c}\n`
@@ -119,22 +121,23 @@ for (const tag of tagsOrdenados) {
 }
 
 menuTexto += `━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 *Owner*: @${ownerNum}
-*Version*: 2.6 PRO
+*Version*: 3.0 GARFIELD EDITION
 *${CANAL_LINK}*
 
 > "Dame lasaña o dame sueño" 😼
+> "Lux X Yallico - Donde Garfield manda"
 ━━━━━━━━━━━`
 
 await conn.sendMessage(m.chat, {
   image: { url: IMG_MENU },
   caption: menuTexto.trim(),
-  mentions: [m.sender]
+  mentions: [m.sender, `${ownerNum}@s.whatsapp.net`]
 }, { quoted: m })
 
 } catch (e) {
-await conn.sendMessage(m.chat, { text: `*❌ ERROR*: ${e.message}` }, { quoted: m })
+await conn.sendMessage(m.chat, { text: `😼 *ERROR GARFIELD*: ${e.message}\n🍕 Se le cayó la lasaña al bot...` }, { quoted: m })
 }
 }
 
