@@ -4,10 +4,8 @@ moment.locale('es')
 
 const filePath = './temp_groups.json'
 
-// LISTA DE NUMEROS AUTORIZADOS
-// Pon tu numero con codigo de pais sin + ni espacios
 const OWNER_NUMBERS = [
-  '51927174369' // +51 927 174 369
+  '51927174369'
 ]
 
 if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, '[]')
@@ -17,7 +15,6 @@ function saveTempGroups() {
   fs.writeFileSync(filePath, JSON.stringify(global.tempGroups, null, 2))
 }
 
-// VERIFICADOR CADA 30 SEGUNDOS
 setInterval(async () => {
   if (!global.conn) return
   const now = Date.now()
@@ -27,21 +24,23 @@ setInterval(async () => {
     const timeLeft = i.exitTime - now
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
-    // AVISO 5 MINUTOS ANTES
     if (timeLeft <= 300000 && timeLeft > 0 &&!i.warned) {
       try {
         await global.conn.sendMessage(i.id, {
-          text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+          text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ AVISO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`5 MINUTOS\`\` ⏰ —˙𖦹.꒷
+😼 Garfield se está despidiendo...
 
 ── *📝 AVISO* ╏ 🍕
 ⏰ ➛ El bot se saldrá de este grupo en 5 minutos
+🍝 ➛ Última porción de lasaña servida
+
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
         })
         i.warned = true
@@ -49,23 +48,25 @@ setInterval(async () => {
       } catch {}
     }
 
-    // HORA DE SALIR
     if (now >= i.exitTime) {
       let attempts = 0
       while (attempts < 3) {
         try {
           await global.conn.sendMessage(i.id, {
-            text: `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+            text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ SALIDA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`SALIENDO\`\` 👋 —˙𖦹.꒷
+😼 Garfield se va a dormir a otro grupo
 
 ── *📝 AVISO* ╏ 🍕
 ⏰ ➛ Temporizador finalizado. Saliendo...
+🍕 ➛ Gracias por la lasaña
+
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
           })
           await new Promise(r => setTimeout(r, 1500))
@@ -105,7 +106,6 @@ function msToTime(ms) {
   return result.join(' ') || '0s'
 }
 
-// FUNCION PARA VERIFICAR SI ES OWNER
 function isOwner(m) {
   let sender = m.sender.replace('@s.whatsapp.net', '')
   return OWNER_NUMBERS.includes(sender)
@@ -114,17 +114,15 @@ function isOwner(m) {
 let handler = async (m, { conn, args, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
-  // BLOQUEO PARA NO AUTORIZADOS
   if (!isOwner(m)) {
     await react(conn, m, "❌")
-    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No tienes permiso para usar este comando\n😼 ➛ Solo el jefe de Garfield puede usar esto\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
   }
 
-  // COMANDO: TEMPLIST
   if (command === 'templist') {
     if (global.tempGroups.length === 0) {
       await react(conn, m, "⚠️")
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ No hay grupos con temporizador activo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ No hay grupos con temporizador activo\n😴 ➛ Garfield está sin tareas por ahora\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
     }
 
     let list = global.tempGroups.map((v, i) => {
@@ -132,40 +130,42 @@ let handler = async (m, { conn, args, command }) => {
       return `│ ${i+1}. *${v.name}*\n│ ⏰ Falta: ${msToTime(timeLeft)}`
     }).join('\n')
 
-    let texto = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐋𝐈𝐒𝐓𝐀 ﹒ ACTIVA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`GRUPOS\`\` 📋 —˙𖦹.꒷
+😼 Grupos donde Garfield está de visita
 
 ── *📊 GRUPOS* ╏ 🍕
 ${list}
 
 ── *📝 NOTA* ╏ 🍕
 💡 ➛ Usa tempcancel para cancelar
+🍕 ➛ Lux X Yallico controla todo
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     await react(conn, m, "📋")
     return m.reply(texto)
   }
 
-  // COMANDO: TEMPORIZADOR
   if (!m.isGroup) {
     await react(conn, m, "❌")
-    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
   }
 
   if (!args[0]) {
     await react(conn, m, "❌")
-    let error = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ FORMATO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`USO\`\` ⏰ —˙𖦹.꒷
+😼 Configura cuánto se quedará Garfield
 
 ── *📖 USO* ╏ 🍕
 ➛.temporizador 30d
@@ -178,7 +178,7 @@ ${list}
 ➛ 3d = 3 días
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     return m.reply(error)
   }
@@ -196,7 +196,7 @@ ${list}
   }
   if (ms < 60000) {
     await react(conn, m, "❌")
-    return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Mínimo 1 minuto\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Mínimo 1 minuto\n😼 ➛ Garfield necesita al menos comer algo pe\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
   }
 
   const exitTime = Date.now() + ms
@@ -211,12 +211,13 @@ ${list}
 
   const fechaSalida = moment.tz(exitTime, 'America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 
-  let ok = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+  let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ ACTIVADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`PROGRAMADO\`\` ⏰ —˙𖦹.꒷
+😼 Garfield se quedará un rato
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 🏠 ➛ Grupo: ${groupName}
@@ -225,53 +226,53 @@ ${list}
 
 ── *📝 NOTA* ╏ 🍕
 🗑️ ➛ Usa tempcancel para cancelar
+🍕 ➛ Lux X Yallico programó la visita
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
   await react(conn, m, "✅")
   return m.reply(ok)
 }
 
-// CANCELAR
 handler.before = async (m, { conn, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   if (command === 'tempcancel') {
 
-    // BLOQUEO PARA NO AUTORIZADOS
     if (!isOwner(m)) {
       await react(conn, m, "❌")
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ No tienes permiso para usar este comando\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
     }
 
     if (!m.isGroup) {
       await react(conn, m, "❌")
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo funciona en grupos\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
     }
 
     let index = global.tempGroups.findIndex(v => v.id === m.chat)
     if (index === -1) {
       await react(conn, m, "⚠️")
-      return m.reply(`🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ No hay temporizador activo\n━━━━━━━━━━━\n🍕 *GARFIELD BOT* 🍕`)
+      return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TEMP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ No hay temporizador activo\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
     }
 
     const groupName = global.tempGroups[index].name
     global.tempGroups.splice(index, 1)
     saveTempGroups()
 
-    let cancel = `🍕 𓆩 𝗚𝗔𝗥𝗙𝗜𝗘𝗟𝗗 𝗕𝗢𝗧 𓆪 🍕
+    let cancel = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
 
 ⤷ ┇ 𝐓𝐄𝐌𝐏𝐎𝐑𝐈𝐙𝐀𝐃𝐎𝐑 ﹒ CANCELADO ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ELIMINADO\`\` 🗑️ —˙𖦹.꒷
+😼 Garfield decidió quedarse más tiempo
 
 ── *📊 INFORMACIÓN* ╏ 🍕
 🏠 ➛ Grupo: ${groupName}
 ✅ ➛ Estado: Cancelado
 
 ━━━━━━━━━━━
-🍕 *GARFIELD BOT* 🍕
+🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
 ━━━━━━━━━━━`
     await react(conn, m, "🗑️")
     return m.reply(cancel)
