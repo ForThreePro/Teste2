@@ -8,7 +8,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     let mime = (q.msg || q).mimetype || ''
 
     if (!q.msg?.audioMessage && !q.msg?.pttMessage && !/audio/.test(mime)) {
-        return m.reply(`😼 Responde a una nota de voz pe\n\nEjemplo: *${usedPrefix + command}*\n\n🍕 *LU BOT*`)
+        return m.reply(`😼 Responde a una nota de voz pe\n\n${usedPrefix + command}`)
     }
 
     let effect = command.toLowerCase()
@@ -33,9 +33,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     try {
         await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } })
-        
         let audio = await q.download()
-        if (!audio) return m.reply('❌ Audio no disponible pe, reenvíalo y al toque ponle el efecto 😼')
+        if (!audio) return m.reply('❌ Audio no disponible, reenvíalo pe')
 
         let tmp = tmpdir()
         let name = Date.now()
@@ -52,11 +51,12 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
         let out = fs.readFileSync(output)
 
-        // DEVUELVE EN MP3 PE, NO COMO NOTA DE VOZ
+        // MP3 COMO AUDIO, NO DOCUMENTO
         await conn.sendMessage(m.chat, { 
-            document: out, 
-            fileName: `${effect}.mp3`,
-            mimetype: 'audio/mpeg'
+            audio: out, 
+            mimetype: 'audio/mpeg',
+            ptt: false,
+            fileName: `${effect}.mp3`
         }, { quoted: m })
 
         try { fs.unlinkSync(input) } catch {}
@@ -65,7 +65,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     } catch (e) {
         console.log(e)
-        m.reply(`❌ Error: ${e.message.slice(0,400)}`)
+        m.reply(`❌ ${e.message.slice(0,400)}`)
     }
 }
 
