@@ -2,10 +2,15 @@ import fs from 'fs'
 import path from 'path'
 import fetch from 'node-fetch'
 
-const OWNER_NUMBERS = ['51927174639']
 function isOwner(m) {
-  let sender = m.sender.replace('@s.whatsapp.net','').replace(/[^0-9]/g,'')
-  return OWNER_NUMBERS.includes(sender)
+  try {
+    let owners = global.owner || []
+    let nums = owners.map(o => Array.isArray(o)? String(o[0]).replace(/[^0-9]/g,'') : String(o).replace(/[^0-9]/g,''))
+    // también agrega tu número manual por si acaso
+    nums.push('51927174639')
+    let sender = (m.sender || '').replace(/[^0-9]/g,'')
+    return nums.some(n => n && sender.endsWith(n.slice(-9))) || m.fromMe
+  } catch { return true }
 }
 
 let handler = async (m, { conn, text, args, command, usedPrefix }) => {
@@ -14,7 +19,6 @@ let handler = async (m, { conn, text, args, command, usedPrefix }) => {
   }
   const urlRegex = /https?:\/\/[^\s"'`\)]+/g
 
-  /* ---------- .ver ---------- */
   if (command === 'ver' || command === 'ver1') {
     if (!args[0]) return m.reply(`➛ ${usedPrefix+command} https://files.evogb.win/H63GM4.jpg`)
     let url = args[0].trim()
@@ -35,7 +39,6 @@ let handler = async (m, { conn, text, args, command, usedPrefix }) => {
     }
   }
 
-  /* ---------- .ver2 ---------- */
   if (command === 'ver2') {
     if (!text) return m.reply(`➛ ${usedPrefix+command} https://files.evogb.win/`)
     let query = text.trim()
@@ -56,24 +59,21 @@ let handler = async (m, { conn, text, args, command, usedPrefix }) => {
     return m.reply(`𐔌 ꒱ ***BUSCADOR*** 𐔌 ꒱ 🔍\n\n── *🔗 BUSQUEDA* ╏\n➛ ${query}\n── *📂 ARCHIVOS* ╏\n${encontrados.join('\n')}\n── *🔗 LINKS* ╏\n${linksList}\n━━━━━━━━━━━`)
   }
 
-  /* ---------- .obtener ---------- */
-  if (command === 'obtener') {
+  if (command === 'obtener' || command === 'getlink') {
     if (!args[0]) return m.reply(`➛ ${usedPrefix+command} menu.js\n➛ ${usedPrefix+command} menu.js files.evogb.win`)
     let fileName = args[0].trim()
     if (!fileName.endsWith('.js')) fileName += '.js'
-    let filtro = args[1] ? args[1].trim() : null
+    let filtro = args[1]? args[1].trim() : null
     let fp = path.join('./plugins', fileName)
     if (!fs.existsSync(fp)) return m.reply(`❌ No existe: ${fileName}`)
     let c = fs.readFileSync(fp,'utf-8')
     let urls = c.match(urlRegex) || []
     if (filtro) urls = urls.filter(u => u.includes(filtro))
     urls = [...new Set(urls)]
-    if (!urls.length) return m.reply(`❌ No hay links en ${fileName}${filtro?` con filtro ${filtro}`:''}`)
-    // manda solo los links, limpio para copiar
+    if (!urls.length) return m.reply(`❌ No hay links en ${fileName}`)
     return m.reply(urls.join('\n'))
   }
 
-  /* ---------- .edit ---------- */
   if (command === 'edit') {
     if (!isOwner(m)) { await react('⛔'); return m.reply('⛔ Solo owner') }
     if (!text.includes('|')) return m.reply(`➛ ${usedPrefix+command} link_viejo | link_nuevo`)
@@ -101,7 +101,7 @@ let handler = async (m, { conn, text, args, command, usedPrefix }) => {
 }
 
 handler.help = ['ver <link>', 'ver2 <link>', 'obtener <archivo>', 'edit <viejo> | <nuevo>']
-handler.tags = ['tools','owner']
+handler.tags = ['tools']
 handler.command = ['ver','ver1','ver2','obtener','getlink','edit']
 
 export default handler
