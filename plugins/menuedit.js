@@ -1,111 +1,54 @@
 import fs from 'fs'
-import path from 'path'
 
-const MENU_PATH = './plugins/menu.js'
-const OWNER_NUM = '51927174369'
+let handler = async (m, { conn, command, text, usedPrefix }) => {
+  const menuPath = './plugins/menu.js'
+  const ownerJid = '51927174369@s.whatsapp.net'
 
-function isOwner(m) {
-  let sender = (m.sender || '').replace(/[^0-9]/g,'')
-  return sender.endsWith(OWNER_NUM) || m.fromMe
-}
-
-// Limpia el código y deja solo el diseño con datos de ejemplo
-function extraerDiseno() {
-  let code = fs.readFileSync(MENU_PATH, 'utf-8')
-
-  // saca todos los bloques `...` asignados a menuTexto
-  let bloques = []
-  let regex = /menuTexto\s*(\+=|=)\s*`([\s\S]*?)`/g
-  let match
-  while ((match = regex.exec(code))!== null) {
-    bloques.push(match[2])
-  }
-  if (!bloques.length) return null
-
-  let diseno = bloques.join('\n')
-
-  // reemplaza variables por ejemplos
-  const reemplazos = {
-    '${estadoBot}': 'Estable • 5h 20m',
-    '${ping}': '23',
-    '${saludo}': 'Buenas noches',
-    '${userName}': 'ForThreePro',
-    '${fraseRandom}': 'Dame lasaña o dame sueño',
-    '${CANAL_LINK}': 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z',
-    '${totalUsers}': '1250',
-    '${pluginsCount}': '180',
-    '${ownerNum}': '51927174369',
-    '${ram}': '85.40',
-    '${totalram}': '16.00',
-    '${fecha}': 'viernes',
-    '${fecha2}': '25 de septiembre de 2026',
-    '${hora}': '11:45:20 pm',
-    '${nombreCat}': 'INFO',
-    '${cmds.length}': '5',
-    '${icono}': 'ℹ️',
-    '${c}': 'owner',
-    '${i+1}': '1',
-    '${c}': 'menu',
-  }
-  // reemplazo simple
-  for (let k in reemplazos) {
-    diseno = diseno.split(k).join(reemplazos[k])
-  }
-  // limpia cualquier ${...} restante
-  diseno = diseno.replace(/\$\{[^}]+\}/g, 'ejemplo')
-  // limpia ${TOP_COMANDOS...}
-  diseno = diseno.replace(/\$\{TOP_COMANDOS[\s\S]*?\}/g, '1..play | 2..sticker | 3..ia')
-
-  return diseno.trim()
-}
-
-let handler = async (m, { conn, text, command, usedPrefix }) => {
   if (command === 'menu1') {
+    if (!fs.existsSync(menuPath)) return m.reply('❌ No encontré plugins/menu.js')
+    
     try {
-      let diseno = extraerDiseno()
-      if (!diseno) return m.reply('❌ No pude extraer el diseño de menu.js')
-      // lo manda como texto para copiar fácil
-      await conn.sendMessage(m.chat, { text: `🎨 *DISEÑO ACTUAL DEL MENU*\nUsuario: ForThreePro\nGithub: Teste2\n\n━━━━━━━━━━━\n\n${diseno}\n\n━━━━━━━━━━━\n\n💡 Para cambiarlo usa:\n${usedPrefix}menuedit tu nuevo diseño aquí` }, { quoted: m })
+      // Importamos tu menu.js real
+      const menuPlugin = (await import('./menu.js?update=' + Date.now())).default
+      // Lo ejecutamos para que genere el menú completo como lo haría .menu
+      // Pero lo capturamos como texto para que lo puedas copiar
+      await menuPlugin(m, { conn, text: '', command: 'menu', usedPrefix: '.' })
+      
+      await m.reply(`✅ Ese de arriba es tu menú completo detectado de *menu.js*\n\nUsuario: ForThreePro\nGithub: Teste2\n\nSi no te gusta, usa:\n${usedPrefix}menuedit + tu nuevo diseño`)
     } catch(e) {
-      m.reply(`❌ Error: ${e.message}`)
+      m.reply(`❌ Error al leer menu.js: ${e.message}`)
     }
   }
 
   if (command === 'menuedit') {
-    if (!isOwner(m)) return m.reply('⛔ Solo owner')
-    if (!text || text.length < 20) return m.reply(`➛ ${usedPrefix}menuedit *pega aquí tu menú completamente nuevo*\n\nPuedes usar:\n{user} = nombre\n{saludo} = saludo\n{fecha} = fecha\n{totalUsers} = usuarios`)
+    if (m.sender !== ownerJid && !m.fromMe) return m.reply('⛔ Solo owner')
+    if (!text || text.length < 30) return m.reply(`Pega tu menú nuevo así:\n${usedPrefix}menuedit Hola soy ForThreePro...\n\nPuedes usar {user}, {fecha}, {hora}`)
 
     try {
-      let code = fs.readFileSync(MENU_PATH, 'utf-8')
-      // hacemos backup
-      fs.copyFileSync(MENU_PATH, MENU_PATH + '.bak')
+      let code = fs.readFileSync(menuPath, 'utf-8')
+      fs.copyFileSync(menuPath, './plugins/menu.js.bak')
 
-      // Convertimos tus placeholders a variables reales
-      let nuevoDiseno = text
-       .replace(/{user}/g, '${userName}')
-       .replace(/{saludo}/g, '${saludo}')
-       .replace(/{fecha}/g, '${fecha2}')
-       .replace(/{totalUsers}/g, '${totalUsers}')
+      // Convertimos tus variables fáciles a las del bot
+      let nuevoTexto = text
+        .replace(/{user}/g, '${userName}')
+        .replace(/{fecha}/g, '${fecha2}')
+        .replace(/{hora}/g, '${hora}')
+        .replace(/`/g, "'") // evitamos que rompa el código
 
-      // Reemplazamos SOLO el primer bloque: let menuTexto = `...`
-      // Usamos una función para no romper el resto de categorías
-      let nuevoCode = code.replace(
-        /let menuTexto = `[\s\S]*?`/m,
-        `let menuTexto = \`${nuevoDiseno}\``
-      )
+      // Reemplaza el primer bloque del menú
+      let newCode = code.replace(/let menuTexto = `[\s\S]*?`/, `let menuTexto = \`${nuevoTexto}\``)
 
-      if (nuevoCode === code) return m.reply('❌ No encontré el bloque menuTexto en menu.js')
-
-      fs.writeFileSync(MENU_PATH, nuevoCode)
-      m.reply(`✅ *MENU CAMBIADO*\n\nUsuario: ForThreePro\n\nTu nuevo diseño ya está guardado pe.\nReinicia el bot y prueba con.menu\n\nSe creó backup en menu.js.bak por si no te gusta.`)
+      if (newCode === code) return m.reply('❌ No pude encontrar el diseño en menu.js')
+      
+      fs.writeFileSync(menuPath, newCode)
+      await m.reply(`✅ *MENU CAMBIADO*\n\nListo pe, ya se guardó tu nuevo diseño.\nHaz .menu1 de nuevo para verlo.`)
     } catch(e) {
-      m.reply(`❌ Error: ${e.message}`)
+      m.reply(`❌ ${e.message}`)
     }
   }
 }
 
-handler.help = ['menu1', 'menuedit <nuevo menu>']
-handler.tags = ['tools', 'owner']
+handler.help = ['menu1', 'menuedit']
+handler.tags = ['owner']
 handler.command = ['menu1', 'menuedit']
-
 export default handler
