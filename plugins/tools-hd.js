@@ -36,7 +36,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const mime = (q.msg || q).mimetype || ''
     if (!/image\/(jpe?g|png)/.test(mime)) {
       await react('❌')
-      return m.reply(head + `➛ Responde a una imagen con *${usedPrefix + command}* (jpg/png)`, m)
+      return m.reply(head + `➛ Responde a una imagen con *${usedPrefix + command}* (jpg/png)`)
     }
     try {
       await react('⏳')
@@ -53,7 +53,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
       }, { quoted: m })
     } catch (err) {
       await react('❌')
-      await m.reply(head + `❌ Error: ${err.message || err}`, m)
+      await m.reply(head + `❌ Error: ${err.message || err}`)
     }
 }
 handler.help = ['hd','upscale','4k']
