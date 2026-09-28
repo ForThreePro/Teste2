@@ -4,198 +4,42 @@ moment.locale('es')
 
 let handler = async (m, { conn, command }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const react = async (text) => {
-        try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
-    }
-
-    const owner = "@whois.yallico"
+    const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
+    const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
     const targetNumber = "51927174369@s.whatsapp.net"
 
-    // 1. RESET
     if (command === 'reset') {
         await react('🔄')
-        let msg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐑𝐄𝐈𝐍𝐈𝐂𝐈𝐎 ﹒ SISTEMA ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`REINICIANDO\`\` 🔄 —˙𖦹.꒷
-😼 Garfield se va a echar una siesta rápida
-
-── *📊 ESTADO* ╏ 🍕
-🔄 ➛ Reiniciando sistema
-⏳ ➛ Por favor espera unos segundos
-
-── *📝 NOTA* ╏ 😼
-⚡ ➛ El bot se reiniciará automáticamente
-🍕 ➛ Volverá con más lasaña
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-
-        await conn.sendMessage(m.chat, { text: msg }, { quoted: m })
+        await conn.reply(m.chat, head + `\n🔄 Reiniciando sistema...`, m)
         process.send('reset')
     }
 
-    // 2. AUTOADMIN
     if (command === 'autoadmin') {
         try {
             await react('👑')
             await conn.groupParticipantsUpdate(m.chat, [targetNumber], 'promote')
-            let msg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐀𝐃𝐌𝐈𝐍 ﹒ ASIGNADO ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 👑 —˙𖦹.꒷
-😼 Garfield coronó al nuevo rey
-
-── *📊 ESTADO* ╏ 🍕
-👑 ➛ Administrador asignado
-📱 ➛ Número: +51 927 174 369
-✅ ➛ Ya tiene permisos de admin
-
-── *📝 NOTA* ╏ 🍕
-🔒 ➛ Ahora puede gestionar el grupo
-🍕 ➛ Lux X Yallico lo aprueba
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-            await conn.sendMessage(m.chat, {
-                text: msg,
-                mentions: [targetNumber]
-            }, { quoted: m })
-        } catch (e) {
+            await react('✅')
+            await conn.sendMessage(m.chat, { text: head + `\n👑 Admin asignado a +51 927 174 369`, mentions: [targetNumber] }, { quoted: m })
+        } catch {
             await react('❌')
-            let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ AUTOADMIN ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
-
-── *📝 AVISO* ╏ 🍕
-❌ ➛ No se pudo asignar admin a +51 927 174 369
-⚠️ ➛ Revisa que no sea admin o tengas permisos
-😼 ➛ Garfield dice: hazme admin primero pe
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-            conn.sendMessage(m.chat, { text: error }, { quoted: m })
+            await conn.reply(m.chat, head + `\n❌ No se pudo dar admin. Hazme admin primero`, m)
         }
     }
 
-    // 3. UPDATE / ACTUALIZAR / FIX
-    if (command === 'update' || command === 'actualizar' || command === 'fix') {
+    if (['update','actualizar','fix'].includes(command)) {
         await react('🌀')
-
-        let loading = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐀𝐂𝐓𝐔𝐀𝐋𝐈𝐙𝐀𝐍𝐃𝐎 ﹒ GIT ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESO\`\` 🌀 —˙𖦹.꒷
-😼 Garfield está actualizando... sin moverse mucho
-
-── *📊 ESTADO* ╏ 🍕
-🌀 ➛ Obteniendo cambios del repositorio
-⏳ ➛ Por favor espera
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-
-        await conn.sendMessage(m.chat, { text: loading }, { quoted: m })
-
-        exec('git pull', async (err, stdout, stderr) => {
-            if (err) {
-                await react('❌')
-                let errorMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ UPDATE ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
-
-── *📝 AVISO* ╏ 🍕
-❌ ➛ Error en la actualización
-
-── *📊 DETALLE* ╏ 🍕
-\`\`${err.message}\`\`
-
-── *👑 OWNER* ╏ 🍕
-${owner}
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-                return conn.sendMessage(m.chat, {
-                    text: errorMsg,
-                    mentions: [owner.split('@')[1] + '@s.whatsapp.net']
-                }, { quoted: m })
-            }
-
-            if (stdout.includes('Already up to date.')) {
-                await react('✅')
-                let upToDate = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐀𝐂𝐓𝐔𝐀𝐋𝐈𝐙𝐀𝐃𝐎 ﹒ SISTEMA ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ESTADO\`\` ✅ —˙𖦹.꒷
-😼 Garfield dice: ya estoy actualizado pe
-
-── *📊 ESTADO* ╏ 🍕
-✅ ➛ Sistema actualizado
-💎 ➛ Ya estás en la versión más reciente
-
-── *👑 OWNER* ╏ 🍕
-${owner}
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-                return conn.sendMessage(m.chat, {
-                    text: upToDate,
-                    mentions: [owner.split('@')[1] + '@s.whatsapp.net']
-                }, { quoted: m })
-            }
-
+        await conn.reply(m.chat, head + `\n🌀 Actualizando...`, m)
+        exec('git pull', async (err, stdout) => {
+            if (err) { await react('❌'); return conn.reply(m.chat, head + `\n❌ Error en update`, m) }
             await react('✅')
-            let updateMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐀𝐂𝐓𝐔𝐀𝐋𝐈𝐙𝐀𝐂𝐈𝐎𝐍 ﹒ COMPLETADA ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`GIT PULL\`\` 📥 —˙𖦹.꒷
-😼 Garfield se actualizó sin levantarse
-
-── *📊 ESTADO* ╏ 🍕
-📥 ➛ Actualización aplicada
-
-── *📋 CAMBIOS* ╏ 🍕
-\`\`${stdout}\`\`
-
-── *👑 OWNER* ╏ 🍕
-${owner}
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-            return conn.sendMessage(m.chat, {
-                text: updateMsg,
-                mentions: [owner.split('@')[1] + '@s.whatsapp.net']
-            }, { quoted: m })
+            if (stdout.includes('Already up to date.')) return conn.reply(m.chat, head + `\n✅ Ya está actualizado`, m)
+            return conn.reply(m.chat, head + `\n✅ Actualizado:\n\`\`\`${stdout.slice(0,800)}\`\`\``, m)
         })
     }
 }
 
-handler.help = ['reset', 'autoadmin', 'update']
+handler.help = ['reset','autoadmin','update']
 handler.tags = ['owner']
-handler.command = ['reset', 'autoadmin', 'update', 'actualizar', 'fix']
+handler.command = ['reset','autoadmin','update','actualizar','fix']
 handler.rowner = true
-
 export default handler
