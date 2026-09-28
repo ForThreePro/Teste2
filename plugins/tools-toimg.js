@@ -1,124 +1,49 @@
 import { webp2mp4 } from '../lib/webp2mp4.js'
-import { ffmpeg, toAudio } from '../lib/converter.js'
+import { toAudio } from '../lib/converter.js'
 import moment from 'moment-timezone'
 moment.locale('es')
 
 let handler = async (m, { conn, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-
-  const react = async (text) => {
-    try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
-  }
-
-  const error = (msg) => {
-    return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐂𝐎𝐍𝐕𝐄𝐑𝐓𝐈𝐃𝐎𝐑 ﹒ ERROR ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
-
-── *📝 AVISO* ╏ 😼
-❌ ➛ ${msg}
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`)
-  }
+  const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} } }
+  const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
 
   if (['tovid', 'tovideo'].includes(command)) {
-    if (!m.quoted) return error('Responde a un *sticker animado*')
-    let mime = m.quoted.mimetype || ''
-    if (!/webp/.test(mime)) return error('Solo acepto *stickers animados* .webp')
+    if (!m.quoted || !/webp/.test(m.quoted.mimetype || '')) {
+      await react('❌')
+      return conn.reply(m.chat, head + `❌ Responde a un *sticker animado*`, m)
+    }
     try {
       await react('⏳')
       let media = await m.quoted.download()
       let out = await webp2mp4(media)
-      await conn.sendFile(m.chat, out, 'video.mp4', `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐓𝐎𝐕𝐈𝐃𝐄𝐎 ﹒ COMPLETADO ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`CONVERTIDO\`\` ✅ —˙𖦹.꒷
-
-── *📊 ESTADO* ╏ 🍕
-✅ ➛ Conversión completada
-🎬 ➛ Sticker animado a Video MP4
-👤 ➛ LUX X YALLICO 😼
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`, m)
       await react('✅')
-    } catch (e) {
-      console.error(e)
-      await react('❌')
-      return error('No se pudo convertir el sticker')
-    }
+      await conn.sendFile(m.chat, out, 'video.mp4', head + `✅ *Tovideo completado*`, m)
+    } catch { await react('❌'); await conn.reply(m.chat, head + `❌ No se pudo convertir`, m) }
   }
 
   if (['tomp3', 'toaudio'].includes(command)) {
     let q = m.quoted ? m.quoted : m
     let mime = (m.quoted ? m.quoted : m.msg).mimetype || ''
-    if (!/video|audio/.test(mime)) return error('Responde a un *video* o *nota de voz*')
+    if (!/video|audio/.test(mime)) { await react('❌'); return conn.reply(m.chat, head + `❌ Responde a un *video o audio*`, m) }
     try {
       await react('⏳')
       let media = await q.download?.()
       let audio = await toAudio(media, 'mp4')
-      await conn.sendFile(m.chat, audio.data, 'audio.mp3', `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐓𝐎𝐌𝐏𝟑 ﹒ COMPLETADO ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`EXTRAIDO\`\` ✅ —˙𖦹.꒷
-
-── *📊 ESTADO* ╏ 🍕
-✅ ➛ Audio extraído
-🎵 ➛ Formato: MP3
-👤 ➛ LUX X YALLICO 😼
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`, m, null, { mimetype: 'audio/mp4' })
       await react('✅')
-    } catch (e) {
-      console.error(e)
-      await react('❌')
-      return error('No se pudo convertir a audio')
-    }
+      await conn.sendFile(m.chat, audio.data, 'audio.mp3', head + `✅ *Audio extraído*`, m, null, { mimetype: 'audio/mp4' })
+    } catch { await react('❌'); await conn.reply(m.chat, head + `❌ No se pudo convertir a audio`, m) }
   }
 
-  if (['toimg', 'stickerimg', 'simg'].includes(command)) {
+  if (['toimg', 'simg'].includes(command)) {
     let q = m.quoted ? m.quoted : m
-    let isSticker = q.mtype === 'stickerMessage' || (q.mimetype || '').includes('webp')
-    if (!isSticker) return error('Responde a un *sticker*')
+    if (!((q.mimetype || '').includes('webp'))) { await react('❌'); return conn.reply(m.chat, head + `❌ Responde a un *sticker*`, m) }
     try {
-      await react('🖼️')
+      await react('⏳')
       let media = await q.download()
-      await conn.sendMessage(m.chat, { 
-        image: media, 
-        caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐓𝐎𝐈𝐌𝐆 ﹒ COMPLETADO ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`CONVERTIDO\`\` ✅ —˙𖦹.꒷
-
-── *📊 ESTADO* ╏ 🍕
-✅ ➛ Conversión completada
-🖼️ ➛ Sticker a Imagen JPG
-👤 ➛ LUX X YALLICO 😼
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━` 
-      }, { quoted: m })
       await react('✅')
-    } catch (e) {
-      console.error(e)
-      await react('❌')
-      error('No pude convertir el *sticker*')
-    }
+      await conn.sendMessage(m.chat, { image: media, caption: head + `✅ *Sticker a imagen*` }, { quoted: m })
+    } catch { await react('❌'); await conn.reply(m.chat, head + `❌ No se pudo convertir`, m) }
   }
 }
 
