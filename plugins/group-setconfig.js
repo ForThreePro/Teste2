@@ -10,7 +10,7 @@ let handler = async (m, { conn, command }) => {
     const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
 
     if (command==='setabrir' || command==='setcerrar') {
-        if (!m.quoted) { await react('❌'); return m.reply(head+`\n❌ Responde a un sticker con *.${command}*`, m) }
+        if (!m.quoted) { await react('❌'); return m.reply(head+`\n❌ Responde a un sticker con *.${command}*`) }
         try {
             let q = m.quoted
             let fileSha256 = q.msg?.fileSha256 || q.message?.stickerMessage?.fileSha256
@@ -18,16 +18,16 @@ let handler = async (m, { conn, command }) => {
             let hash = Buffer.from(fileSha256).toString('base64')
             if (command==='setabrir') chat.stickerAbrir = hash; else chat.stickerCerrar = hash
             await react('✅')
-            return m.reply(head+`\n✅ Sticker *${command==='setabrir'?'ABRIR 🟢':'CERRAR 🔴'}* guardado`, m)
-        } catch { await react('❌'); return m.reply(head+`\n❌ Error`, m) }
+            return m.reply(head+`\n✅ Sticker *${command==='setabrir'?'ABRIR 🟢':'CERRAR 🔴'}* guardado`)
+        } catch { await react('❌'); return m.reply(head+`\n❌ Error`) }
     }
 
     if (['resetsticker','delsticker','clearsticker','delabrir','delcerrar'].includes(command)) {
         let b=[]
         if (['resetsticker','delsticker','clearsticker','delabrir'].includes(command) && chat.stickerAbrir) { delete chat.stickerAbrir; b.push('ABRIR') }
         if (['resetsticker','delsticker','clearsticker','delcerrar'].includes(command) && chat.stickerCerrar) { delete chat.stickerCerrar; b.push('CERRAR') }
-        if (!b.length) { await react('❌'); return m.reply(head+`\n⚠️ No hay stickers`, m) }
-        await react('🗑️'); return m.reply(head+`\n🗑️ Eliminado: ${b.join(', ')}`, m)
+        if (!b.length) { await react('❌'); return m.reply(head+`\n⚠️ No hay stickers`) }
+        await react('🗑️'); return m.reply(head+`\n🗑️ Eliminado: ${b.join(', ')}`)
     }
 }
 
@@ -37,7 +37,6 @@ handler.before = async function(m, { conn }) {
     if (!chat.stickerAbrir && !chat.stickerCerrar) return
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
-    const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
     try {
         let fileSha256 = m.msg?.fileSha256; if (!fileSha256) return
         let hash = Buffer.from(fileSha256).toString('base64')
@@ -46,7 +45,6 @@ handler.before = async function(m, { conn }) {
         else if (hash===chat.stickerCerrar) { isClose='announcement'; estado='CERRADO 🔒' }
         else return
         await conn.groupSettingUpdate(m.chat, isClose)
-        await react('✅')
         await conn.sendMessage(m.chat, { text: head+`\n${estado}\n👑 Por: @${m.sender.split('@')[0]}`, mentions:[m.sender] }, { quoted:m })
     } catch {}
 }
