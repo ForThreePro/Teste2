@@ -1,114 +1,34 @@
-import util from 'util'
-import path from 'path'
 import moment from 'moment-timezone'
 moment.locale('es')
 
 let user = a => '@' + a.split('@')[0]
+const pickRandom = (l) => l[Math.floor(Math.random()*l.length)]
+Array.prototype.getRandom = function(){ return this[Math.floor(Math.random()*this.length)] }
 
-function handler(m, { groupMetadata, command, conn, text }) {
+let handler = async (m, { groupMetadata, command, conn, text }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const react = async (text) => {
-        try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
-    }
+    const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
+    const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
 
-    if (!groupMetadata) {
-        return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Este comando solo funciona en grupos\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
-    }
+    if (!groupMetadata) return m.reply(head+`\n❌ Solo en grupos`, m)
+    if (!text) { await react('❌'); return m.reply(head+`\n🏆 Usa: *.top <motivo>*\nEj: *.top Más activos*`, m) }
 
-    if (!text) {
-        await react('❌')
-        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    let ps = groupMetadata.participants.map(v=>v.id)
+    if (ps.length < 10) { await react('⚠️'); return m.reply(head+`\n⚠️ Mínimo 10 miembros`, m) }
 
-⤷ ┇ 𝐓𝐎𝐏 ﹒ RANKING ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
+    let picks = Array.from({length:10},()=>ps.getRandom())
+    let x = pickRandom(['🐱','🍕','💤','😼','🔥','😂','👀','😎','✨','❤️'])
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FORMATO\`\` 🏆 —˙𖦹.꒷
+    let top = head + `\n🏆 *TOP 10 ${text.toUpperCase()}* ${x}\n\n` +
+      picks.map((p,i)=>`${x} *${i+1}.* ${user(p)}`).join('\n') +
+      `\n\n🎲 Aleatorio`
 
-── *📖 USO* ╏ 🍕
-➛.top <motivo del ranking>
-😼 ➛ Garfield elige a los ganadores
-
-── *💡 EJEMPLOS* ╏ 🍕
-➛.top Mejores en PVP
-➛.top Más activos
-➛.top Más tóxicos
-➛.top Más tragones como Garfield
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: error }, { quoted: m })
-    }
-
-    let ps = groupMetadata.participants.map(v => v.id)
-    if (ps.length < 10) {
-        await react('⚠️')
-        return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐀𝐕𝐈𝐒𝐎 ﹒ TOP ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n⚠️ ➛ Se necesitan mínimo 10 miembros en el grupo\n😼 ➛ Garfield necesita más competencia\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`)
-    }
-
-    let a = ps.getRandom()
-    let b = ps.getRandom()
-    let c = ps.getRandom()
-    let d = ps.getRandom()
-    let e = ps.getRandom()
-    let f = ps.getRandom()
-    let g = ps.getRandom()
-    let h = ps.getRandom()
-    let i = ps.getRandom()
-    let j = ps.getRandom()
-    let k = Math.floor(Math.random() * 70)
-
-    let emojis = ['🐱','🍕','💤','😼','🙄','😂','👀','🔥','🤑','💩','🥱','😎','😅','👇🏻','😔','🌚','🗿','✨','❤️']
-    let x = pickRandom(emojis)
-
-    let vn = `https://hansxd.nasihosting.com/sound/sound${k}.mp3`
-
-    let top = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐑𝐀𝐍𝐊𝐈𝐍𝐆 ﹒ ${text.toUpperCase()} ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`TOP 10\`\` ${x} —˙𖦹.꒷
-😼 Garfield presenta a los elegidos
-
-── *🏅 RANKING* ╏ 🍕
-${x} *1.* ${user(a)}
-${x} *2.* ${user(b)}
-${x} *3.* ${user(c)}
-${x} *4.* ${user(d)}
-${x} *5.* ${user(e)}
-${x} *6.* ${user(f)}
-${x} *7.* ${user(g)}
-${x} *8.* ${user(h)}
-${x} *9.* ${user(i)}
-${x} *10.* ${user(j)}
-
-── *📝 NOTA* ╏ 😼
-🎲 ➛ Ranking 100% aleatorio y divertido
-🍕 ➛ Aprobado por Garfield
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-
-    m.reply(top, null, { mentions: [a, b, c, d, e, f, g, h, i, j] })
     await react(x)
-
-    // Descomenta si quieres que mande audio
-    // conn.sendFile(m.chat, vn, 'top.mp3', null, m, true, { type: 'audioMessage', ptt: true })
+    return m.reply(top, null, { mentions: picks })
 }
 
 handler.help = ['top <texto>']
 handler.tags = ['fun']
 handler.command = /^(top)$/i
 handler.group = true
-
 export default handler
-
-function pickRandom(list) {
-    return list[Math.floor(Math.random() * list.length)]
-}
-
-Array.prototype.getRandom = function() {
-    return this[Math.floor(Math.random() * this.length)]
-}
