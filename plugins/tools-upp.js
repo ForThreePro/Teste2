@@ -6,7 +6,6 @@ moment.locale('es')
 
 let handler = async (m, { conn }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-
   const react = async (text) => {
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
@@ -15,41 +14,11 @@ let handler = async (m, { conn }) => {
   let mime = (q.msg || q).mimetype || ''
   if (!mime) {
     await react('❌')
-    return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐔𝐏𝐋𝐎𝐀𝐃𝐄𝐑 ﹒ USO ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`COMO USAR\`\` ⚠️ —˙𖦹.꒷
-
-── *📖 INSTRUCCIONES* ╏ 🍕
-➛ Responde a una *imagen, video, audio o documento*
-➛ Formatos: Imagen | Video | Audio | Doc
-😼 ➛ Garfield lo subirá a la nube pe
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`, m)
+    return conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐔𝐏𝐋𝐎𝐀𝐃𝐄𝐑 ﹒ USO ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n➛ Responde a una *imagen, video, audio o documento* para subirlo.`, m)
   }
 
   try {
     await react('⏳')
-    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐔𝐏𝐋𝐎𝐀𝐃𝐄𝐑 ﹒ SUBIENDO ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ☁️ —˙𖦹.꒷
-
-── *📊 ESTADO* ╏ 😼
-⏳ ➛ Subiendo archivo a la nube evogb.win...
-⚡ ➛ Generando enlace...
-🍕 ➛ Garfield está trabajando... casi
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`)
-
     let media = await q.download()
     let link = await myCloud(media)
     if (!link.url) throw new Error('Sin URL')
@@ -60,39 +29,21 @@ let handler = async (m, { conn }) => {
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` ✅ —˙𖦹.꒷
-😼 Garfield subió tu archivo sin levantarse mucho
 
-── *📊 DATOS DEL ARCHIVO* ╏ 🍕
-🔗 ➛ Enlace: ${link.url}
-🆔 ➛ ID: ${link.id || 'N/A'}
-📦 ➛ Peso: ${formatBytes(media.length)}
-🖥️ ➛ Servidor: evogb.win
-👤 ➛ LUX X YALLICO 😼
+── *📊 DATOS* ╏ 🍕
+🔗 ➛ ${link.url}
+📦 ➛ ${formatBytes(media.length)}
+🖥️ ➛ evogb.win
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🍕 *LUX X YALLICO* 😼
 ━━━━━━━━━━━`
 
-    await conn.sendFile(m.chat, media, 'lux-yallico-' + crypto.randomBytes(3).toString("hex") + '.' + link.url.split('.').pop(), txt, m)
     await react('✅')
+    await conn.reply(m.chat, txt, m)
   } catch (e) {
-    console.error(e)
     await react('❌')
-    await conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐔𝐏𝐋𝐎𝐀𝐃𝐄𝐑 ﹒ ERROR ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
-😼 Se le cayó la lasaña al servidor
-
-── *📝 AVISO* ╏ 🍕
-❌ ➛ No se pudo subir el archivo
-💡 ➛ El servidor puede estar saturado
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`, m)
+    await conn.reply(m.chat, `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Error al subir el archivo.`, m)
   }
 }
 
