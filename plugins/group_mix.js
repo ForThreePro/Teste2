@@ -3,10 +3,12 @@ moment.locale('es')
 
 let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-  const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
   const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+  const footer = `\n━━━━━━━━━━━\n🍕 *LUX X YALLICO* 😼`
+  const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
+  const reply = (txt) => conn.sendMessage(m.chat, { text: head + `\n${txt}` + footer }, { quoted: m })
 
-  if (!isAdmin && !isOwner) { await react('❌'); return m.reply(head+`\n❌ Solo admins`) }
+  if (!isAdmin && !isOwner) { await react('❌'); return reply(`❌ Solo admins`) }
 
   if (['resetlink','revokelink'].includes(command)) {
     try {
@@ -14,32 +16,36 @@ let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner }) =
       await conn.groupRevokeInvite(m.chat)
       let code = await conn.groupInviteCode(m.chat)
       await react('✅')
-      return m.reply(head+`\n🔗 Nuevo link:\nhttps://chat.whatsapp.com/${code}`)
-    } catch { await react('❌'); return m.reply(head+`\n❌ Necesito ser admin`) }
+      return reply(`🔗 Nuevo link:\nhttps://chat.whatsapp.com/${code}`)
+    } catch { await react('❌'); return reply(`❌ Necesito ser admin`) }
   }
 
   if (['setname','setgroupname'].includes(command)) {
-    if (!text) { await react('❌'); return m.reply(head+`\n❌ Usa: *${usedPrefix}setname Nuevo nombre*`) }
-    try { await react('⏳'); await conn.groupUpdateSubject(m.chat, text); await react('✅'); return m.reply(head+`\n✅ Nombre cambiado a: *${text}*`) }
-    catch { await react('❌'); return m.reply(head+`\n❌ Error`) }
+    if (!text) { await react('❌'); return reply(`❌ Usa: *${usedPrefix}setname Nuevo nombre*`) }
+    try { await react('⏳'); await conn.groupUpdateSubject(m.chat, text); await react('✅'); return reply(`✅ Nombre cambiado a: *${text}*`) }
+    catch { await react('❌'); return reply(`❌ Error al cambiar nombre`) }
   }
 
   if (['setdesc','setgroupdesc'].includes(command)) {
-    if (!text) { await react('❌'); return m.reply(head+`\n❌ Usa: *${usedPrefix}setdesc Nueva descripción*`) }
-    try { await react('⏳'); await conn.groupUpdateDescription(m.chat, text); await react('✅'); return m.reply(head+`\n✅ Descripción actualizada`) }
-    catch { await react('❌'); return m.reply(head+`\n❌ Error`) }
+    if (!text) { await react('❌'); return reply(`❌ Usa: *${usedPrefix}setdesc Nueva descripción*`) }
+    try { await react('⏳'); await conn.groupUpdateDescription(m.chat, text); await react('✅'); return reply(`✅ Descripción actualizada`) }
+    catch { await react('❌'); return reply(`❌ Error al cambiar descripción`) }
   }
 
   if (['setfoto','setppgroup','setppgc'].includes(command)) {
     let q = m.quoted ? m.quoted : m
-    let mime = (q.msg||q).mimetype || ''
+    let mime = (q.msg || q).mimetype || ''
     try {
       await react('⏳')
-      if (text && /https?:\/\//.test(text)) await conn.updateProfilePicture(m.chat, { url: text })
-      else if (/image/.test(mime)) await conn.updateProfilePicture(m.chat, await q.download())
-      else { await react('❌'); return m.reply(head+`\n❌ Responde a una imagen o pasa un link`) }
-      await react('✅'); return m.reply(head+`\n✅ Foto actualizada`)
-    } catch { await react('❌'); return m.reply(head+`\n❌ Error`) }
+      if (text && /https?:\/\//.test(text)) {
+        await conn.updateProfilePicture(m.chat, { url: text })
+      } else if (/image/.test(mime)) {
+        let img = await q.download()
+        await conn.updateProfilePicture(m.chat, img)
+      } else { await react('❌'); return reply(`❌ Responde a una imagen o pasa un link`) }
+      await react('✅')
+      return reply(`✅ Foto actualizada`)
+    } catch { await react('❌'); return reply(`❌ Error al actualizar foto`) }
   }
 }
 
