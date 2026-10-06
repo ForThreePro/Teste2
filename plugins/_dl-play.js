@@ -51,27 +51,20 @@ function getDurationSeconds(value) {
 }
 
 async function downloadWithApi(link, isAudio) {
-  // API DELIRIUS
   try {
     const endpoint = isAudio? `${api.url2}/download/ytmp3?url=${encodeURIComponent(link)}` : `${api.url2}/download/ytmp4?url=${encodeURIComponent(link)}&format=360p`
     const res = await fetch(endpoint)
     const json = await res.json()
-    if (json.status && json.data?.download) {
-      return { title: json.data.title, downloadUrl: json.data.download }
-    }
-  } catch (e) { console.log('delirius fail:', e.message) }
-
-  // API FAA
+    if (json.status && json.data?.download) return { title: json.data.title, downloadUrl: json.data.download }
+  } catch {}
   try {
     const fallbackUrl = isAudio? `${api.url3}/faa/ytmp3?url=${encodeURIComponent(link)}` : `${api.url3}/faa/ytmp4?url=${encodeURIComponent(link)}`
     const res = await fetch(fallbackUrl)
     const json = await res.json()
     if (json.status && json.result) {
-      const result = json.result
-      return { title: result.title, downloadUrl: isAudio? result.mp3 : result.download_url }
+      return { title: json.result.title, downloadUrl: isAudio? json.result.mp3 : json.result.download_url }
     }
-  } catch (e) { console.log('faa fail:', e.message) }
-
+  } catch {}
   throw new Error('Las 2 APIs fallaron')
 }
 
@@ -94,9 +87,7 @@ const handler = async (m, { conn, command, text }) => {
         return s > 0 && s <= MAX_DURATION
       }) || search.videos[0]
       link = selectedItem.url
-
       const caption = `‧˚꒰👛୭ *_𝐘𝐎𝐔𝐓𝐔𝐁𝐄 𝐃𝐋_*\n*𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎*\n\n╭───INFO ꒰🎧꒱────╮\n‧˚꒰🌼୭ Título: ${selectedItem.title}\n‧˚꒰🌼୭ Canal: ${selectedItem.author?.name}\n‧˚꒰🌼୭ Duración: ${selectedItem.timestamp}\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Descargando...`.trim()
-
       if (selectedItem.thumbnail) {
         try {
           const r = await fetch(selectedItem.thumbnail)
@@ -112,10 +103,9 @@ const handler = async (m, { conn, command, text }) => {
       link = text
     }
 
-    const isAudio = command === 'play'
-    const { title, downloadUrl } = await downloadWithApi(link, isAudio)
+    const isAudio = ['play', 'play2'].includes(command)
+    const { title, downloadUrl } = await downloadWithApi(link, true)
 
-    // ARREGLO DEL ERROR DE AUDIO: bajar como buffer
     const fileRes = await axios.get(downloadUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
     const buffer = Buffer.from(fileRes.data)
 
@@ -126,10 +116,12 @@ const handler = async (m, { conn, command, text }) => {
     const cleanTitle = (title || selectedItem?.title || 'lux').replace(/[^\w\s-]/gi, '').trim()
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
 
-    if (isAudio) {
+    if (command === 'play') {
       return conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mpeg', fileName: `${cleanTitle}.mp3` }, { quoted: fkontak })
     }
-    return conn.sendMessage(m.chat, { video: buffer, mimetype: 'video/mp4', fileName: `${cleanTitle}.mp4`, caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*` }, { quoted: fkontak })
+    if (command === 'play2') {
+      return conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mpeg', ptt: true, fileName: `${cleanTitle}.mp3` }, { quoted: fkontak })
+    }
 
   } catch (e) {
     console.error(e)
