@@ -21,53 +21,48 @@ let handler = async (m, { conn, text }) => {
   let mime = (q.msg || q).mimetype || ''
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '📈', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
 
-    if (/video/.test(mime) &&!link) {
-      await conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 〕─╮\n│ ⏳ Subiendo a evogb...\n╰──────────╯`, m)
+    if (/image/.test(mime) &&!link) {
+      await conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│ ⏳ Subiendo a evogb.win...\n╰────────────────╯`, m)
       let media = await q.download()
       let up = await myCloud(media)
       link = up.url
     }
 
-    if (!link) return conn.reply(m.chat, `Usa:.hdvid link`, m)
+    if (!link) return conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 〕─╮\n│ Usa:.removebg link o responde a imagen\n╰──────────╯`, m)
 
-    const apiUrl = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(link)}`
-    const j = await fetch(apiUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }).then(r => r.json())
+    const apiUrl = `https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(link)}`
 
-    console.log('HDVID JSON:', j)
+    // 1. Pedir JSON primero
+    const j = await fetch(apiUrl).then(r => r.json())
+    console.log(j) // para que veas que devuelve
 
-    let resultUrl = j.result?.url || j.result || j.url
-    if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.video
-    if (!resultUrl) throw new Error(`API no dio video: ${JSON.stringify(j).slice(0,400)}`)
+    if (!j.status &&!j.result) throw new Error('API FAA no devolvió resultado')
 
-    // Descarga
-    const res = await axios.get(resultUrl, {
-      responseType: 'arraybuffer',
-      headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://api-faa.my.id/' }
-    })
+    // La API puede devolver el link en result, result.url, data, etc - probamos todos
+    let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data
 
+    if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.image
+
+    if (!resultUrl ||!resultUrl.startsWith('http')) {
+      throw new Error('API no devolvió link válido: ' + JSON.stringify(j).slice(0,200))
+    }
+
+    const res = await axios.get(resultUrl, { responseType: 'arraybuffer' })
     const buffer = Buffer.from(res.data)
 
-    // VALIDACIÓN IMPORTANTE
-    if (buffer.length < 10000) {
-      throw new Error(`Video muy pequeño (${buffer.length} bytes), seguro es error: ${buffer.toString().slice(0,200)}`)
-    }
+    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ ✨ *REMOVEBG*\n│ 🔌 API: FAA-BOT\n│ 🔗 Origen: ${link}\n│\n╰─〔 🌸 Fondo eliminado 〕─╯`
 
-    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│ 📈 HD VIDEO OK\n│ 🎬 Tamaño: ${(buffer.length/1024/1024).toFixed(2)} MB\n╰─〔 🌸 〕─╯`
-
-    // Intenta enviar como video, si falla como documento
-    try {
-      await conn.sendMessage(m.chat, { video: buffer, mimetype: 'video/mp4', fileName: `hdvid-lux.mp4`, caption: cap }, { quoted: m })
-    } catch {
-      await conn.sendMessage(m.chat, { document: buffer, mimetype: 'video/mp4', fileName: `hdvid-lux.mp4`, caption: cap }, { quoted: m })
-    }
+    await conn.sendMessage(m.chat, { image: buffer, caption: cap }, { quoted: m })
+    await conn.sendMessage(m.chat, { document: buffer, mimetype: 'image/png', fileName: `removebg-lux.png` }, { quoted: m })
 
   } catch (e) {
     console.log(e)
-    conn.reply(m.chat, `╭─〔 ❌ Error 〕─╮\n│ ${e.message}\n│\n│ Tip: Prueba con link directo.mp4\n│ no con evogb, FAA falla con evogb\n╰──────────╯`, m)
+    conn.reply(m.chat, `╭─〔 ❌ Error 〕─╮\n│ ${e.message}\n╰──────────╯`, m)
   }
 }
 
-handler.command = ['hdvid', 'hdvideo', 'mejorar']
+handler.command = ['removebg', 'nobg', 'quitarfondo']
+handler.tags = ['tools']
 export default handler
