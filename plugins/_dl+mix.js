@@ -11,7 +11,6 @@ async function uploadEvogb(content) {
   const formData = new FormData()
   formData.append("file", new Blob([content], { type: mime }), `${crypto.randomBytes(5).toString("hex")}.${ext}`)
   const response = await fetch("https://evogb.win/api/upload", { method: "POST", body: formData })
-  if (!response.ok) throw new Error('Error en evogb.win')
   const j = await response.json()
   return j.url
 }
@@ -25,13 +24,24 @@ async function uploadCatbox(content) {
   return (await r.text()).trim()
 }
 
+function getBufferFromJson(j) {
+  let out = j.result?.url || j.result?.image || j.result?.data || j.result || j.url || j.data || j.image
+  if (typeof out === 'object') out = out.url || out.image || out.data
+  if (!out) return null
+  out = String(out).trim()
+  if (out.startsWith('http')) return { isUrl: true, data: out }
+  if (out.startsWith('data:image')) return { isUrl: false, data: Buffer.from(out.split(',')[1], 'base64') }
+  if (out.length > 300) return { isUrl: false, data: Buffer.from(out, 'base64') }
+  return null
+}
+
 let handler = async (m, { conn, text }) => {
   let link = text?.trim()
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
 
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen\n\n‧˚꒰🌼୭ Ejemplo:.removebg (respondiendo a imagen)` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen` }, { quoted: m })
   }
 
   try {
@@ -47,36 +57,42 @@ let handler = async (m, { conn, text }) => {
 
     // 2 - HDv2
     await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 2/3 Mejorando en HDv2...` }, { quoted: m })
-    let hdUrl, hdBuffer, hdLink
+    let hdLink = link
+    let hdBuffer = media
     try {
-      const hdApi = `https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`
-      const hdJson = await fetch(hdApi).then(r => r.json())
-      if (hdJson.status === false) throw new Error(hdJson.error)
-      hdUrl = hdJson.result?.url || hdJson.result?.image || hdJson.result || hdJson.url
-      if (typeof hdUrl === 'object') hdUrl = hdUrl.url || hdUrl.image
-      if (!hdUrl?.startsWith('http')) throw new Error('HD no devolvió link')
-
-      const r1 = await axios.get(hdUrl, { responseType: 'arraybuffer' })
-      hdBuffer = Buffer.from(r1.data)
-      try { hdLink = await uploadCatbox(hdBuffer) } catch { hdLink = await uploadEvogb(hdBuffer) }
+      const hdJson = await fetch(`https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`).then(r => r.json())
+      const parsedHD = getBufferFromJson(hdJson)
+      if (parsedHD) {
+        if (parsedHD.isUrl) {
+          const r1 = await axios.get(parsedHD.data, { responseType: 'arraybuffer' })
+          hdBuffer = Buffer.from(r1.data)
+        } else {
+          hdBuffer = parsedHD.data
+        }
+        try { hdLink = await uploadCatbox(hdBuffer) } catch { hdLink = await uploadEvogb(hdBuffer) }
+      }
     } catch (e) {
-      console.log('HD falló, usando original:', e.message)
-      hdLink = link // si falla HD, usa la original
-      hdBuffer = media
+      console.log('HD falló, sigo con original')
+      hdLink = link
     }
 
-    // 3 - Removebg sobre el HD
+    // 3 - Removebg (ahora soporta json)
     await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 3/3 Quitando fondo...` }, { quoted: m })
-    const bgApi = `https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(hdLink)}`
-    const bgJson = await fetch(bgApi).then(r => r.json())
-    let bgUrl = bgJson.result?.url || bgJson.result?.image || bgJson.result || bgJson.url || bgJson.data
-    if (typeof bgUrl === 'object') bgUrl = bgUrl.url || bgUrl.image
-    if (!bgUrl?.startsWith('http')) throw new Error('Removebg no devolvió link')
+    const bgJson = await fetch(`https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(hdLink)}`).then(r => r.json())
+    console.log(bgJson)
 
-    const r2 = await axios.get(bgUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
-    const finalBuffer = Buffer.from(r2.data)
+    const parsedBG = getBufferFromJson(bgJson)
+    if (!parsedBG) throw new Error('Removebg json vacío: ' + JSON.stringify(bgJson).slice(0,200))
 
-    const cap = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: HDv2 + Removebg\n‧˚꒰🌼୭ HD: ${hdBuffer? (hdBuffer.length/1024/1024).toFixed(2)+' MB' : 'omitido'}\n‧˚꒰🌼୭ Final: ${(finalBuffer.length/1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Fondo eliminado en HD`
+    let finalBuffer
+    if (parsedBG.isUrl) {
+      const r2 = await axios.get(parsedBG.data, { responseType: 'arraybuffer' })
+      finalBuffer = Buffer.from(r2.data)
+    } else {
+      finalBuffer = parsedBG.data
+    }
+
+    const cap = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: HDv2 + Removebg (JSON)\n‧˚꒰🌼୭ Final: ${(finalBuffer.length/1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯`
 
     await conn.sendMessage(m.chat, { image: finalBuffer, caption: cap }, { quoted: m })
     await conn.sendMessage(m.chat, { document: finalBuffer, mimetype: 'image/png', fileName: `hd-removebg-lux.png` }, { quoted: m })
