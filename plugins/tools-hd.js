@@ -39,7 +39,7 @@ async function buildContact(m, conn) {
   }
 }
 
-let handler = async (m, { conn, text, command }) => {
+let handler = async (m, { conn, text }) => {
   const fkontak = await buildContact(m, conn)
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
@@ -47,7 +47,7 @@ let handler = async (m, { conn, text, command }) => {
 
   if (!/image/.test(mime) &&!link) {
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen\n\n‧˚꒰🌼୭ Comandos:\n.hdv4 - HD v4 (mejor)\n.hdv3 - HD v3\n.hdv2 - HD v2\n.superhd - Super HD` }, { quoted: fkontak })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen para mejorar en HD\n\n‧˚꒰🌼୭ Ejemplo:.hd (respondiendo a imagen)` }, { quoted: fkontak })
   }
 
   try {
@@ -58,41 +58,19 @@ let handler = async (m, { conn, text, command }) => {
       link = await uploadEvogb(media)
     }
 
-    // Definir endpoint según comando
-    let apiUrl = ''
-    let tipo = ''
-    const cmd = command.toLowerCase()
+    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en HD...` }, { quoted: fkontak })
 
-    if (cmd === 'hdv4' || cmd === 'hd4' || cmd === 'hd') {
-      apiUrl = `https://api-faa.my.id/faa/hdv4?image=${encodeURIComponent(link)}`
-      tipo = 'HDv4'
-    } else if (cmd === 'hdv3' || cmd === 'hd3') {
-      apiUrl = `https://api-faa.my.id/faa/hdv3?image=${encodeURIComponent(link)}`
-      tipo = 'HDv3'
-    } else if (cmd === 'hdv2' || cmd === 'hd2') {
-      apiUrl = `https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`
-      tipo = 'HDv2'
-    } else if (cmd === 'superhd' || cmd === 'shd') {
-      apiUrl = `https://api-faa.my.id/faa/superhd?url=${encodeURIComponent(link)}`
-      tipo = 'SuperHD'
-    } else {
-      apiUrl = `https://api-faa.my.id/faa/hdv4?image=${encodeURIComponent(link)}`
-      tipo = 'HDv4'
-    }
-
-    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en ${tipo}...\n꒰🌐꒱ API: ${apiUrl.split('?')[0]}` }, { quoted: fkontak })
-
+    const apiUrl = `https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`
     const j = await fetch(apiUrl).then(r => r.json())
-    console.log(`${tipo} response:`, j)
 
-    let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data || j.resultUrl
+    let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data
     if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.image
-    if (!resultUrl?.startsWith('http')) throw new Error(`${tipo} no devolvió link: ${JSON.stringify(j).slice(0,300)}`)
+    if (!resultUrl?.startsWith('http')) throw new Error('API hdv2 no devolvió link: ' + JSON.stringify(j).slice(0,300))
 
     const res = await axios.get(resultUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
     const buffer = Buffer.from(res.data)
 
-    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰📈꒱────╮\n‧˚꒰🌼୭ Tipo: ${tipo}\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024 / 1024).toFixed(2)} MB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Imagen mejorada en ${tipo}`
+    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰📈꒱────╮\n‧˚꒰🌼୭ Tipo: HDv2\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024 / 1024).toFixed(2)} MB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Imagen mejorada en HD`
 
     await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: fkontak })
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
@@ -104,8 +82,8 @@ let handler = async (m, { conn, text, command }) => {
   }
 }
 
-handler.command = ['hdv4', 'hdv3', 'hdv2', 'superhd', 'hd', 'hd4', 'hd3', 'hd2', 'shd']
+handler.command = ['hd']
 handler.tags = ['tools']
-handler.help = ['hdv4', 'hdv3', 'hdv2', 'superhd']
+handler.help = ['hd']
 handler.group = true
 export default handler
