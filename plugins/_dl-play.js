@@ -1,169 +1,164 @@
-import fetch from "node-fetch"
+import fetch from 'node-fetch'
+import axios from 'axios'
+import fs from 'fs'
 import yts from 'yt-search'
-import moment from 'moment-timezone'
-moment.locale('es')
 
-const react = async (conn, m, text) => {
-  try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
+const isUrl = (text) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/[^\s]+$/i.test(text)
+const MAX_BYTES = 50 * 1024 * 1024
+const MAX_DURATION = 10 * 60
+
+async function buildContact(m, conn) {
+  let thumb = null
+  try {
+    const ppUrl = await conn.profilePictureUrl(m.sender, 'image')
+    if (ppUrl) {
+      const res = await axios.get(ppUrl, { responseType: 'arraybuffer' })
+      thumb = Buffer.from(res.data, 'binary')
+    }
+  } catch {
+    try { thumb = fs.readFileSync('./src/logo.jpg') } catch { thumb = null }
+  }
+  return {
+    key: { fromMe: false, participant: '0@s.whatsapp.net' },
+    message: {
+      contactMessage: {
+        displayName: m.pushName || 'Usuario',
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${m.pushName || 'Usuario'};;;\nFN:${m.pushName || 'Usuario'}\nitem1.TEL;waid=${(m.sender || '').replace(/[^0-9]/g, '')}:${m.sender || ''}\nitem1.X-ABLabel:Cel\nEND:VCARD`,
+        jpegThumbnail: thumb || null
+      }
+    }
+  }
 }
 
-const handler = async (m, { conn, text, usedPrefix, command }) => {
-    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const ownerNum = global.owner?.[0]?.[0] || '51927174369'
+async function getSize(url) {
+  if (!url) return 0
+  try {
+    const res = await axios.head(url, { timeout: 5000, maxRedirects: 5, headers: { 'User-Agent': 'Mozilla/5.0' } })
+    let size = parseInt(res.headers['content-length'] || '0', 10)
+    if (!size || isNaN(size)) {
+      const resGet = await axios.get(url, { headers: { Range: 'bytes=0-0', 'User-Agent': 'Mozilla/5.0' }, timeout: 5000, maxRedirects: 5 })
+      const contentRange = resGet.headers['content-range']
+      if (contentRange) size = parseInt(contentRange.split('/')[1] || '0', 10)
+    }
+    return isNaN(size)? 0 : size
+  } catch { return 0 }
+}
 
-    try {
-        if (!text.trim()) {
-            let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+function formatSize(bytes) {
+  if (!bytes || bytes <= 0) return 'Desconocido'
+  const mb = bytes / (1024 * 1024)
+  if (mb >= 1024) return `${(mb / 1024).toFixed(2)} GB`
+  return `${mb.toFixed(2)} MB`
+}
 
-⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ ${command.toUpperCase()} ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
+function getDurationSeconds(value) {
+  if (typeof value === 'number') return value
+  if (!value) return 0
+  if (typeof value === 'string') {
+    if (/^\d+$/.test(value)) return Number(value)
+    const parts = value.split(':').map(Number)
+    if (parts.some(isNaN)) return 0
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2]
+    if (parts.length === 2) return parts[0] * 60 + parts[1]
+    if (parts.length === 1) return parts[0]
+  }
+  return 0
+}
 
-  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
-🎵 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Buscando música como Garfield busca su lasaña a las 3AM"*
+async function downloadWithApi(link, isAudio) {
+  const endpoint = isAudio? `${api.url2}/download/ytmp3` : `${api.url2}/download/ytmp4`
+  const downloadApiUrl = isAudio? `${endpoint}?url=${encodeURIComponent(link)}` : `${endpoint}?url=${encodeURIComponent(link)}&format=360p`
+  try {
+    const res = await fetch(downloadApiUrl)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const json = await res.json()
+    if (json.status && json.data?.download) return { data: json.data, downloadUrl: json.data.download }
+  } catch {}
+  const fallbackUrl = isAudio? `${api.url3}/faa/ytmp3?url=${encodeURIComponent(link)}` : `${api.url3}/faa/ytmp4?url=${encodeURIComponent(link)}`
+  const fallbackRes = await fetch(fallbackUrl)
+  if (!fallbackRes.ok) throw new Error(`HTTP ${fallbackRes.status}`)
+  const fallbackJson = await fallbackRes.json()
+  if (!fallbackJson.status ||!fallbackJson.result) throw new Error('Fallback API failed')
+  const result = fallbackJson.result
+  const downloadUrl = isAudio? result.mp3 : result.download_url
+  if (!downloadUrl) throw new Error('No download URL')
+  return { data: { title: result.title, thumbnail: result.thumbnail, duration: result.duration, download: downloadUrl }, downloadUrl }
+}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
+const handler = async (m, { conn, command, text }) => {
+  const fkontak = await buildContact(m, conn)
+  if (!text) {
+    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Ingresa el nombre o link de YouTube, preciosa` }, { quoted: fkontak })
+  }
+  try {
+    await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } })
+    let link = text
+    let selectedItem = null
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
-🎵 ➛ Busca y descarga música de YouTube
-🎵 ➛ Envía el audio en MP3
-😼 ➛ Garfield DJ en la casa
-
-── *📖 USO* ╏ 🍕
-➛.*${command}* <nombre de canción>
-➛.*${command}* <link de YouTube>
-
-── *💡 EJEMPLOS* ╏ 🍕
-➛.*play* despacito
-➛.*play* https://youtu.be/dQw4w9WgXcQ
-
-── *⏱️ LÍMITE* ╏ 🍕
-📦 ➛ Máx duración: *30 minutos*
-🍝 ➛ Como una siesta corta de Garfield
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-*Owner*: @${ownerNum}
-━━━━━━━━━━━`
-            return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
+    if (!isUrl(text)) {
+      const search = await yts(text)
+      if (!search.videos?.length) {
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+        return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ No se encontró coincidencia` }, { quoted: fkontak })
+      }
+      selectedItem = search.videos.find(v => {
+        const s = getDurationSeconds(v.seconds || v.timestamp)
+        return s > 0 && s <= MAX_DURATION
+      })
+      if (!selectedItem) {
+        await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+        return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Supera los 10 min` }, { quoted: fkontak })
+      }
+      link = selectedItem.url
+      const caption = `‧˚꒰👛୭ *_𝐘𝐎𝐔𝐓𝐔𝐁𝐄 𝐃𝐋_*\n*𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎*\n\n╭───INFO ꒰🎧꒱────╮\n‧˚꒰🌼୭ Título: ${selectedItem.title}\n‧˚꒰🌼୭ Canal: ${selectedItem.author?.name || 'Desconocido'}\n‧˚꒰🌼୭ Duración: ${selectedItem.timestamp}\n‧˚꒰🌼୭ Link: ${link}\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Enviando...`.trim()
+      if (selectedItem.thumbnail) {
+        try {
+          const thumbRes = await fetch(selectedItem.thumbnail)
+          const thumb = await thumbRes.buffer()
+          await conn.sendMessage(m.chat, { image: thumb, caption }, { quoted: fkontak })
+        } catch {
+          await conn.sendMessage(m.chat, { text: caption }, { quoted: fkontak })
         }
-
-        await react(conn, m, '🔍')
-        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` 🔍 —˙𖦹.꒷
-
-── *📊 ESTADO* ╏ 🍕
-🔍 ➛ Buscando canción...
-📥 ➛ Obteniendo información...
-⬇️ ➛ Preparando descarga...
-😼 ➛ Garfield afinando oídos...
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`)
-
-        const videoMatch = text.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/))([a-zA-Z0-9_-]{11})/)
-        const query = videoMatch? 'https://youtu.be/' + videoMatch[1] : text
-        const search = await yts(query)
-        const result = videoMatch? search.videos.find(v => v.videoId === videoMatch[1]) || search.all[0] : search.all[0]
-        if (!result) throw new Error('No se encontraron resultados.')
-
-        const { title, thumbnail, timestamp, views, videoId, author, seconds } = result
-        if (seconds > 1800) throw new Error('El contenido supera el límite de duración de 30 minutos.')
-
-        const vistas = formatViews(views)
-        const canal = author.name
-        const shortUrl = `https://youtu.be/${videoId}`
-        const thumb = (await conn.getFile(thumbnail)).data
-
-        const [_, mediaUrl] = await Promise.all([
-            conn.sendMessage(m.chat, {
-                image: thumb,
-                caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎵 —˙𖦹.꒷
-
-── *📊 INFORMACIÓN* ╏ 🍕
-📌 ➛ Título: *${title}*
-👤 ➛ Canal: *${canal}*
-👁️ ➛ Vistas: *${vistas}*
-⏱️ ➛ Duración: *${timestamp}*
-🔗 ➛ Link: ${shortUrl}
-😼 ➛ Encontrado por Garfield
-
-── *📥 DESCARGA* ╏ 🍕
-⬇️ ➛ Enviando audio...
-🍝 ➛ Preparando tu lasaña musical...
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-            }, { quoted: m }),
-            getMediaUrl(shortUrl)
-        ])
-
-        if (!mediaUrl) throw new Error('No se pudo obtener el audio.')
-
-        await react(conn, m, '📥')
-        await conn.sendMessage(m.chat, {
-            audio: { url: mediaUrl },
-            fileName: `${title}.mp3`,
-            mimetype: 'audio/mpeg'
-        }, { quoted: m })
-
-        await react(conn, m, '✅')
-
-    } catch (e) {
-        await react(conn, m, '❌')
-        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        let menuErr = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
-
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
-
-── *📝 DESCRIPCIÓN* ╏ 🍕
-❌ ➛ ${e.message}
-😴 ➛ Garfield se durmió buscando
-
-── *💡 SOLUCIÓN* ╏ 🍕
-🔧 ➛ Usa un nombre o link válido
-🔧 ➛ Máx 30 minutos de duración
-🍕 ➛ Intenta con otro sabor de lasaña
-
-━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-━━━━━━━━━━━`
-        return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
+      } else {
+        await conn.sendMessage(m.chat, { text: caption }, { quoted: fkontak })
+      }
+    } else {
+      try {
+        const search = await yts(text)
+        const video = search.videos?.find(item => item.url === text) || search.videos?.[0]
+        if (!video) throw new Error()
+        const seconds = getDurationSeconds(video.seconds || video.timestamp)
+        if (!seconds || seconds > MAX_DURATION) throw new Error()
+        selectedItem = video
+      } catch {
+        return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Supera el límite` }, { quoted: fkontak })
+      }
     }
-}
 
-async function getMediaUrl(url) {
-    try {
-        const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
-        return res.data?.download || null
-    } catch {
-        return null
+    const isAudio = command == 'play'
+    const { data, downloadUrl } = await downloadWithApi(link, isAudio)
+    const size = await getSize(downloadUrl)
+    if (size > MAX_BYTES) {
+      return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Pesa mucho: ${formatSize(size)}` }, { quoted: fkontak })
     }
+
+    const cleanTitle = (data.title || selectedItem?.title || 'descarga').replace(/[^\w\s-]/gi, '').trim()
+    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+
+    if (isAudio) {
+      return conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg', fileName: `${cleanTitle}.mp3` }, { quoted: fkontak })
+    }
+    return conn.sendMessage(m.chat, { video: { url: downloadUrl }, mimetype: 'video/mp4', fileName: `${cleanTitle}.mp4` }, { quoted: fkontak })
+
+  } catch (e) {
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error, intenta de nuevo` }, { quoted: fkontak })
+  }
 }
 
-function formatViews(views) {
-    if (views === undefined) return "No disponible"
-    if (views >= 1_000_000_000) return `${(views / 1_000_000_000).toFixed(1)}B`
-    if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1)}M`
-    if (views >= 1_000) return `${(views / 1_000).toFixed(1)}k`
-    return views.toString()
-}
-
-handler.command = handler.help = ['play', 'yta', 'ytmp3', 'playaudio', 'ytaudio']
+handler.command = ['play', 'play2']
 handler.tags = ['descargas']
+handler.help = ['play', 'play2']
 handler.group = true
 export default handler
