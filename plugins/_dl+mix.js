@@ -15,6 +15,8 @@ async function myCloud(content) {
   return await response.json()
 }
 
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+
 let handler = async (m, { conn, text }) => {
   let link = text?.trim()
   let q = m.quoted? m.quoted : m
@@ -34,31 +36,56 @@ let handler = async (m, { conn, text }) => {
 
     const apiUrl = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(link)}`
 
-    const j = await fetch(apiUrl).then(r => r.json())
-    console.log('HDVID RESPONSE:', j)
-
-    if (!j.status &&!j.result) throw new Error('API FAA no devolvió resultado')
-
-    let resultUrl = j.result?.url || j.result?.video || j.result?.hd || j.result || j.url || j.data
-    if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.video
-
-    if (!resultUrl ||!resultUrl.startsWith('http')) {
-      throw new Error('API no devolvió link válido: ' + JSON.stringify(j).slice(0,300))
+    let j = null
+    for (let i = 0; i < 3; i++) {
+      try {
+        const r = await fetch(apiUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        })
+        if (r.status === 429) {
+          await sleep(3000 * (i+1))
+          continue
+        }
+        j = await r.json()
+        break
+      } catch { await sleep(2000) }
     }
 
-    const res = await axios.get(resultUrl, { responseType: 'arraybuffer' })
-    const buffer = Buffer.from(res.data)
+    if (!j) throw new Error('API con limite 429, espera 1 min')
+    console.log('HDVID:', j)
 
-    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ 📈 *HD VIDEO*\n│ 🔌 API: FAA-BOT\n│ 🔗 Origen: ${link}\n│ 🎬 Calidad mejorada\n│\n╰─〔 🌸 Listo 〕─╯`
+    let resultUrl = j.result?.url || j.result?.video || j.result || j.url
+    if (typeof resultUrl === 'object') resultUrl = resultUrl.url
+    if (!resultUrl?.startsWith('http')) throw new Error('Sin link HD: ' + JSON.stringify(j).slice(0,200))
+
+    // Descargar con reintento
+    let buffer = null
+    for (let i = 0; i < 3; i++) {
+      try {
+        const res = await axios.get(resultUrl, {
+          responseType: 'arraybuffer',
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        })
+        buffer = Buffer.from(res.data)
+        break
+      } catch (e) {
+        if (e.response?.status === 429) await sleep(3000)
+        else throw e
+      }
+    }
+
+    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│ 📈 HD VIDEO\n│ 🔌 API: FAA-BOT\n│ 🎬 Mejorado\n╰─〔 🌸 〕─╯`
 
     await conn.sendMessage(m.chat, { video: buffer, mimetype: 'video/mp4', fileName: `hdvid-lux.mp4`, caption: cap }, { quoted: m })
 
   } catch (e) {
     console.log(e)
+    if (e.message.includes('429')) {
+      return conn.reply(m.chat, `╭─〔 ⏳ Limite 〕─╮\n│ La API FAA está saturada (429)\n│ Espera 1-2 min y vuelve a intentar\n╰──────────╯`, m)
+    }
     conn.reply(m.chat, `╭─〔 ❌ Error 〕─╮\n│ ${e.message}\n╰──────────╯`, m)
   }
 }
 
 handler.command = ['hdvid', 'hdvideo', 'mejorar']
-handler.tags = ['tools']
 export default handler
