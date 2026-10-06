@@ -1,0 +1,53 @@
+let handler = async (m, { conn, usedPrefix, command }) => {
+    if (!m.isGroup) return m.reply(`‧˚꒰👛୭ *_𝐑 𝐔 𝐋 𝐄 𝐓 𝐀_*\n\n꒰🍧꒱ Solo en grupos preciosa`)
+
+    let groupMetadata = await conn.groupMetadata(m.chat)
+    let participants = groupMetadata.participants
+    let botNumber = conn.user.jid
+    
+    let botIsAdmin = participants.find(p => p.id === botNumber)?.admin
+    if (!botIsAdmin) return m.reply(`‧˚꒰👛୭ *_𝐄 𝐑 𝐑 𝐎 𝐑_*\n\n꒰🍧꒱ Necesito ser admin`)
+
+    let userIsAdmin = participants.find(p => p.id === m.sender)?.admin
+    if (!userIsAdmin) return m.reply(`‧˚꒰👛୭ *_𝐄 𝐑 𝐑 𝐎 𝐑_*\n\n꒰🍧꒱ Solo admins pueden usar esto`)
+
+    // Filtrar candidatos (que no sean admins ni el bot)
+    let candidates = participants.filter(p => !p.admin && p.id !== botNumber)
+    if (!candidates.length) return m.reply(`‧˚꒰👛୭ *_𝐑 𝐔 𝐋 𝐄 𝐓 𝐀_*\n\n꒰🍧꒱ No hay víctimas disponibles, todos son admins`)
+
+    let victim = candidates[Math.floor(Math.random() * candidates.length)]
+
+    await conn.sendMessage(m.chat, { 
+        text: 
+`‧˚꒰👛୭ *_𝐑 𝐔 𝐋 𝐄 𝐓 𝐀 𝐁 𝐀 𝐍_*
+
+╭───GIRANDO ꒰🎰꒱────╮
+‧˚꒰🌼୭ Eligiendo víctima...
+‧˚꒰🌼୭ Participantes: ${candidates.length}
+╰─────── ݁ ˖Ი𐑼⋆────╯
+
+꒰🍧꒱ La ruleta eligió a @${victim.id.split('@')[0]} 💥
+
+*¡ADIOS PRECIOSA!*`,
+        mentions: [victim.id]
+    })
+
+    await new Promise(r => setTimeout(r, 1500))
+
+    try {
+        await conn.groupParticipantsUpdate(m.chat, [victim.id], 'remove')
+        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+    } catch (e) {
+        console.error(e)
+        m.reply(`‧˚꒰👛୭ *_𝐄 𝐑 𝐑 𝐎 𝐑_*\n\n꒰🍧꒱ No pude expulsar a @${victim.id.split('@')[0]}`, null, { mentions: [victim.id] })
+    }
+}
+
+handler.help = ['ruletaban']
+handler.tags = ['group']
+handler.command = /^(ruletaban|ruletab)$/i
+handler.group = true
+handler.admin = true
+handler.botAdmin = true
+
+export default handler
