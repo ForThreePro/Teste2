@@ -4,22 +4,23 @@ let handler = async (m, { conn }) => {
     let botNumber = conn.user.jid
 
     let candidates = participants.filter(p => !p.admin && p.id !== botNumber)
-    if (!candidates.length) return m.reply(`‧˚꒰👛୭ *_𝐑 𝐔 𝐋 𝐄 𝐓 𝐀_*\n\n꒰🍧꒱ No hay víctimas, todos son admins`)
+    if (!candidates.length) return m.reply(`‧˚꒰🐱୭ *_𝐆𝐀𝐑𝐅𝐈𝐄𝐋𝐃 𝐗 𝐋𝐔𝐗_*\n\n꒰🍝꒱ No hay víctimas, todos son admins 😾`)
 
     let victim = candidates[Math.floor(Math.random() * candidates.length)]
 
     await conn.sendMessage(m.chat, { 
         text: 
-`‧˚꒰👛୭ *_𝐑 𝐔 𝐋 𝐄 𝐓 𝐀 𝐁 𝐀 𝐍_*
+`‧˚꒰🐱୭ *_𝐑 𝐔 𝐋 𝐄 𝐓 𝐀 𝐁 𝐀 𝐍_*
+*𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎*
 
 ╭───GIRANDO ꒰🎰꒱────╮
-‧˚꒰🌼୭ Eligiendo víctima...
-‧˚꒰🌼୭ Participantes: ${candidates.length}
+‧˚꒰🍝୭ Eligiendo víctima...
+‧˚꒰😼୭ Participantes: ${candidates.length}
 ╰─────── ݁ ˖Ი𐑼⋆────╯
 
-꒰🍧꒱ La ruleta eligió a @${victim.id.split('@')[0]} 💥
+꒰🐾꒱ La ruleta eligió a @${victim.id.split('@')[0]} 💥
 
-*¡ADIOS PRECIOSA!*`,
+*¡GARFIELD SE COMIÓ TU LASAÑA!* 🍕`,
         mentions: [victim.id]
     })
 
@@ -27,9 +28,9 @@ let handler = async (m, { conn }) => {
 
     try {
         await conn.groupParticipantsUpdate(m.chat, [victim.id], 'remove')
-        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+        await conn.sendMessage(m.chat, { react: { text: '🐱', key: m.key } })
     } catch (e) {
-        m.reply(`‧˚꒰👛୭ *_𝐄 𝐑 𝐑 𝐎 𝐑_*\n\n꒰🍧꒱ No pude expulsar a @${victim.id.split('@')[0]}`, null, { mentions: [victim.id] })
+        m.reply(`‧˚꒰🐱୭ *_𝐆𝐀𝐑𝐅𝐈𝐄𝐋𝐃 𝐗 𝐋𝐔𝐗_*\n\n꒰🍝꒱ No pude expulsar a @${victim.id.split('@')[0]} 😿`, null, { mentions: [victim.id] })
     }
 }
 
