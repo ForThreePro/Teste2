@@ -1,48 +1,46 @@
+import crypto from "crypto"
+import { FormData, Blob } from "formdata-node"
+import { fileTypeFromBuffer } from "file-type"
 import fetch from 'node-fetch'
 import axios from 'axios'
-import FormData from 'form-data'
 
-async function uploadToCatbox(buffer, name = 'video.mp4') {
-  const form = new FormData()
-  form.append('reqtype', 'fileupload')
-  form.append('fileToUpload', buffer, name)
-  const res = await axios.post('https://catbox.moe/user/api.php', form, { headers: form.getHeaders() })
-  return res.data
+async function myCloud(content) {
+  const fileType = await fileTypeFromBuffer(content)
+  const ext = fileType?.ext || 'bin'
+  const mime = fileType?.mime || 'application/octet-stream'
+  const formData = new FormData()
+  formData.append("file", new Blob([content], { type: mime }), `${crypto.randomBytes(5).toString("hex")}.${ext}`)
+  const response = await fetch("https://evogb.win/api/upload", { method: "POST", body: formData })
+  if (!response.ok) throw new Error('Error en evogb')
+  return await response.json()
 }
 
-const handler = async (m, { conn, text }) => {
-  let videoUrl = text?.trim()
-  const q = m.quoted ? m.quoted : m
-  const mime = (q.msg || q).mimetype || ''
+let handler = async (m, { conn, text }) => {
+  let link = text?.trim()
+  let q = m.quoted? m.quoted : m
+  let mime = (q.msg || q).mimetype || ''
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '📈', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
 
-    if (/video/.test(mime) && !videoUrl) {
-      conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│  ⏳ Subiendo video...\n╰────────────────╯`, m)
-      const buff = await q.download()
-      videoUrl = await uploadToCatbox(buff, 'input.mp4')
+    // Si responde a imagen, primero subir a evogb
+    if (/image/.test(mime) &&!link) {
+      await conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│ ⏳ Subiendo a evogb.win...\n╰────────────────╯`, m)
+      let media = await q.download()
+      let up = await myCloud(media)
+      link = up.url
     }
 
-    if (!videoUrl) return conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│  🎬 Responde a un video\n│  o usa: .hdvid https://link.mp4\n│\n╰────────────────╯`, m)
+    if (!link) return conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ 🖼️ Usa:\n│.removebg https://link.jpg\n│ o responde a una imagen\n│\n╰────────────────╯`, m)
 
-    const apiUrl = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(videoUrl)}`
-    const j = await fetch(apiUrl).then(r => r.json()).catch(() => null)
-
-    // Si la API devuelve json con link
-    let finalUrl = j?.result?.url || j?.result || j?.url || apiUrl
-    if (typeof finalUrl !== 'string' || !finalUrl.startsWith('http')) finalUrl = apiUrl
-
-    const res = await axios.get(finalUrl, { responseType: 'arraybuffer' }).catch(async () => {
-      // si falla, prueba directo con la api como buffer
-      return await axios.get(apiUrl, { responseType: 'arraybuffer' })
-    })
-    
+    const apiUrl = `https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(link)}`
+    const res = await axios.get(apiUrl, { responseType: 'arraybuffer' })
     const buffer = Buffer.from(res.data)
 
-    const caption = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│  📈 *HD VIDEO*\n│  🔌 API: FAA-BOT\n│  🎬 Calidad mejorada a HD\n│\n╰─〔 🌸 Listo 〕─╯`
+    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ ✨ *REMOVEBG*\n│ 🔗 Origen: ${link}\n│ 🔌 API: FAA-BOT\n│ 🖥️ Host: evogb.win\n│\n╰─〔 🌸 Fondo eliminado 〕─╯`
 
-    return conn.sendMessage(m.chat, { video: buffer, mimetype: 'video/mp4', fileName: `hd-lux.mp4`, caption }, { quoted: m })
+    await conn.sendMessage(m.chat, { image: buffer, caption: cap }, { quoted: m })
+    await conn.sendMessage(m.chat, { document: buffer, mimetype: 'image/png', fileName: `removebg-lux.png` }, { quoted: m })
 
   } catch (e) {
     console.log(e)
@@ -50,6 +48,6 @@ const handler = async (m, { conn, text }) => {
   }
 }
 
-handler.command = ['hdvid', 'hdvideo', 'mejorar', 'remini']
+handler.command = ['removebg', 'nobg']
 handler.tags = ['tools']
 export default handler
