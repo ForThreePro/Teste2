@@ -21,7 +21,7 @@ let handler = async (m, { conn, text }) => {
   let link = text?.trim()
 
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen para HD\n\n‧˚꒰🌼୭ Ejemplo:.hd` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen para mejorar en HD\n\n‧˚꒰🌼୭ Ejemplo:.hd (respondiendo a imagen)` }, { quoted: m })
   }
 
   try {
@@ -32,23 +32,26 @@ let handler = async (m, { conn, text }) => {
       link = await uploadEvogb(media)
     }
 
-    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en HDv2...` }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en HD...` }, { quoted: m })
 
     const apiUrl = `https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`
     const j = await fetch(apiUrl).then(r => r.json())
-    console.log(j)
 
     let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data
     if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.image
-    if (!resultUrl?.startsWith('http')) throw new Error('API no devolvió link: ' + JSON.stringify(j).slice(0,200))
+    if (!resultUrl?.startsWith('http')) throw new Error('API hdv2 no devolvió link: ' + JSON.stringify(j).slice(0,300))
 
-    const res = await axios.get(resultUrl, { responseType: 'arraybuffer' })
+    const res = await axios.get(resultUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
     const buffer = Buffer.from(res.data)
 
-    await conn.sendMessage(m.chat, { image: buffer, caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ HDv2 listo • ${(buffer.length/1024/1024).toFixed(2)} MB` }, { quoted: m })
+    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰📈꒱────╮\n‧˚꒰🌼୭ Tipo: HDv2\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024 / 1024).toFixed(2)} MB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Imagen mejorada en HD`
+
+    await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: m })
+    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
 
   } catch (e) {
     console.error(e)
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
     return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: m })
   }
 }
@@ -56,4 +59,5 @@ let handler = async (m, { conn, text }) => {
 handler.command = ['hd']
 handler.tags = ['tools']
 handler.help = ['hd']
+handler.group = true
 export default handler
