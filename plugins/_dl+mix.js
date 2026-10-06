@@ -21,26 +21,38 @@ let handler = async (m, { conn, text }) => {
   let mime = (q.msg || q).mimetype || ''
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '📈', key: m.key } })
 
-    // Si responde a imagen, primero subir a evogb
-    if (/image/.test(mime) &&!link) {
+    if (/video/.test(mime) &&!link) {
       await conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│ ⏳ Subiendo a evogb.win...\n╰────────────────╯`, m)
       let media = await q.download()
       let up = await myCloud(media)
       link = up.url
     }
 
-    if (!link) return conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ 🖼️ Usa:\n│.removebg https://link.jpg\n│ o responde a una imagen\n│\n╰────────────────╯`, m)
+    if (!link) return conn.reply(m.chat, `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ 🎬 Usa:\n│.hdvid https://link.mp4\n│ o responde a un video\n│\n╰────────────────╯`, m)
 
-    const apiUrl = `https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(link)}`
-    const res = await axios.get(apiUrl, { responseType: 'arraybuffer' })
-    const buffer = Buffer.from(res.data)
+    const apiUrl = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(link)}`
 
-    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ ✨ *REMOVEBG*\n│ 🔗 Origen: ${link}\n│ 🔌 API: FAA-BOT\n│ 🖥️ Host: evogb.win\n│\n╰─〔 🌸 Fondo eliminado 〕─╯`
+    // La API puede devolver el video directo o json
+    let buffer
+    try {
+      const j = await fetch(apiUrl).then(r => r.json())
+      const finalUrl = j?.result?.url || j?.result || j?.url
+      if (finalUrl && finalUrl.startsWith('http')) {
+        const r = await axios.get(finalUrl, { responseType: 'arraybuffer' })
+        buffer = Buffer.from(r.data)
+      } else {
+        throw new Error('no json')
+      }
+    } catch {
+      const r = await axios.get(apiUrl, { responseType: 'arraybuffer' })
+      buffer = Buffer.from(r.data)
+    }
 
-    await conn.sendMessage(m.chat, { image: buffer, caption: cap }, { quoted: m })
-    await conn.sendMessage(m.chat, { document: buffer, mimetype: 'image/png', fileName: `removebg-lux.png` }, { quoted: m })
+    const cap = `╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮\n│\n│ 📈 *HD VID*\n│ 🔗 Origen: ${link}\n│ 🔌 API: FAA-BOT\n│ 🖥️ Host: evogb.win\n│ 🎬 Mejorado a HD\n│\n╰─〔 🌸 Listo 〕─╯`
+
+    await conn.sendMessage(m.chat, { video: buffer, mimetype: 'video/mp4', fileName: `hdvid-lux.mp4`, caption: cap }, { quoted: m })
 
   } catch (e) {
     console.log(e)
@@ -48,6 +60,6 @@ let handler = async (m, { conn, text }) => {
   }
 }
 
-handler.command = ['removebg', 'nobg']
+handler.command = ['hdvid', 'hdvideo', 'mejorar']
 handler.tags = ['tools']
 export default handler
