@@ -4,7 +4,7 @@ import fs from 'fs'
 import yts from 'yt-search'
 
 const isUrl = (text) => /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/[^\s]+$/i.test(text)
-const MAX_BYTES = 50 * 1024 * 1024
+const MAX_BYTES = 80 * 1024 * 1024
 const MAX_DURATION = 10 * 60
 
 const api = {
@@ -54,20 +54,14 @@ async function downloadWithApi(link, isAudio) {
     const endpoint = isAudio? `${api.url2}/download/ytmp3?url=${encodeURIComponent(link)}` : `${api.url2}/download/ytmp4?url=${encodeURIComponent(link)}&format=360p`
     const res = await fetch(endpoint)
     const json = await res.json()
-    if (json.status && json.data?.download) {
-      return { title: json.data.title, downloadUrl: json.data.download, usedApi: 'Delirius' }
-    }
-  } catch (e) { console.log('delirius fail', e.message) }
-
+    if (json.status && json.data?.download) return { title: json.data.title, downloadUrl: json.data.download, usedApi: 'Delirius' }
+  } catch {}
   try {
     const fallbackUrl = isAudio? `${api.url3}/faa/ytmp3?url=${encodeURIComponent(link)}` : `${api.url3}/faa/ytmp4?url=${encodeURIComponent(link)}`
     const res = await fetch(fallbackUrl)
     const json = await res.json()
-    if (json.status && json.result) {
-      return { title: json.result.title, downloadUrl: isAudio? json.result.mp3 : json.result.download_url, usedApi: 'FAA' }
-    }
-  } catch (e) { console.log('faa fail', e.message) }
-
+    if (json.status && json.result) return { title: json.result.title, downloadUrl: isAudio? json.result.mp3 : json.result.download_url, usedApi: 'FAA' }
+  } catch {}
   throw new Error('Las 2 APIs fallaron')
 }
 
@@ -75,7 +69,7 @@ const handler = async (m, { conn, command, text }) => {
   const fkontak = await buildContact(m, conn)
   if (!text) {
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Ingresa el nombre o link, preciosa` }, { quoted: fkontak })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Ingresa nombre o link, preciosa` }, { quoted: fkontak })
   }
   try {
     await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } })
@@ -90,17 +84,13 @@ const handler = async (m, { conn, command, text }) => {
         return s > 0 && s <= MAX_DURATION
       }) || search.videos[0]
       link = selectedItem.url
-
-      const captionSearch = `‧˚꒰👛୭ *_𝐘𝐎𝐔𝐓𝐔𝐁𝐄 𝐃𝐋_*\n*𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎*\n\n╭───INFO ꒰🎧꒱────╮\n‧˚꒰🌼୭ Título: ${selectedItem.title}\n‧˚꒰🌼୭ Canal: ${selectedItem.author?.name}\n‧˚꒰🌼୭ Duración: ${selectedItem.timestamp}\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Descargando...`.trim()
-
+      const caption = `‧˚꒰👛୭ *_𝐘𝐎𝐔𝐓𝐔𝐁𝐄 𝐃𝐋_*\n*𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎*\n\n╭───INFO ꒰🎧꒱────╮\n‧˚꒰🌼୭ Título: ${selectedItem.title}\n‧˚꒰🌼୭ Canal: ${selectedItem.author?.name}\n‧˚꒰🌼୭ Duración: ${selectedItem.timestamp}\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Descargando...`.trim()
       if (selectedItem.thumbnail) {
         try {
           const r = await fetch(selectedItem.thumbnail)
           const img = Buffer.from(await r.arrayBuffer())
-          await conn.sendMessage(m.chat, { image: img, caption: captionSearch }, { quoted: fkontak })
-        } catch {
-          await conn.sendMessage(m.chat, { text: captionSearch }, { quoted: fkontak })
-        }
+          await conn.sendMessage(m.chat, { image: img, caption }, { quoted: fkontak })
+        } catch { await conn.sendMessage(m.chat, { text: caption }, { quoted: fkontak }) }
       }
     } else {
       const search = await yts(text)
@@ -117,20 +107,23 @@ const handler = async (m, { conn, command, text }) => {
     const cleanTitle = (title || selectedItem?.title || 'lux').replace(/[^\w\s-]/gi, '').trim()
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
 
-    // Texto que dice que API se usó
     const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🌼୭ Título: ${cleanTitle}\n꒰🔌୭ API usada: *${usedApi}*\n꒰⚖️୭ Tamaño: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
 
     if (command === 'play') {
       await conn.sendMessage(m.chat, { text: apiText }, { quoted: fkontak })
-      return conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mpeg', fileName: `${cleanTitle}.mp3` }, { quoted: fkontak })
+      return conn.sendMessage(m.chat, {
+        audio: buffer,
+        mimetype: 'audio/mp4',
+        ptt: false
+      }, { quoted: fkontak })
     }
+
     if (command === 'play2') {
       return conn.sendMessage(m.chat, {
         video: buffer,
         mimetype: 'video/mp4',
         fileName: `${cleanTitle}.mp4`,
-        caption: apiText,
-        ptv: true
+        caption: apiText
       }, { quoted: fkontak })
     }
 
