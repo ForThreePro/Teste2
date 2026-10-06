@@ -4,35 +4,15 @@ import { fileTypeFromBuffer } from "file-type"
 import fetch from 'node-fetch'
 import axios from 'axios'
 
-async function uploadEvogb(content) {
+async function myCloud(content) {
   const fileType = await fileTypeFromBuffer(content)
   const ext = fileType?.ext || 'bin'
   const mime = fileType?.mime || 'application/octet-stream'
   const formData = new FormData()
   formData.append("file", new Blob([content], { type: mime }), `${crypto.randomBytes(5).toString("hex")}.${ext}`)
   const response = await fetch("https://evogb.win/api/upload", { method: "POST", body: formData })
-  const j = await response.json()
-  return j.url
-}
-
-async function uploadCatbox(content) {
-  const ft = await fileTypeFromBuffer(content)
-  const form = new FormData()
-  form.append("reqtype", "fileupload")
-  form.append("fileToUpload", new Blob([content], { type: ft?.mime || 'image/jpeg' }), `file.${ft?.ext || 'jpg'}`)
-  const r = await fetch("https://catbox.moe/user/api.php", { method: "POST", body: form })
-  return (await r.text()).trim()
-}
-
-function getBufferFromJson(j) {
-  let out = j.result?.url || j.result?.image || j.result?.data || j.result || j.url || j.data || j.image
-  if (typeof out === 'object') out = out.url || out.image || out.data
-  if (!out) return null
-  out = String(out).trim()
-  if (out.startsWith('http')) return { isUrl: true, data: out }
-  if (out.startsWith('data:image')) return { isUrl: false, data: Buffer.from(out.split(',')[1], 'base64') }
-  if (out.length > 300) return { isUrl: false, data: Buffer.from(out, 'base64') }
-  return null
+  if (!response.ok) throw new Error('Error en evogb.win')
+  return await response.json()
 }
 
 let handler = async (m, { conn, text }) => {
@@ -40,70 +20,67 @@ let handler = async (m, { conn, text }) => {
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
 
-  if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen` }, { quoted: m })
+  if (/image/.test(mime) &&!link) {
+    try {
+      await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
+      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Subiendo a evogb.win...` }, { quoted: m })
+      let media = await q.download()
+      let up = await myCloud(media)
+      link = up.url
+    } catch (e) {
+      await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+      return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error al subir: ${e.message}` }, { quoted: m })
+    }
+  }
+
+  if (!link) {
+    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen o manda link\n\n‧˚꒰🌼୭ Ejemplo:.removebg https://link.jpg` }, { quoted: m })
   }
 
   try {
     await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
 
-    // 1 - Subir original
-    let media
-    if (!link) {
-      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 1/3 Subiendo...` }, { quoted: m })
-      media = await q.download()
-      try { link = await uploadCatbox(media) } catch { link = await uploadEvogb(media) }
-    }
+    const apiUrl = `https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(link)}`
+    const j = await fetch(apiUrl).then(r => r.json())
+    console.log(j)
 
-    // 2 - HDv2
-    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 2/3 Mejorando en HDv2...` }, { quoted: m })
-    let hdLink = link
-    let hdBuffer = media
-    try {
-      const hdJson = await fetch(`https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`).then(r => r.json())
-      const parsedHD = getBufferFromJson(hdJson)
-      if (parsedHD) {
-        if (parsedHD.isUrl) {
-          const r1 = await axios.get(parsedHD.data, { responseType: 'arraybuffer' })
-          hdBuffer = Buffer.from(r1.data)
-        } else {
-          hdBuffer = parsedHD.data
-        }
-        try { hdLink = await uploadCatbox(hdBuffer) } catch { hdLink = await uploadEvogb(hdBuffer) }
-      }
-    } catch (e) {
-      console.log('HD falló, sigo con original')
-      hdLink = link
-    }
+    if (!j.status &&!j.result) throw new Error('API FAA no devolvió resultado: ' + JSON.stringify(j).slice(0,200))
 
-    // 3 - Removebg (ahora soporta json)
-    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 3/3 Quitando fondo...` }, { quoted: m })
-    const bgJson = await fetch(`https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(hdLink)}`).then(r => r.json())
-    console.log(bgJson)
+    // Soporta link, data URI y base64 puro (JSON)
+    let resultData = j.result?.url || j.result?.image || j.result?.data || j.result || j.url || j.data || j.image
+    if (typeof resultData === 'object') resultData = resultData.url || resultData.image || resultData.data
+    if (!resultData) throw new Error('API vacía')
 
-    const parsedBG = getBufferFromJson(bgJson)
-    if (!parsedBG) throw new Error('Removebg json vacío: ' + JSON.stringify(bgJson).slice(0,200))
+    let buffer
+    const str = String(resultData).trim()
 
-    let finalBuffer
-    if (parsedBG.isUrl) {
-      const r2 = await axios.get(parsedBG.data, { responseType: 'arraybuffer' })
-      finalBuffer = Buffer.from(r2.data)
+    if (str.startsWith('http')) {
+      // Si es link
+      const res = await axios.get(str, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
+      buffer = Buffer.from(res.data)
+    } else if (str.startsWith('data:image')) {
+      // Si es data:image/png;base64,...
+      buffer = Buffer.from(str.split(',')[1], 'base64')
     } else {
-      finalBuffer = parsedBG.data
+      // Si es base64 puro
+      buffer = Buffer.from(str, 'base64')
     }
 
-    const cap = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: HDv2 + Removebg (JSON)\n‧˚꒰🌼୭ Final: ${(finalBuffer.length/1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯`
+    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: Removebg\n‧˚꒰🌼୭ Origen: evogb.win\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Fondo eliminado`
 
-    await conn.sendMessage(m.chat, { image: finalBuffer, caption: cap }, { quoted: m })
-    await conn.sendMessage(m.chat, { document: finalBuffer, mimetype: 'image/png', fileName: `hd-removebg-lux.png` }, { quoted: m })
+    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+    await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: m })
+    await conn.sendMessage(m.chat, { document: buffer, mimetype: 'image/png', fileName: `removebg-lux.png` }, { quoted: m })
 
   } catch (e) {
     console.error(e)
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
     return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: m })
   }
 }
 
-handler.command = ['removebg', 'nobg']
+handler.command = ['removebg', 'nobg', 'quitarfondo']
 handler.tags = ['tools']
 handler.help = ['removebg']
 handler.group = true
