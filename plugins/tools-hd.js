@@ -1,81 +1,94 @@
+import crypto from "crypto"
+import { FormData, Blob } from "formdata-node"
+import { fileTypeFromBuffer } from "file-type"
 import fetch from 'node-fetch'
-import FormData from 'form-data'
-import moment from 'moment-timezone'
-moment.locale('es')
+import axios from 'axios'
+import fs from 'fs'
 
-const api = { url: 'https://api.stellarwa.xyz', key: 'proyectsV2' }
-
-function generateUniqueFilename(mime) {
-  const ext = mime.split('/')[1] || 'jpg'
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let id = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-  return `${id}.${ext}`
+async function myCloud(content) {
+  const fileType = await fileTypeFromBuffer(content)
+  const ext = fileType?.ext || 'bin'
+  const mime = fileType?.mime || 'application/octet-stream'
+  const formData = new FormData()
+  formData.append("file", new Blob([content], { type: mime }), `${crypto.randomBytes(5).toString("hex")}.${ext}`)
+  const response = await fetch("https://evogb.win/api/upload", { method: "POST", body: formData })
+  if (!response.ok) throw new Error('Error en evogb.win')
+  return await response.json()
 }
 
-async function uploadToUguu(buffer, mime) {
-  const body = new FormData()
-  body.append('files[]', buffer, generateUniqueFilename(mime || 'image/jpeg'))
-  const res = await fetch('https://uguu.se/upload.php', { method: 'POST', body, headers: body.getHeaders(), timeout: 30000 })
-  const json = await res.json()
-  const url = json.files?.[0]?.url
-  if (!url) throw new Error('No se pudo subir a Uguu')
-  return url
-}
-
-async function getEnhancedBuffer(url) {
-  const apiUrl = `${api.url}/tools/upscale?url=${encodeURIComponent(url)}&key=${api.key}`
-  let lastErr
-  for (let i = 0; i < 3; i++) {
-    try {
-      const res = await fetch(apiUrl, { timeout: 120000 })
-      if (!res.ok) throw new Error(`Error ${res.status}`)
-      const buf = Buffer.from(await res.arrayBuffer())
-      if (buf.length < 5000) throw new Error('Respuesta vacía')
-      return buf
-    } catch (e) {
-      lastErr = e
-      console.log(`[HD] Intento ${i+1} fallido:`, e.message)
-      await new Promise(r => setTimeout(r, 2000 * (i+1)))
+async function buildContact(m, conn) {
+  let thumb = null
+  try {
+    const ppUrl = await conn.profilePictureUrl(m.sender, 'image')
+    if (ppUrl) {
+      const res = await axios.get(ppUrl, { responseType: 'arraybuffer' })
+      thumb = Buffer.from(res.data, 'binary')
+    }
+  } catch {
+    try { thumb = fs.readFileSync('./src/logo.jpg') } catch { thumb = null }
+  }
+  return {
+    key: { fromMe: false, participant: '0@s.whatsapp.net' },
+    message: {
+      contactMessage: {
+        displayName: m.pushName || 'Usuario',
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;${m.pushName || 'Usuario'};;;\nFN:${m.pushName || 'Usuario'}\nitem1.TEL;waid=${(m.sender || '').replace(/[^0-9]/g, '')}:${m.sender || ''}\nitem1.X-ABLabel:Cel\nEND:VCARD`,
+        jpegThumbnail: thumb || null
+      }
     }
   }
-  throw lastErr
 }
 
-let handler = async (m, { conn, usedPrefix, command }) => {
-    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
-    const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+let handler = async (m, { conn, text }) => {
+  const fkontak = await buildContact(m, conn)
+  let link = text?.trim()
+  let q = m.quoted? m.quoted : m
+  let mime = (q.msg || q).mimetype || ''
 
-    const q = m.quoted? m.quoted : m
-    const mime = (q.msg || q).mimetype || ''
-    if (!/image\/(jpe?g|png)/.test(mime)) {
-      await react('❌')
-      return m.reply(head + `➛ Responde a una imagen con *${usedPrefix + command}* (jpg/png)`)
+  try {
+    if (/image/.test(mime) &&!link) {
+      await conn.sendMessage(m.chat, { react: { text: '📈', key: m.key } })
+      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Subiendo a evogb.win...` }, { quoted: fkontak })
+      let media = await q.download()
+      let up = await myCloud(media)
+      link = up.url
     }
-    try {
-      await react('⏳')
-      const buffer = await q.download()
-      if (buffer.length > 4 * 1024 * 1024) {
-        await react('❌')
-        return m.reply(head + `❌ Imagen muy pesada (máx 4MB)`)
-      }
-      const url1 = await uploadToUguu(buffer, mime)
-      const bufHD = await getEnhancedBuffer(url1)
 
-      await react('✅')
-      await conn.sendMessage(m.chat, {
-        image: bufHD,
-        caption: head + `\n✅ *HD Listo*\n😼 Imagen mejorada`
-      }, { quoted: m })
-    } catch (err) {
-      console.log('[HD ERROR]', err)
-      await react('❌')
-      let msg = err.message || String(err)
-      if (msg.includes('504') || msg.includes('timeout')) msg = 'La API tardó demasiado. Intenta con una imagen más pequeña o espera 1 min.'
-      await m.reply(head + `❌ Error: ${msg}`)
+    if (!link) {
+      await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+      return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen o manda link\n\n‧˚꒰🌼୭ Ejemplo:.hdv4 https://link.jpg` }, { quoted: fkontak })
     }
+
+    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en HD 4x...` }, { quoted: fkontak })
+
+    const apiUrl = `https://api-faa.my.id/faa/hdv4?url=${encodeURIComponent(link)}`
+    const j = await fetch(apiUrl).then(r => r.json())
+    console.log(j)
+
+    if (!j.status &&!j.result) throw new Error('API FAA no devolvió resultado')
+
+    let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data
+    if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.image
+    if (!resultUrl?.startsWith('http')) throw new Error('API no devolvió link válido: ' + JSON.stringify(j).slice(0,200))
+
+    const res = await axios.get(resultUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
+    const buffer = Buffer.from(res.data)
+
+    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰📈꒱────╮\n‧˚꒰🌼୭ Tipo: HDv4 x4 Upscale\n‧˚꒰🌼୭ Origen: evogb.win\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024 / 1024).toFixed(2)} MB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Imagen mejorada a 4K\n꒰🌐꒱ Link: ${link.slice(0,40)}...`
+
+    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+    await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: fkontak })
+    await conn.sendMessage(m.chat, { document: buffer, mimetype: 'image/jpeg', fileName: `hdv4-lux.jpg` }, { quoted: fkontak })
+
+  } catch (e) {
+    console.error(e)
+    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: fkontak })
+  }
 }
-handler.help = ['hd','upscale','4k']
+
+handler.command = ['hdv4', 'hd4', 'mejorar4k', 'remini4']
 handler.tags = ['tools']
-handler.command = ['hd','upscale','remini','4k']
+handler.help = ['hdv4']
+handler.group = true
 export default handler
