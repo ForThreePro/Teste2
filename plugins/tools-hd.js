@@ -5,13 +5,15 @@ import crypto from "crypto"
 import { FormData, Blob } from "formdata-node"
 import { fileTypeFromBuffer } from "file-type"
 
-async function uploadCatbox(content) {
-  const ft = await fileTypeFromBuffer(content)
-  const form = new FormData()
-  form.append("reqtype", "fileupload")
-  form.append("fileToUpload", new Blob([content], { type: ft?.mime || 'image/jpeg' }), `file.${ft?.ext || 'jpg'}`)
-  const r = await fetch("https://catbox.moe/user/api.php", { method: "POST", body: form })
-  return (await r.text()).trim()
+async function uploadEvogb(content) {
+  const fileType = await fileTypeFromBuffer(content)
+  const ext = fileType?.ext || 'bin'
+  const mime = fileType?.mime || 'application/octet-stream'
+  const formData = new FormData()
+  formData.append("file", new Blob([content], { type: mime }), `${crypto.randomBytes(5).toString("hex")}.${ext}`)
+  const response = await fetch("https://evogb.win/api/upload", { method: "POST", body: formData })
+  const j = await response.json()
+  return j.url
 }
 
 async function buildContact(m, conn) {
@@ -45,26 +47,27 @@ let handler = async (m, { conn, text }) => {
 
   if (!/image/.test(mime) &&!link) {
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen\n\n‧˚꒰🌼୭ Ejemplo:.hdv3 (respondiendo a imagen)` }, { quoted: fkontak })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen` }, { quoted: fkontak })
   }
 
   try {
     await conn.sendMessage(m.chat, { react: { text: '📈', key: m.key } })
 
-    // Si es link directo, úsalo. Si es imagen, súbela en silencio a catbox
     if (!link) {
       let media = await q.download()
-      link = await uploadCatbox(media)
+      link = await uploadEvogb(media)
     }
 
     await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en HD v3...` }, { quoted: fkontak })
 
-    const apiUrl = `https://api-faa.my.id/faa/hdv3?url=${encodeURIComponent(link)}`
-    const j = await fetch(apiUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } }).then(r => r.json())
+    // FIX: es?image= no?url=
+    const apiUrl = `https://api-faa.my.id/faa/hdv3?image=${encodeURIComponent(link)}`
+    const j = await fetch(apiUrl).then(r => r.json())
+    console.log(j)
 
-    let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data
+    let resultUrl = j.result?.url || j.result?.image || j.result || j.url || j.data || j.resultUrl
     if (typeof resultUrl === 'object') resultUrl = resultUrl.url || resultUrl.image
-    if (!resultUrl?.startsWith('http')) throw new Error('FAA no devolvió imagen: ' + JSON.stringify(j).slice(0,200))
+    if (!resultUrl?.startsWith('http')) throw new Error('FAA no devolvió link: ' + JSON.stringify(j).slice(0,300))
 
     const res = await axios.get(resultUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
     const buffer = Buffer.from(res.data)
