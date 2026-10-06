@@ -12,7 +12,19 @@ async function myCloud(content) {
   formData.append("file", new Blob([content], { type: mime }), `${crypto.randomBytes(5).toString("hex")}.${ext}`)
   const response = await fetch("https://evogb.win/api/upload", { method: "POST", body: formData })
   if (!response.ok) throw new Error('Error en evogb.win')
-  return await response.json()
+  const j = await response.json()
+  return j.url
+}
+
+function parseResult(j) {
+  let out = j.result?.url || j.result?.image || j.result?.data || j.result || j.url || j.data || j.image
+  if (typeof out === 'object') out = out.url || out.image || out.data
+  if (!out) return null
+  out = String(out).trim()
+  if (out.startsWith('http')) return { type: 'url', data: out }
+  if (out.startsWith('data:image')) return { type: 'buf', data: Buffer.from(out.split(',')[1], 'base64') }
+  if (out.length > 300) return { type: 'buf', data: Buffer.from(out, 'base64') }
+  return null
 }
 
 let handler = async (m, { conn, text }) => {
@@ -20,67 +32,51 @@ let handler = async (m, { conn, text }) => {
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
 
-  if (/image/.test(mime) &&!link) {
-    try {
-      await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
-      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Subiendo a evogb.win...` }, { quoted: m })
-      let media = await q.download()
-      let up = await myCloud(media)
-      link = up.url
-    } catch (e) {
-      await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-      return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error al subir: ${e.message}` }, { quoted: m })
-    }
-  }
-
-  if (!link) {
-    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen o manda link\n\n‧˚꒰🌼୭ Ejemplo:.removebg https://link.jpg` }, { quoted: m })
+  if (!/image/.test(mime) &&!link) {
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen\n\n꒰🌼୭.removebg = HDv2 + quita fondo` }, { quoted: m })
   }
 
   try {
     await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
 
-    const apiUrl = `https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(link)}`
-    const j = await fetch(apiUrl).then(r => r.json())
-    console.log(j)
-
-    if (!j.status &&!j.result) throw new Error('API FAA no devolvió resultado: ' + JSON.stringify(j).slice(0,200))
-
-    // Soporta link, data URI y base64 puro (JSON)
-    let resultData = j.result?.url || j.result?.image || j.result?.data || j.result || j.url || j.data || j.image
-    if (typeof resultData === 'object') resultData = resultData.url || resultData.image || resultData.data
-    if (!resultData) throw new Error('API vacía')
-
-    let buffer
-    const str = String(resultData).trim()
-
-    if (str.startsWith('http')) {
-      // Si es link
-      const res = await axios.get(str, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
-      buffer = Buffer.from(res.data)
-    } else if (str.startsWith('data:image')) {
-      // Si es data:image/png;base64,...
-      buffer = Buffer.from(str.split(',')[1], 'base64')
-    } else {
-      // Si es base64 puro
-      buffer = Buffer.from(str, 'base64')
+    if (/image/.test(mime) &&!link) {
+      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 1/3 Subiendo...` }, { quoted: m })
+      let media = await q.download()
+      let up = await myCloud(media)
+      link = up.url
     }
 
-    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: Removebg\n‧˚꒰🌼୭ Origen: evogb.win\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Fondo eliminado`
+    // 2 - HDv2
+    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 2/3 HDv2...` }, { quoted: m })
+    let hdLink = link
+    let hdBuf = null
+    try {
+      const j1 = await fetch(`https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`).then(r=>r.json())
+      const p1 = parseResult(j1)
+      if (p1) {
+        hdBuf = p1.type === 'url'? Buffer.from((await axios.get(p1.data,{responseType:'arraybuffer'})).data) : p1.data
+        hdLink = (await myCloud(hdBuf)).url || (await myCloud(hdBuf))
+        if (typeof hdLink === 'object') hdLink = hdLink.url
+      }
+    } catch { hdLink = link }
 
-    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
-    await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: m })
-    await conn.sendMessage(m.chat, { document: buffer, mimetype: 'image/png', fileName: `removebg-lux.png` }, { quoted: m })
+    // 3 - Removebg
+    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ 3/3 Quitando fondo...` }, { quoted: m })
+    const j2 = await fetch(`https://api-faa.my.id/faa/removebg?url=${encodeURIComponent(hdLink)}`).then(r=>r.json())
+    const p2 = parseResult(j2)
+    if (!p2) throw new Error('Removebg falló: ' + JSON.stringify(j2).slice(0,150))
+
+    let finalBuffer = p2.type === 'url'? Buffer.from((await axios.get(p2.data,{responseType:'arraybuffer'})).data) : p2.data
+
+    await conn.sendMessage(m.chat, { image: finalBuffer, caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ HD + Fondo eliminado\n‧˚꒰🌼୭ Peso: ${(finalBuffer.length/1024).toFixed(0)} KB` }, { quoted: m })
+    await conn.sendMessage(m.chat, { document: finalBuffer, mimetype: 'image/png', fileName: `hd-removebg-lux.png` }, { quoted: m })
 
   } catch (e) {
-    console.error(e)
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
     return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: m })
   }
 }
 
-handler.command = ['removebg', 'nobg', 'quitarfondo']
+handler.command = ['removebg', 'nobg']
 handler.tags = ['tools']
 handler.help = ['removebg']
 handler.group = true
