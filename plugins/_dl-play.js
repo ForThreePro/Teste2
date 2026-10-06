@@ -37,7 +37,7 @@ const handler = async (m, { conn, command, text }) => {
     const isAudio = command === 'play'
     const apiUrl = isAudio? `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(link)}` : `https://api-faa.my.id/faa/ytmp4?url=${encodeURIComponent(link)}`
     const j = await fetch(apiUrl).then(r => r.json())
-    if (!j.status ||!j.result) throw new Error('API FAA caída')
+    if (!j.status || !j.result) throw new Error('API FAA caída')
     const downloadUrl = isAudio? j.result.mp3 : j.result.download_url
     const title = j.result.title || searchInfo?.title || 'lux'
 
@@ -49,30 +49,38 @@ const handler = async (m, { conn, command, text }) => {
       } catch { await conn.sendMessage(m.chat, { text: cap }, { quoted: fkontak }) }
     }
 
-    const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' })
-    const buffer = Buffer.from(res.data)
     const cleanTitle = title.replace(/[^\w\s-]/gi, '').trim()
-    const size = (buffer.length / 1024 / 1024).toFixed(2)
-    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭─INFO ꒰🔌꒱─╮\n‧˚ Título: ${cleanTitle}\n‧˚ API: *FAA*\n‧˚ Tamaño: ${size} MB\n╰───────`.trim()
+    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n‧˚꒰🌼୭ Título: ${cleanTitle}\n‧˚꒰🌼୭ API: *FAA*`.trim()
 
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
 
     if (command === 'play') {
+      const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' })
+      const buffer = Buffer.from(res.data)
       await conn.sendMessage(m.chat, { text: apiText }, { quoted: fkontak })
       return conn.sendMessage(m.chat, { document: buffer, mimetype: 'audio/mpeg', fileName: `${cleanTitle}.mp3` }, { quoted: fkontak })
     }
+
     if (command === 'play2') {
       await conn.sendMessage(m.chat, { text: apiText }, { quoted: fkontak })
-      return conn.sendMessage(m.chat, { document: buffer, mimetype: 'video/mp4', fileName: `${cleanTitle}.mp4` }, { quoted: fkontak })
+      return conn.sendMessage(m.chat, {
+        video: { url: downloadUrl },
+        mimetype: 'video/mp4',
+        fileName: `${cleanTitle}.mp4`,
+        caption: apiText
+      }, { quoted: fkontak })
     }
+
     if (command === 'play3') {
+      const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' })
+      const buffer = Buffer.from(res.data)
       return conn.sendMessage(m.chat, { video: buffer, mimetype: 'video/mp4', fileName: `${cleanTitle}.mp4`, caption: apiText, ptv: true }, { quoted: fkontak })
     }
+
   } catch (e) {
     console.log(e)
     return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ Error: ${e.message}` }, { quoted: fkontak })
   }
 }
 handler.command = ['play', 'play2', 'play3']
-handler.tags = ['descargas']
 export default handler
