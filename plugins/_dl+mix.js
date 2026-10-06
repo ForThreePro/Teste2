@@ -48,7 +48,7 @@ let handler = async (m, { conn, text }) => {
   if (/image/.test(mime) &&!link) {
     try {
       await conn.sendMessage(m.chat, { react: { text: '🪄', key: m.key } })
-      const captionWait = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Subiendo a evogb.win, preciosa...`
+      const captionWait = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Subiendo a evogb.win...`
       await conn.sendMessage(m.chat, { text: captionWait }, { quoted: fkontak })
       let media = await q.download()
       let up = await myCloud(media)
@@ -61,7 +61,7 @@ let handler = async (m, { conn, text }) => {
 
   if (!link) {
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen o manda link, preciosa\n\n‧˚꒰🌼୭ Ejemplo:.removebg https://link.jpg` }, { quoted: fkontak })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen o manda link\n\n‧˚꒰🌼୭ Ejemplo:.removebg https://link.jpg` }, { quoted: fkontak })
   }
 
   try {
@@ -79,7 +79,7 @@ let handler = async (m, { conn, text }) => {
     const res = await axios.get(resultUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
     const buffer = Buffer.from(res.data)
 
-    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: Removebg\n‧˚꒰🌼୭ Origen: evogb.win\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Fondo eliminado, preciosa`
+    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰🪄꒱────╮\n‧˚꒰🌼୭ Tipo: Removebg\n‧˚꒰🌼୭ Origen: evogb.win\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024).toFixed(0)} KB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Fondo eliminado`
 
     await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
     await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: fkontak })
