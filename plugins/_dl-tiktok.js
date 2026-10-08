@@ -12,36 +12,36 @@ var handler = async (m, { conn, args }) => {
   const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
   if (!args[0]) {
-    let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    let menuUso = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 📱 ࣪ ꕀ.tiktok ˚. ᵎᵎ
-> *"Bajando videos como Garfield baja lasaña un lunes"*
+> *"Bajando videos como fantasma roba dulces"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 📱 ➛ Descarga videos de TikTok sin marca de agua
 📱 ➛ Con botones interactivos
-😼 ➛ Garfield viendo TikTok con lasaña
+👻 ➛ Fantasma viendo TikTok en Halloween
 
-── *📖 USO* ╏ 🍕
+── *📖 USO* ╏ 🦇
 ➛.*tiktok* <link de tiktok>
 ➛.*tt* <link de tiktok>
 
-── *💡 EJEMPLO* ╏ 🍕
+── *💡 EJEMPLO* ╏ 🕯️
 ➛ https://vm.tiktok.com/ZMkcmTCa6/
 
-── *🔗 SOPORTE* ╏ 🍕
+── *🔗 SOPORTE* ╏ 🎃
 📱 ➛ vm.tiktok.com
 📱 ➛ vt.tiktok.com
 📱 ➛ www.tiktok.com
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
@@ -49,44 +49,44 @@ var handler = async (m, { conn, args }) => {
 
   const url = args[0]
   if (!url.match(/(https?:\/\/)?(www\.)?(vm\.|vt\.|www\.)?tiktok\.com\//)) {
-    await react(conn, m, '❌')
-    let menuError = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    await react(conn, m, '💀')
+    let menuError = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 ❌ ➛ El enlace no es válido
-😿 ➛ Garfield: "Eso no es TikTok, es trampa"
+👻 ➛ Fantasma: "Eso no es TikTok, es trampa"
 
-── *📖 USO* ╏ 🍕
+── *📖 USO* ╏ 🦇
 ➛ Solo links de: *tiktok.com*
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
   }
 
   try {
-    await react(conn, m, "⏳")
-    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    await react(conn, m, "🎃")
+    await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ⚙️ —˙𖦹.꒷
 
-── *📊 ESTADO* ╏ 🍕
-🔍 ➛ Analizando link de TikTok...
-📥 ➛ Obteniendo video HD...
+── *📊 ESTADO* ╏ 🎃
+🔍 ➛ Analizando link embrujado...
+📥 ➛ Obteniendo video HD maldito...
 ⬇️ ➛ Preparando descarga sin marca...
-😼 ➛ Garfield buscando el botón...
+👻 ➛ Fantasma buscando el botón...
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`)
 
     const tiktokData = await tiktokdl(url)
@@ -102,7 +102,7 @@ var handler = async (m, { conn, args }) => {
       key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false },
       message: {
         locationMessage: {
-          name: `😼 LUX X YALLICO - GARFIELD EDITION 🍕`,
+          name: `🎃 LUX X YALLICO - HALLOWEEN EDITION 🦇`,
           jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer())
         }
       }
@@ -115,25 +115,25 @@ var handler = async (m, { conn, args }) => {
         message: {
           interactiveMessage: proto.Message.InteractiveMessage.fromObject({
             body: {
-              text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+              text: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 📥 —˙𖦹.꒷
 
-── *📊 INFORMACIÓN* ╏ 🍕
+── *📊 INFORMACIÓN* ╏ 🎃
 📌 ➛ Título: *${title}*
 👤 ➛ Autor: *@${author}*
 ❤️ ➛ Likes: *${likes}*
 💬 ➛ Comentarios: *${comments}*
-😼 ➛ Garfield le dio like
+👻 ➛ Fantasma le dio like
 
-── *📥 DESCARGA* ╏ 🍕
+── *📥 DESCARGA* ╏ 🦇
 ⬇️ ➛ Video sin marca de agua
-🍝 ➛ Listo para ver comiendo lasaña`
+🍬 ➛ Listo para ver en noche de brujas`
             },
-            footer: { text: 'Sin marca de agua ✨ | LUX X YALLICO - GARFIELD EDITION 😼' },
+            footer: { text: 'Sin marca de agua ✨ | LUX X YALLICO - HALLOWEEN EDITION 🎃' },
             header: { hasMediaAttachment: true, videoMessage: media.videoMessage },
             nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
               buttons: [
@@ -147,29 +147,29 @@ var handler = async (m, { conn, args }) => {
     }, { quoted: businessHeader })
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-    await react(conn, m, "✅")
+    await react(conn, m, "🎃")
 
   } catch (error) {
-    await react(conn, m, "❌")
+    await react(conn, m, "💀")
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    let menuErr = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    let menuErr = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 ❌ ➛ ${error.message}
-😴 ➛ Garfield se durmió intentando
+💀 ➛ El fantasma se asustó
 
-── *💡 SOLUCIÓN* ╏ 🍕
+── *💡 SOLUCIÓN* ╏ 🕯️
 🔧 ➛ Verifica que el video sea público
 🔧 ➛ Intenta con otro link
-🍕 ➛ Garfield dice: prueba otra vez
+🎃 ➛ Fantasma dice: prueba otra vez
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
   }
@@ -190,7 +190,7 @@ const formatNum = (n) => {
 }
 
 handler.help = ['tiktok <link>']
-handler.tags = ['descargas']
+handler.tags = ['descargas', 'halloween']
 handler.command = ['tt', 'tiktok']
 handler.limit = true
 export default handler
