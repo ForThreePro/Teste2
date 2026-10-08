@@ -190,7 +190,7 @@ const formatNum = (n) => {
 }
 
 handler.help = ['tiktok <link>']
-handler.tags = ['descargas', 'halloween']
+handler.tags = ['descargas']
 handler.command = ['tt', 'tiktok']
 handler.limit = true
 export default handler
