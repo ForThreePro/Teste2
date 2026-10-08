@@ -1,3 +1,4 @@
+
 import { existsSync, promises as fs } from 'fs'
 import path from 'path'
 import moment from 'moment-timezone'
@@ -13,8 +14,8 @@ var handler = async (m, { conn }) => {
 
     if (!sessionPath) return m.reply('🧐 *No encontré la carpeta de sesión*')
 
-    await conn.sendMessage(m.chat, { react: { text: '🧹', key: m.key } })
-    await m.reply(`😴 *Garfield limpiando... hasta Odie ayuda hoy* 🍝`)
+    await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
+    await m.reply(`‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n꒰👻꒱ Garfield con disfraz de fantasma limpiando... 🕸️`)
 
     let files = await fs.readdir(sessionPath)
     let filesDeleted = 0
@@ -35,36 +36,36 @@ var handler = async (m, { conn }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
-    let menu = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    let menu = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗜𝗖𝗢 𓆪 🦇
 
-⤷ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ FIX ：✿ 。
+⤷ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍 𝐅𝐈𝐗 ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
-🧹 ࣪ ꕀ.dsowner ˚. ᵎᵎ
-> *"Limpiando hasta la última miga de lasaña"*
+🎃 ࣪ ꕀ.dsowner ˚. ᵎᵎ
+> *"Limpiando hasta el último fantasma de la sesión"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FIX DE SESIÓN\`\` [${filesDeleted}] 🧹 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`FIX DE SESIÓN HALLOWEEN\`\` [${filesDeleted}] 🕸️ —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
-🧹 ➛ Elimina archivos de caché basura de la sesión
+── *📝 DESCRIPCIÓN* ╏ 🎃
+🧹 ➛ Elimina archivos de caché basura embrujados
 🔒 ➛ No borra \`creds\` ni \`app-state\` para que no se desconecte
-😼 ➛ Garfield supervisando: *"Más rápido, que hay lasaña esperando"*
+👻 ➛ Garfield disfrazado: *"Más rápido, que hay dulces esperando"* 🍬
 
-── *📖 USO* ╏ 🍕
+── *📖 USO* ╏ 🦇
 👑 ➛ Usar solo en el número principal del bot
 🔌 ➛ El bot sigue conectado, no necesita reinicio
 
-── *📊 RESULTADO* ╏ 🍕
+── *📊 RESULTADO* ╏ 🕯️
 ✅ ➛ Archivos eliminados: *${filesDeleted}*
-💎 ➛ Estado: *${filesDeleted === 0? 'Todo limpio - Garfield feliz 😸' : 'Limpieza completada - Hora de la siesta 😴'}*
+💀 ➛ Estado: *${filesDeleted === 0? 'Todo limpio - Sin fantasmas 😸' : 'Exorcismo completado - Hora de pedir dulces 🎃'}*
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 *Owner*: @${ownerNum}
-*Version*: 2.6 PRO
+*Version*: 2.6 HALLOWEEN PRO
 
-> "Odio los lunes, pero amo una sesión limpia" 😼🍝
+> "Odio los lunes, pero amo una sesión sin fantasmas" 😼🎃
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
