@@ -1,18 +1,31 @@
 import fetch from 'node-fetch'
 import axios from 'axios'
 import yts from 'yt-search'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 const handler = async (m, { conn, command, text }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+  
   if (!text) return conn.reply(m.chat, 
-`╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮
-│
-│  ꒰🍧꒱ Ejemplo:
-│  .${command} bad bunny dtmf
-│
-╰────────────────╯`, m)
+`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐘𝐓 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🎃 ࣪ ꕀ.${command} bad bunny dtmf ˚. ᵎᵎ
+
+.⃟𖥔 ݁. 𖦹˙— \`\`EJEMPLO\`\` 🕯️ —˙𖦹.꒷
+👻 ➛.play diles - bad bunny
+🦇 ➛.play2 diles - video
+🎃 ➛.play3 diles - video nota
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`, m)
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
 
     let link = text
     let info = null
@@ -30,40 +43,56 @@ const handler = async (m, { conn, command, text }) => {
 
     const j = await fetch(apiUrl).then(r => r.json())
     if (!j.status || !j.result) throw new Error('API FAA está caída')
-    
+
     const downloadUrl = isAudio ? j.result.mp3 : j.result.download_url
     const title = (j.result.title || info?.title || 'lux').replace(/[^\w\s-]/gi, '').trim()
 
     if (info) {
       const preview = 
-`╭─〔 👛 𝗬𝗧 - 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗜𝗖𝗢 〕─╮
-│
-│  🎧 *Título:* ${info.title}
-│  👤 *Canal:* ${info.author.name}
-│  ⏰ *Duración:* ${info.timestamp}
-│  👀 *Vistas:* ${info.views.toLocaleString()}
-│  🔗 *Link:* ${info.url}
-│
-╰─〔 🌼 Enviando ${isAudio ? 'audio' : 'video'}... 〕─╯`.trim()
+`‧˚꒰🎃୭ 𓆩 𝗬𝗧 - 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐏𝐑𝐄𝐕𝐈𝐄𝐖 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`INFO\`\` 🕸️ —˙𖦹.꒷
+
+── *📊 VIDEO* ╏ 🎃
+🎧 ➛ Título: *${info.title}*
+👤 ➛ Canal: *${info.author.name}*
+⏰ ➛ Duración: *${info.timestamp}*
+👀 ➛ Vistas: *${info.views.toLocaleString()}*
+🔗 ➛ Link: ${info.url}
+
+── *📥 ESTADO* ╏ 🦇
+⬇️ ➛ Enviando ${isAudio ? 'audio embrujado' : 'video maldito'}...
+👻 ➛ Espera un momento
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`.trim()
       await conn.reply(m.chat, preview, m)
     }
 
     const res = await axios.get(downloadUrl, { responseType: 'arraybuffer' })
     const buffer = Buffer.from(res.data)
     const size = (buffer.length / 1024 / 1024).toFixed(2)
-    const type = isAudio ? 'ᴀᴜᴅɪᴏ 🎧' : 'ᴠɪᴅᴇᴏ 🎬'
+    const type = isAudio ? 'AUDIO EMBRUJADO 🎃' : 'VIDEO MALDITO 🎬'
 
     const finalText = 
-`╭─〔 👛 𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 〕─╮
-│
-│  📂 *${type}*
-│  ────────────────
-│  🎵 *Título:* ${title}
-│  🔌 *API:* FAA-BOT
-│  ⚖️ *Peso:* ${size} MB
-│  ✨ *Estado:* Listo
-│
-╰─〔 🌸 〕─╯`.trim()
+`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀 ﹒ ${type} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`INFO\`\` 🕯️ —˙𖦹.꒷
+
+── *📊 DETALLES* ╏ 🎃
+🎵 ➛ Título: *${title}*
+🔌 ➛ API: *FAA-BOT*
+⚖️ ➛ Peso: *${size} MB*
+✨ ➛ Estado: *Listo - Embrujado*
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`.trim()
 
     if (command === 'play') {
       await conn.reply(m.chat, finalText, m)
@@ -80,10 +109,11 @@ const handler = async (m, { conn, command, text }) => {
 
   } catch (e) {
     console.log(e)
-    return conn.reply(m.chat, `╭─〔 ❌ Error 〕─╮\n│ ${e.message}\n╰──────────╯`, m)
+    return conn.reply(m.chat, `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰💀꒱ Error: ${e.message}\n꒰👻꒱ El fantasma no encontró la canción`, m)
   }
 }
 
+handler.help = ['play <texto>', 'play2 <texto>', 'play3 <texto>']
+handler.tags = ['descargas']
 handler.command = ['play', 'play2', 'play3']
-handler.tags = ['dl']
 export default handler
