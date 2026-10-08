@@ -90,7 +90,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 }
 
 handler.help = ['bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'chipmunk', 'grave', 'vibrato']
-handler.tags = ['audio', 'halloween']
+handler.tags = ['audio']
 handler.command = ['bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'chipmunk', 'agudo', 'grave', 'vibrato']
 
 export default handler
