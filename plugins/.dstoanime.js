@@ -17,34 +17,46 @@ async function faaBuffer(apiUrl) {
   const res = await fetch(apiUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } })
   const ct = res.headers.get('content-type') || ''
   if (ct.includes('image')) {
-    return Buffer.from(await res.arrayBuffer())
+    const buf = Buffer.from(await res.arrayBuffer())
+    return buf
   }
-  const j = await res.json()
+  const j = await res.json().catch(async () => {
+    const txt = await res.text()
+    if (txt.trim().startsWith('<!DOCTYPE')) throw new Error('API poseída 🎃')
+    throw new Error('Respuesta no JSON: ' + txt.slice(0,100))
+  })
   let url = j.result?.url || j.result?.image || j.result || j.url || j.data
   if (typeof url === 'object') url = url.url || url.image
-  if (!url) throw new Error(JSON.stringify(j).slice(0,120))
+  if (!url ||!String(url).startsWith('http')) throw new Error('API no dio url')
   const { data } = await axios.get(String(url).trim(), { responseType: 'arraybuffer' })
   return Buffer.from(data)
 }
 
-let handler = async (m, { conn, text }) => {
+let handler = async (m, { conn, text, command }) => {
   let link = text?.trim()
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
+
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una foto\n\n꒰🌼୭.toanime` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n꒰👻꒱ Responde a una foto para convertirla en anime embrujado\n\n꒰🦇୭.${command}` }, { quoted: m })
   }
+
   try {
-    await conn.sendMessage(m.chat, { react: { text: '🎨', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
+
     if (/image/.test(mime) &&!link) {
       let media = await q.download()
       link = await myCloud(media)
     }
-    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Convirtiendo...` }, { quoted: m })
+
+    await conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🕸️꒱ Convirtiendo a anime Halloween...` }, { quoted: m })
+
     const buf = await faaBuffer(`https://api-faa.my.id/faa/toanime?url=${encodeURIComponent(link)}`)
-    await conn.sendMessage(m.chat, { image: buf, caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Anime listo` }, { quoted: m })
+
+    await conn.sendMessage(m.chat, { image: buf, caption: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰👻꒱ Anime Halloween listo\n‧˚꒰🦇୭ ${(buf.length/1024).toFixed(0)} KB` }, { quoted: m })
+
   } catch (e) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰💀꒱ Error: ${e.message}` }, { quoted: m })
   }
 }
 
