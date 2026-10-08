@@ -2,13 +2,34 @@ import { exec } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 let handler = async (m, { conn, usedPrefix, command }) => {
+    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     let q = m.quoted ? m.quoted : m
     let mime = (q.msg || q).mimetype || ''
 
     if (!q.msg?.audioMessage && !q.msg?.pttMessage && !/audio/.test(mime)) {
-        return m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\nResponde a una nota de voz pe\n\n*${usedPrefix + command}*`)
+        return m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐀𝐔𝐃𝐈𝐎 ﹒ EFECTOS ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🎃 ࣪ ꕀ.${command} ˚. ᵎᵎ
+> Responde a una nota de voz pe
+
+.⃟𖥔 ݁. 𖦹˙— \`\`EFECTOS\`\` 👻 —˙𖦹.꒷
+
+── *🎃 DISPONIBLES* ╏ 🦇
+🎧 ➛ bass, blown, deep, earrape
+🎧 ➛ fast, fat, nightcore, reverse
+🎧 ➛ robot, slow, chipmunk, grave
+🎧 ➛ agudo, vibrato
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`)
     }
 
     let effect = command.toLowerCase()
@@ -32,9 +53,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 
     try {
-        await conn.sendMessage(m.chat, { react: { text: '🎧', key: m.key } })
+        await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
         let audio = await q.download()
-        if (!audio) return m.reply('😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ Audio no disponible, reenvíalo pe')
+        if (!audio) return m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n💀 Audio no disponible, reenvíalo pe`)
 
         let tmp = tmpdir()
         let name = Date.now()
@@ -55,21 +76,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
             audio: out, 
             mimetype: 'audio/mpeg',
             ptt: false,
-            fileName: `LUX_X_YALLICO_${effect}.mp3`
+            fileName: `LUX_X_YALLICO_${effect}_HALLOWEEN.mp3`
         }, { quoted: m })
 
         try { fs.unlinkSync(input) } catch {}
         try { fs.unlinkSync(output) } catch {}
-        await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
+        await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
 
     } catch (e) {
         console.log(e)
-        m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n❌ ${e.message.slice(0,400)}`)
+        m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n💀 Error embrujado: ${e.message.slice(0,400)}`)
     }
 }
 
 handler.help = ['bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'chipmunk', 'grave', 'vibrato']
-handler.tags = ['audio']
+handler.tags = ['audio', 'halloween']
 handler.command = ['bass', 'blown', 'deep', 'earrape', 'fast', 'fat', 'nightcore', 'reverse', 'robot', 'slow', 'smooth', 'chipmunk', 'agudo', 'grave', 'vibrato']
 
 export default handler
