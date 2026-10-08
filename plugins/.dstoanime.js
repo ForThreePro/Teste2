@@ -13,23 +13,17 @@ async function myCloud(content) {
   return j.url || j.data?.url
 }
 
-function getUrl(j) {
-  let out = j.result?.url || j.result?.video || j.result?.image || j.result || j.url || j.data
-  if (typeof out === 'object') out = out.url || out.video || out.image || out.data
-  return out? String(out).trim() : null
-}
-
-let handler = async (m, { conn, text, command }) => {
+let handler = async (m, { conn, text }) => {
   let link = text?.trim()
   let q = m.quoted? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
 
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una foto\n\n꒰🌼୭.${command} foto` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una foto\n\n꒰🌼୭.toanime` }, { quoted: m })
   }
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: command.includes('anime')? '🎨' : '🎬', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🎨', key: m.key } })
 
     if (/image/.test(mime) &&!link) {
       await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Subiendo...` }, { quoted: m })
@@ -37,35 +31,25 @@ let handler = async (m, { conn, text, command }) => {
       link = await myCloud(media)
     }
 
-    if (command == 'toanime' || command == 'anime') {
-      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Convirtiendo a anime...` }, { quoted: m })
-      const j = await fetch(`https://api-faa.my.id/faa/toanime?url=${encodeURIComponent(link)}`).then(r=>r.json())
-      const url = getUrl(j)
-      if (!url) throw new Error('toanime falló: ' + JSON.stringify(j).slice(0,150))
-      const buf = Buffer.from((await axios.get(url, { responseType: 'arraybuffer' })).data)
-      await conn.sendMessage(m.chat, { image: buf, caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Anime listo` }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Convirtiendo a anime...` }, { quoted: m })
 
-    } else {
-      await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Generando video 20-40s...` }, { quoted: m })
-      const j = await fetch(`https://api-faa.my.id/faa/img2video?url=${encodeURIComponent(link)}`).then(r=>r.json())
-      const url = getUrl(j)
-      if (!url) throw new Error('video falló: ' + JSON.stringify(j).slice(0,150))
+    const j = await fetch(`https://api-faa.my.id/faa/toanime?url=${encodeURIComponent(link)}`).then(r=>r.json())
 
-      // FIX DEFINITIVO: siempre a buffer
-      const { data } = await axios.get(url, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
-      const buf = Buffer.from(data)
-      if (buf.length < 10000) throw new Error('Video vacío')
+    let url = j.result?.url || j.result?.image || j.result || j.url || j.data
+    if (typeof url === 'object') url = url.url || url.image
+    if (!url) throw new Error('API falló: ' + JSON.stringify(j).slice(0,150))
 
-      await conn.sendMessage(m.chat, { video: buf, mimetype: 'video/mp4', caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Video listo` }, { quoted: m })
-    }
+    const buf = Buffer.from((await axios.get(String(url).trim(), { responseType: 'arraybuffer' })).data)
+
+    await conn.sendMessage(m.chat, { image: buf, caption: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Anime listo\n‧˚꒰🌼୭ Peso: ${(buf.length/1024).toFixed(0)} KB` }, { quoted: m })
 
   } catch (e) {
     return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: m })
   }
 }
 
-handler.command = ['toanime', 'anime', 'tovideo', 'img2video', 'img2vid']
+handler.command = ['toanime', 'anime']
 handler.tags = ['ai']
-handler.help = ['toanime', 'tovideo']
+handler.help = ['toanime']
 handler.group = true
 export default handler
