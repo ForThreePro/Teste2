@@ -22,56 +22,56 @@ const handler = async (m, { conn, command }) => {
         let mime = (q.msg || q).mimetype || ''
 
         if (!mime ||!/audio|video/.test(mime)) {
-            let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+            let menuUso = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐃𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
-🎵 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Hasta Garfield reconoce música mientras come lasaña"*
+🎃 ࣪ ꕀ.${command} ˚. ᵎᵎ
+> *"Hasta el fantasma reconoce música en Halloween"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`BUSCADOR\`\` 🔍 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`BUSCADOR HALLOWEEN\`\` 🔍 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 🎵 ➛ Identifica canciones respondiendo a audios o videos
-🎵 ➛.song = Descarga el audio
-🎵 ➛.letra = Muestra la letra + descarga el audio
+🎃 ➛.song = Descarga el audio embrujado
+👻 ➛.letra = Muestra la letra + descarga el audio
 
-── *📖 USO* ╏ 🍕
+── *📖 USO* ╏ 🦇
 1️⃣ ➛ Responde a un audio con:.*${command}*
 2️⃣ ➛ Responde a un video con:.*${command}*
 
-── *⏱️ NOTA* ╏ 🍕
-📦 ➛ Analiza los primeros *${CLIP_SECONDS}s* de audio
-😼 ➛ Garfield escucha mejor con lasaña
+── *⏱️ NOTA* ╏ 🕯️
+📦 ➛ Analiza los primeros *${CLIP_SECONDS}s*
+🦇 ➛ Garfield con disfraz escucha mejor
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
         }
 
-        await m.react('🔍')
+        await m.react('🎃')
         let buffer = await q.download()
         if (!buffer) throw new Error('Error al descargar el archivo')
 
-        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` 🎶 —˙𖦹.꒷
 
-── *📊 PROCESO* ╏ 🍕
-🔍 ➛ Analizando ${CLIP_SECONDS}s de audio...
-📤 ➛ Subiendo a servidor temporal...
-🎶 ➛ Buscando coincidencia...
-😼 ➛ Garfield afinando sus bigotes...
+── *📊 PROCESO* ╏ 🎃
+🕸️ ➛ Analizando ${CLIP_SECONDS}s de audio...
+📤 ➛ Subiendo al cementerio temporal...
+🎶 ➛ Invocando coincidencia...
+👻 ➛ Garfield fantasma afinando bigotes...
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`)
 
         let clip = await prepareClip(buffer, CLIP_SECONDS)
@@ -79,8 +79,7 @@ const handler = async (m, { conn, command }) => {
         let song = await recognizeUrl(url)
         let searchQuery = `${song.title} ${song.artist}`.replace(/\[.*?\]|\(feat.*?\)/gi, '').trim()
 
-        // 2. BUSCAR Y DESCARGAR
-        await m.react('📥')
+        await m.react('🦇')
         let search = await yts(searchQuery)
         let result = search.videos[0]
         if (!result) throw new Error('No se encontró la canción en YouTube')
@@ -89,36 +88,33 @@ const handler = async (m, { conn, command }) => {
         const shortUrl = `https://youtu.be/${videoId}`
         const thumb = (await conn.getFile(thumbnail)).data
         const vistas = formatViews(views)
-
-        // 3. DESCARGAR AUDIO
         const mediaUrl = await getMediaUrl(shortUrl)
         if (!mediaUrl) throw new Error('No se pudo obtener el audio')
 
-        // ===== SI ES.song =====
         if(command === 'song'){
             await conn.sendMessage(m.chat, {
                 image: thumb,
-                caption: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+                caption: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎵 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎃 —˙𖦹.꒷
 
-── *📊 INFORMACIÓN* ╏ 🍕
+── *📊 INFORMACIÓN* ╏ 🎃
 📌 ➛ Título: *${title}*
 👤 ➛ Artista: *${author.name}*
 👁️ ➛ Vistas: *${vistas}*
 ⏱️ ➛ Duración: *${timestamp}*
 🔗 ➛ Link: ${shortUrl}
-😼 ➛ Encontrado por Garfield
+👻 ➛ Encontrado por fantasma Garfield
 
-── *📥 DESCARGA* ╏ 🍕
-⬇️ ➛ Enviando audio...
-🍝 ➛ Preparando lasaña sonora...
+── *📥 DESCARGA* ╏ 🦇
+⬇️ ➛ Enviando audio embrujado...
+🍬 ➛ Preparando dulce sonoro...
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
             }, { quoted: m })
 
@@ -129,33 +125,32 @@ const handler = async (m, { conn, command }) => {
             }, { quoted: m })
         }
 
-        // ===== SI ES.letra =====
         if(command === 'letra'){
             await m.react('📝')
             const lyricsRes = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(song.artist)}/${encodeURIComponent(song.title)}`).then(r => r.json())
             let lyrics = lyricsRes.lyrics || 'No se encontró la letra'
-            if(lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga, como siesta de Garfield 😴'
+            if(lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga, como siesta de fantasma 😴'
 
             await conn.sendMessage(m.chat, {
-                text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+                text: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐋𝐄𝐓𝐑𝐀 ﹒ LETRA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`LETRA\`\` 🎤 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`LETRA HALLOWEEN\`\` 🎤 —˙𖦹.꒷
 
-── *📊 CANCIÓN* ╏ 🍕
+── *📊 CANCIÓN* ╏ 🎃
 📌 ➛ *${title}* - *${author.name}*
-😼 ➛ Garfield tararea esto
+👻 ➛ Garfield fantasma tararea esto
 
-── *📜 LETRA* ╏ 🍕
+── *📜 LETRA* ╏ 🕯️
 \`\`${lyrics}\`\`
 
-── *📥 DESCARGA* ╏ 🍕
-⬇️ ➛ Enviando audio...
+── *📥 DESCARGA* ╏ 🦇
+⬇️ ➛ Enviando audio embrujado...
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
             }, { quoted: m })
 
@@ -166,35 +161,34 @@ const handler = async (m, { conn, command }) => {
             }, { quoted: m })
         }
 
-        await m.react('✅')
+        await m.react('🎃')
 
     } catch(e) {
-        await m.react('❌')
+        await m.react('💀')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        let menuError = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        let menuError = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 ❌ ➛ ${e.message}
-😿 ➛ Garfield no pudo reconocerlo, estaba dormido
+😿 ➛ El fantasma no pudo reconocerlo, se asustó
 
-── *💡 SOLUCIÓN* ╏ 🍕
+── *💡 SOLUCIÓN* ╏ 🕯️
 🔧 ➛ Usa un audio/video más claro
 🔧 ➛ Asegúrate que tenga música con voz
-🍝 ➛ Prueba con más lasaña... digo, más volumen
+🍬 ➛ Prueba con más dulces... digo, más volumen
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
     }
 }
 
-// ===== FUNCIONES =====
 async function recognizeUrl(audioUrl) {
   const res = await fetch(SONGFINDER_API, {
     method: 'POST',
@@ -244,6 +238,6 @@ function formatViews(views) {
 }
 
 handler.help = ['song', 'letra']
-handler.tags = ['buscador']
+handler.tags = ['buscador', 'halloween']
 handler.command = ['song', 'letra']
 export default handler
