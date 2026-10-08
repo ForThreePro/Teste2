@@ -18,32 +18,32 @@ const handler = async (m, { conn }) => {
     const mime = (q.msg || q).mimetype || ''
 
     if (!/video/.test(mime)) {
-        let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        let menuUso = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐇𝐄𝐑𝐀𝐌𝐈𝐄𝐍𝐓𝐀 ﹒ AUDIVD ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
-🎵 ࣪ ꕀ.audivd ˚. ᵎᵎ
-> *"Sacando el audio como Garfield saca la lasaña del horno"*
+🎃 ࣪ ꕀ.audivd ˚. ᵎᵎ
+> *"Sacando el audio como fantasma saca almas"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA\`\` ⚙️ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`HERRAMIENTA HALLOWEEN\`\` ⚙️ —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
-🎵 ➛ Extrae el audio de un video
-🎵 ➛ Convierte a MP3 192kbps
-😼 ➛ Garfield escuchando mientras come
+── *📝 DESCRIPCIÓN* ╏ 🎃
+🎃 ➛ Extrae el audio de un video
+🦇 ➛ Convierte a MP3 192kbps
+👻 ➛ Fantasma Garfield escuchando
 
-── *📖 USO* ╏ 🍕
+── *📖 USO* ╏ 🦇
 1️⃣ ➛ Responde a un video con:.*audivd*
 2️⃣ ➛ O usa el alias:.*audio*
 
-── *📦 FORMATO* ╏ 🍕
+── *📦 FORMATO* ╏ 🕯️
 ⬇️ ➛ Salida: *MP3 44.1kHz Stereo*
-🍝 ➛ Calidad lasaña premium
+🎃 ➛ Calidad calabaza premium
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
@@ -52,22 +52,22 @@ const handler = async (m, { conn }) => {
     let tempVideo
     let tempAudio
     try {
-        await react(conn, m, "⏳")
-        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        await react(conn, m, "🎃")
+        await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ AUDIVD ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` ⚙️ —˙𖦹.꒷
 
-── *📊 ESTADO* ╏ 🍕
-📥 ➛ Descargando video...
-🎵 ➛ Extrayendo audio...
-⚙️ ➛ Convirtiendo a MP3...
-😴 ➛ Garfield espera con hambre...
+── *📊 ESTADO* ╏ 🎃
+📥 ➛ Descargando video embrujado...
+🎵 ➛ Extrayendo alma del audio...
+⚙️ ➛ Convirtiendo a MP3 maldito...
+👻 ➛ Fantasma espera con dulces...
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`)
 
         const videoBuffer = await q.download()
@@ -96,55 +96,55 @@ const handler = async (m, { conn }) => {
         await conn.sendMessage(m.chat, {
             audio: audioBuffer,
             mimetype: 'audio/mpeg',
-            fileName: 'audio_extraido.mp3',
+            fileName: 'audio_extraido_halloween.mp3',
             ptt: false
         }, { quoted: m })
 
-        await react(conn, m, "✅")
-        let menuOk = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        await react(conn, m, "🎃")
+        let menuOk = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ AUDIVD ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎵 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎃 —˙𖦹.꒷
 
-── *📊 RESULTADO* ╏ 🍕
-✅ ➛ Audio extraído correctamente
+── *📊 RESULTADO* ╏ 🎃
+✅ ➛ Audio exorcizado correctamente
 📌 ➛ Formato: *MP3 192kbps*
 📌 ➛ Calidad: *44.1kHz Stereo*
-😼 ➛ Garfield aprueba este audio
+👻 ➛ Fantasma aprueba este audio
 
-── *📥 DESCARGA* ╏ 🍕
+── *📥 DESCARGA* ╏ 🦇
 ⬇️ ➛ Archivo enviado arriba
-🍝 ➛ Listo para escuchar comiendo lasaña
+🍬 ➛ Listo para escuchar en noche de brujas
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuOk }, { quoted: m })
 
     } catch (e) {
         console.error(e)
-        await react(conn, m, "❌")
+        await react(conn, m, "💀")
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        let menuErr = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        let menuErr = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ AUDIVD ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 ❌ ➛ ${e.message}
-😴 ➛ Garfield se quedó dormido
+💀 ➛ El fantasma se asustó
 
-── *💡 SOLUCIÓN* ╏ 🍕
+── *💡 SOLUCIÓN* ╏ 🕯️
 🔧 ➛ Usa un video válido
 🔧 ➛ Máx 2 minutos recomendado
-🍕 ➛ Intenta con menos peso que una lasaña
+🎃 ➛ Intenta con menos peso que una calabaza
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
     } finally {
@@ -154,7 +154,7 @@ const handler = async (m, { conn }) => {
 }
 
 handler.help = ['audivd']
-handler.tags = ['tools']
+handler.tags = ['tools', 'halloween']
 handler.command = ['audivd', 'audio']
 handler.limit = true
 export default handler
