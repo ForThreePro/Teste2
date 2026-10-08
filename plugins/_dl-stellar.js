@@ -200,7 +200,7 @@ let handler = async (m, { conn, command }) => {
 }
 
 handler.help = ['play1 <nombre>', 'ttmp3 <link>', 'fb <link>']
-handler.tags = ['descargas', 'halloween']
+handler.tags = ['descargas']
 handler.command = /^(play1|ttmp3|fb|facebook)$/i
 handler.register = false
 export default handler
