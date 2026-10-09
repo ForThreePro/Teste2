@@ -7,7 +7,7 @@ const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
 if (!m.quoted) {
   let error = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ VER ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ VER ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
