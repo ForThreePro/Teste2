@@ -68,6 +68,6 @@ let handler = async (m, { conn, args, command }) => {
 }
 
 handler.help = ['temporizador 30d','tempcancel','templist']
-handler.tags = ['grupo']
+handler.tags = ['grupos']
 handler.command = ['temporizador','temp','tempcancel','templist']
 export default handler
