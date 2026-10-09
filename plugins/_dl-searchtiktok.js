@@ -11,13 +11,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   const footer = `\n━━━━━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN* 🦇`
   const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
 
-  if (!text) return conn.reply(m.chat, head + `\n💀 Usa: *${usedPrefix + command} ${command.includes('tiktok')? 'Bad Bunny' : 'Naruto'}*` + footer, m)
+  if (!text) return conn.reply(m.chat, head + `\n💀 Usa: *${usedPrefix + command} Naruto*` + footer, m)
 
   let type = ''
   if (['ttsearch','tiktoksearch','ttss'].includes(command)) type = 'tiktok'
   if (['pinterest','pin','pinterestsearch'].includes(command)) type = 'pinterest'
   if (['pinterestvideo','pinvid','pinterestvid'].includes(command)) type = 'pinvid'
-  if (['ytsearch','yts','ytbuscar'].includes(command)) type = 'yt'
+  if (['ytsearch','yts'].includes(command)) type = 'yt'
   if (['apksearch','apk'].includes(command)) type = 'apk'
   if (['soundcloud','scsearch'].includes(command)) type = 'soundcloud'
   if (['spotify','spotifysearch'].includes(command)) type = 'spotify'
@@ -27,49 +27,61 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   try {
     await react('⏳')
-    let endpoint = type === 'pinvid' ? 'pinterestvideo' : type
+    let endpoint = type === 'pinvid'? 'pinterestvideo' : type
     let apiUrl = `${BASE}/${endpoint}?query=${encodeURIComponent(text)}&key=${API_KEY}`
     let res = await fetch(apiUrl)
     let json = await res.json()
 
-    let data = json.result || json.data || json.results || []
-    if (!Array.isArray(data)) data = [data]
+    // FIX: Detectar si viene con count + videos / pins
+    let result = json.result || json.data || json
+    let data = []
+
+    if (Array.isArray(result)) {
+      data = result
+    } else if (result.videos) {
+      data = result.videos // pinvid
+    } else if (result.pins || result.images) {
+      data = result.pins || result.images // pinterest
+    } else if (result.results) {
+      data = result.results
+    } else {
+      data = [result]
+    }
+
     data = data.filter(Boolean)
     if (!data.length) throw new Error('API sin resultados')
 
     let v = data[Math.floor(Math.random() * data.length)]
 
     let mediaUrl = ''
-    let title = v.title || v.name || v.caption || text
+    let title = v.title || v.name || text
 
     if (type === 'tiktok') {
-      mediaUrl = v.dl || v.play || v.video || v.url
-      if (typeof mediaUrl === 'object') mediaUrl = mediaUrl.url
+      mediaUrl = v.dl || v.play
     } else if (type === 'pinterest') {
-      mediaUrl = v.image || v.images?.[0] || v.url
-      if (typeof mediaUrl === 'object') mediaUrl = mediaUrl.url || mediaUrl.src
+      mediaUrl = v.image || v.img || v.media || v.url
     } else if (type === 'pinvid') {
-      mediaUrl = v.video || v.videoUrl || v.dl || v.url
-      if (typeof mediaUrl === 'object') mediaUrl = mediaUrl.url
+      mediaUrl = v.dl || v.video || v.videoUrl
+      title = v.title || text
     } else {
-      mediaUrl = v.thumbnail || v.image || v.cover || v.artwork || v.profilePic || v.icon || v.url
+      mediaUrl = v.thumbnail || v.thumb || v.image || v.cover || v.icon || v.url
     }
 
-    if (!mediaUrl || !mediaUrl.startsWith('http')) throw new Error(`Sin URL válida: ${JSON.stringify(v).slice(0,250)}`)
+    if (typeof mediaUrl === 'object') mediaUrl = mediaUrl.url || mediaUrl.src || ''
+    if (!mediaUrl ||!mediaUrl.startsWith('http')) throw new Error(`URL inválida`)
 
     let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} SEARCH* 🎃\n\n`
     caption += `꒰ 👻 ꒱ *Título:* ${String(title).slice(0,90)}\n`
     caption += `꒰ 🔍 ꒱ *Query:* ${text}\n`
-    if (v.author || v.username) caption += `꒰ 🦇 ꒱ *Autor:* ${v.author || v.username}\n`
-    caption += `꒰ 🎲 ꒱ *Random* ${data.length} encontrados\n`
+    if (v.likes) caption += `꒰ ❤️ ꒱ *Likes:* ${v.likes}\n`
+    if (v.duration) caption += `꒰ ⏱️ ꒱ *Duración:* ${v.duration}\n`
+    caption += `꒰ 🎲 ꒱ *Random ${data.length} encontrados*\n`
     caption += footer
 
     if (type === 'tiktok' || type === 'pinvid') {
       await conn.sendFile(m.chat, mediaUrl, `${type}.mp4`, caption, m)
-    } else if (type === 'pinterest' || type === 'instagram' || type === 'facebook') {
-      await conn.sendFile(m.chat, mediaUrl, `${type}.jpg`, caption, m)
     } else {
-      await conn.sendFile(m.chat, mediaUrl, 'thumb.jpg', caption + `\n\n🔗 ${v.url || v.link || ''}`, m)
+      await conn.sendFile(m.chat, mediaUrl, `${type}.jpg`, caption, m)
     }
 
     await react('🎃')
