@@ -11,164 +11,83 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   const footer = `\n━━━━━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN* 🦇`
   const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
 
-  if (!text) return conn.reply(m.chat, head + `\n💀 Usa: *${usedPrefix + command} Bad Bunny*` + footer, m)
+  if (!text) return conn.reply(m.chat, head + `\n💀 Usa: *${usedPrefix + command} Naruto*` + footer, m)
 
   let type = ''
   if (['ttsearch','tiktoksearch','ttss'].includes(command)) type = 'tiktok'
-  if (['pinterest','pin'].includes(command)) type = 'pinterest'
-  if (['pinvid','pinterestvideo'].includes(command)) type = 'pinterestvideo'
-  if (['ytsearch','yts','ytbuscar'].includes(command)) type = 'yt'
+  if (['pinterest','pin','pinterestsearch'].includes(command)) type = 'pinterest'
+  if (['pinvid','pinterestvideo','pinterestvid'].includes(command)) type = 'pinterestvideo'
   if (['apk','apksearch','apkdl'].includes(command)) type = 'apk'
-  if (['igsearch','instagramsearch'].includes(command)) type = 'instagram'
-  if (['fbsearch','facebooksearch'].includes(command)) type = 'facebook'
-  if (['spotify','spotifysearch'].includes(command)) type = 'spotify'
-  if (['soundcloud','scsearch'].includes(command)) type = 'soundcloud'
-  if (['deezer'].includes(command)) type = 'deezer'
 
   try {
     await react('⏳')
+    let apiUrl = `${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
+    let res = await fetch(apiUrl)
+    let json = await res.json()
 
-    // ========= FUNCION DESCARGA UNIVERSAL =========
-    const tryDownload = async (videoUrl, endpoints) => {
-      for (let ep of endpoints) {
-        try {
-          let r = await fetch(ep)
-          let j = await r.json().catch(()=>null)
-          if (!j) {
-            // si no es json, puede ser redirect directo
-            if (r.url && r.url.startsWith('http') && r.url!== ep) return r.url
-            continue
-          }
-          let dl = j.result?.dl || j.result?.url || j.result?.download || j.result || j.dl || j.url || j.link
-          if (typeof dl === 'object') dl = dl.url || dl.dl
-          if (typeof dl === 'string' && dl.startsWith('http')) return dl
-        } catch {}
-      }
-      return null
-    }
+    let result = json.result || json.data || json
+    let data = []
+    if (Array.isArray(result)) data = result
+    else if (result.videos) data = result.videos
+    else if (result.pins) data = result.pins
+    else if (result.images) data = result.images
+    else data = [result]
 
-    // ========= SEARCH BASE =========
-    let sRes = await fetch(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
-    let sJson = await sRes.json()
-    let sData = sJson.result || sJson.data || sJson.results || sJson
-    if (!Array.isArray(sData)) {
-      if (sData.videos) sData = sData.videos
-      else if (sData.pins) sData = sData.pins
-      else if (sData.images) sData = sData.images
-      else if (sData.tracks) sData = sData.tracks
-      else sData = [sData]
-    }
-    sData = sData.flat().filter(Boolean)
-    if (!sData.length) throw new Error('Sin resultados')
-    let v = sData[Math.floor(Math.random() * sData.length)]
+    data = data.flat().filter(Boolean)
+    if (!data.length) throw new Error('Sin resultados')
 
-    let title = v.title || v.name || v.caption || text
-    let thumb = v.thumbnail || v.thumb || v.image || v.cover || v.artwork || v.icon
-    let videoUrl = v.url || v.link || v.videoUrl || v.permalink || ''
+    let v = data[Math.floor(Math.random() * data.length)]
+    let title = v.title || v.name || text
 
-    // ========= CASOS CON DESCARGA =========
-    if (['yt','instagram','facebook','tiktok','spotify','soundcloud','deezer','apk','pinterestvideo'].includes(type)) {
-      let dlEndpoints = []
-
-      if (type === 'yt') {
-        dlEndpoints = [
-          `${BASE}/download/ytmp4?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-          `${BASE}/download/yt?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'instagram') {
-        dlEndpoints = [
-          `${BASE}/download/ig?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-          `${BASE}/download/instagram?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'facebook') {
-        dlEndpoints = [
-          `${BASE}/download/fb?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-          `${BASE}/download/facebook?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'tiktok') {
-        dlEndpoints = [
-          `${BASE}/download/tiktok?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-          `${BASE}/download/tt?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'spotify') {
-        dlEndpoints = [
-          `${BASE}/download/spotify?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-          `${BASE}/download/sp?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'soundcloud') {
-        dlEndpoints = [
-          `${BASE}/download/soundcloud?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-          `${BASE}/download/sc?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'deezer') {
-        dlEndpoints = [
-          `${BASE}/download/deezer?url=${encodeURIComponent(videoUrl)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'apk') {
-        dlEndpoints = [
-          `${BASE}/download/apk?query=${encodeURIComponent(text)}&key=${API_KEY}`,
-          `${BASE}/download/apk?package=${encodeURIComponent(v.id||v.package||text)}&key=${API_KEY}`,
-        ]
-      } else if (type === 'pinterestvideo') {
-        // pinvid ya trae dl directo
-        let direct = v.dl || v.video || v.videoUrl
-        if (direct && direct.startsWith('http')) {
-          await conn.sendFile(m.chat, direct, 'pinvid.mp4', head + `\n‧˚꒰🦇୭ *PINTEREST VIDEO* 🎃\n\n꒰ 👻 ꒱ ${title.slice(0,80)}\n` + footer, m)
-          await react('🎃')
-          return
-        }
-      }
-
-      let mediaDl = null
-      if (type!== 'pinterestvideo') {
-        // si el objeto ya trae dl directo
-        if (v.dl && typeof v.dl === 'string' && v.dl.startsWith('http')) mediaDl = v.dl
-        else mediaDl = await tryDownload(videoUrl, dlEndpoints)
-      }
-
-      let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()}* 🎃\n\n`
-      caption += `꒰ 👻 ꒱ *${String(title).slice(0,80)}*\n`
-      caption += `꒰ 🔍 ꒱ ${text}\n`
-      if (v.author || v.artist) caption += `꒰ 🦇 ꒱ ${v.author||v.artist}\n`
-      caption += footer
-
-      if (!mediaDl) {
-        // fallback: manda thumb + link
-        if (thumb) await conn.sendFile(m.chat, thumb, 'thumb.jpg', caption + `\n🔗 ${videoUrl}`, m)
-        else await conn.reply(m.chat, caption + `\n🔗 ${videoUrl}\n\n💀 No se pudo descargar directo`, m)
-        await react('💀')
-        return
-      }
-
-      // ENVIAR SEGUN TIPO
-      if (['instagram','facebook','yt','tiktok','pinterestvideo'].includes(type)) {
-        await conn.sendFile(m.chat, mediaDl, `${type}.mp4`, caption, m)
-      } else if (['spotify','soundcloud','deezer'].includes(type)) {
-        if (thumb) {
-          try { await conn.sendFile(m.chat, thumb, 'thumb.jpg', caption, m) } catch {}
-        }
-        await conn.sendFile(m.chat, mediaDl, `${title}.mp3`, `🎧 *${title}* - LUX X YALLICO 🎃`, m, false, { mimetype: 'audio/mpeg' })
-      } else if (type === 'apk') {
-        if (thumb) {
-          try { await conn.sendFile(m.chat, thumb, 'icon.jpg', caption, m) } catch {}
-        }
-        await conn.sendMessage(m.chat, { document: { url: mediaDl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title}.apk` }, { quoted: m })
-      }
-
-      await react('🎃')
-      return
-    }
-
-    // ========= PINTEREST IMAGEN =========
-    const extractUrl = (obj) => {
-      let d = obj.image || obj.img || obj.src || obj.url || obj.media || obj.dl
+    // Extractor universal
+    const getUrl = (obj) => {
+      let d = obj.dl || obj.image || obj.img || obj.src || obj.url || obj.video || obj.videoUrl || obj.download
       if (typeof d === 'string' && d.startsWith('http')) return d
+      if (d && typeof d === 'object') {
+        let d2 = d.url || d.src || d.image
+        if (typeof d2 === 'string' && d2.startsWith('http')) return d2
+      }
       for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
-      let m2 = JSON.stringify(obj).match(/https?:\/\/[^\s"']+/g)
-      return m2? m2[0] : null
+      let mm = JSON.stringify(obj).match(/https?:\/\/[^\s"']+/g)
+      return mm? mm[0] : null
     }
-    let mediaUrl = extractUrl(v)
-    await conn.sendFile(m.chat, mediaUrl, `${type}.jpg`, head + `\n‧˚꒰🦇୭ *${type.toUpperCase()}* 🎃\n\n꒰ 👻 ꒱ ${title.slice(0,80)}\n` + footer, m)
+
+    let mediaUrl = getUrl(v)
+
+    if (!mediaUrl) throw new Error('No se pudo extraer URL')
+
+    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()}* 🎃\n\n`
+    caption += `꒰ 👻 ꒱ *${String(title).slice(0,80)}*\n`
+    caption += `꒰ 🔍 ꒱ ${text}\n`
+    if (v.likes) caption += `꒰ ❤️ ꒱ ${v.likes} likes\n`
+    caption += `꒰ 🎲 ꒱ ${data.length} encontrados\n`
+    caption += footer
+
+    if (type === 'tiktok' || type === 'pinterestvideo') {
+      await conn.sendFile(m.chat, mediaUrl, `${type}.mp4`, caption, m)
+    } else if (type === 'pinterest') {
+      await conn.sendFile(m.chat, mediaUrl, `${type}.jpg`, caption, m)
+    } else if (type === 'apk') {
+      let icon = v.icon || v.thumbnail || v.image
+      let size = v.size || ''
+      let version = v.version || v.versionName || ''
+
+      let captionApk = head + `\n‧˚꒰🦇୭ *APK DOWNLOAD* 📦🎃\n\n`
+      captionApk += `꒰ 👻 ꒱ *App:* ${title}\n`
+      if (version) captionApk += `꒰ 🧟 ꒱ *Versión:* ${version}\n`
+      if (size) captionApk += `꒰ 💀 ꒱ *Tamaño:* ${size}\n`
+      captionApk += `꒰ 🔍 ꒱ ${text}\n` + footer
+
+      if (icon) {
+        try { await conn.sendFile(m.chat, icon, 'icon.jpg', captionApk, m) } catch { await conn.reply(m.chat, captionApk, m) }
+      } else {
+        await conn.reply(m.chat, captionApk, m)
+      }
+
+      // Enviar APK como documento
+      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title}.apk` }, { quoted: m })
+    }
+
     await react('🎃')
 
   } catch (e) {
@@ -178,8 +97,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   }
 }
 
-handler.help = ['igsearch','fbsearch','spotify','soundcloud','deezer','ytsearch','apk','ttsearch','pinterest','pinvid']
-handler.tags = ['search','downloader']
-handler.command = ['igsearch','instagramsearch','fbsearch','facebooksearch','spotify','spotifysearch','soundcloud','scsearch','deezer','ytsearch','yts','ytbuscar','apk','apksearch','ttsearch','tiktoksearch','ttss','pinterest','pin','pinvid','pinterestvideo']
+handler.help = ['pinterest','pinvid','ttsearch','apk']
+handler.tags = ['search']
+handler.command = ['pinterest','pin','pinterestsearch','pinvid','pinterestvideo','pinterestvid','ttsearch','tiktoksearch','ttss','apk','apksearch','apkdl']
 
 export default handler
