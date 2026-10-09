@@ -22,102 +22,104 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
     await react('🔍')
 
-    let apiUrl = `${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
-    let res = await fetch(apiUrl)
-    let txt = await res.text()
-
-    // FIX del error <!DOCTYPE
-    if (txt.trim().startsWith('<!DOCTYPE') || txt.trim().startsWith('<html')) {
-      throw new Error('API Stellar devolvió HTML (está caída o key expiró)')
+    const safeJSON = async (url) => {
+      let r = await fetch(url)
+      let t = await r.text()
+      if (t.trim().startsWith('<!DOCTYPE') || t.trim().startsWith('<html')) throw new Error('API Stellar caída')
+      return JSON.parse(t)
     }
 
-    let json
-    try { json = JSON.parse(txt) } catch { throw new Error('API no devolvió JSON válido') }
-
-    let result = json.result || json.data || json
-    let data = []
-    if (Array.isArray(result)) data = result
-    else if (result.videos) data = result.videos
-    else if (result.pins) data = result.pins
-    else if (result.images) data = result.images
-    else data = [result]
-
-    data = data.flat().filter(Boolean)
-    if (!data.length) throw new Error(`No hay resultados para "${text}"`)
-
-    const getUrl = (obj) => {
-      if (typeof obj === 'string' && obj.startsWith('http')) return obj
-      let d = obj.dl || obj.video || obj.videoUrl || obj.url || obj.download || obj.image || obj.img || obj.src || obj.thumbnail
+    const getUrl = (o) => {
+      if (!o) return null
+      if (typeof o === 'string' && o.startsWith('http')) return o
+      let d = o.dl || o.video || o.videoUrl || o.url || o.download || o.image || o.img
       if (typeof d === 'string' && d.startsWith('http')) return d
       if (d && typeof d === 'object') return d.url || d.src || null
-      // busca cualquier http dentro del objeto
-      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
+      for (let k in o) if (typeof o[k] === 'string' && o[k].startsWith('http')) return o[k]
       return null
     }
 
-    const getImages = (obj) => {
-      let arr = []
-      if (obj.image) arr.push(obj.image)
-      if (obj.img) arr.push(obj.img)
-      if (obj.src) arr.push(obj.src)
-      if (obj.url && obj.url.includes('pinimg')) arr.push(obj.url)
-      if (obj.images && Array.isArray(obj.images)) arr.push(...obj.images)
-      return arr.filter(u => typeof u === 'string' && u.startsWith('http'))
-    }
-
     if (type === 'pinterest') {
+      let json = await safeJSON(`${BASE}/search/pinterest?query=${encodeURIComponent(text)}&key=${API_KEY}`)
+      let result = json.result || json.data || []
+      let data = Array.isArray(result)? result : [result]
       let images = []
-      for (let o of data) images.push(...getImages(o), getUrl(o))
-      images = [...new Set(images.filter(Boolean))]
-
-      if (!images.length) throw new Error(`No se encontraron imágenes para "${text}"`)
-
-      let toSend = images.slice(0, 5)
-
-      const cards = toSend.map((url, i) => ({
-        header: { hasMediaAttachment: true, imageMessage: { url } },
-        body: { text: `‧˚꒰🦇୭ ${text} - ${i+1}/${toSend.length} 🎃` },
-        footer: { text: 'LUX X YALLICO' },
-        nativeFlowMessage: {
-          buttons: [{
-            name: 'cta_url',
-            buttonParamsJson: JSON.stringify({
-              display_text: '👻 Ver HD',
-              url: url
-            })
-          }]
-        }
-      }))
-
-      await conn.sendMessage(m.chat, {
-        text: head + `\n‧˚꒰🦇୭ *PINTEREST CARRUSEL - ${text}* 🎃\n\n꒰ 👻 ꒱ *${toSend.length} resultados*\n꒰ 🔍 ꒱ ${text}\n` + footer,
-        footer: '🦇 Desliza para ver más 👉',
-        cards: cards,
-        header: { hasMediaAttachment: false }
-      }, { quoted: m })
-
+      for (let o of data) {
+        let u = getUrl(o)
+        if (u) images.push(u)
+        if (o.images) images.push(...o.images.filter(x=>typeof x==='string'))
+      }
+      images = [...new Set(images)].slice(0,5)
+      if (!images.length) throw new Error(`No hay imágenes para "${text}"`)
+      for (let i=0;i<images.length;i++){
+        let cap = i===0? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n꒰ 👻 ꒱ ${images.length} fotos (${i+1}/${images.length})\n` + footer : `꒰ 🦇 ꒱ ${text} ${i+1}/${images.length}`
+        await conn.sendFile(m.chat, images[i], `pin-${i}.jpg`, cap, m)
+        await new Promise(r=>setTimeout(r,600))
+      }
       await react('🎃')
       return
     }
 
-    // PINVID / TTSEARCH / APK
-    let v = data[0]
-    let mediaUrl = getUrl(v)
-    if (!mediaUrl) throw new Error('No se pudo extraer URL del resultado')
+    if (type === 'pinterestvideo') {
+      // 1. Buscar
+      let json = await safeJSON(`${BASE}/search/pinterestvideo?query=${encodeURIComponent(text)}&key=${API_KEY}`)
+      let result = json.result || json.data || json
+      let data = Array.isArray(result)? result : (result.videos || [result])
+      data = data.flat().filter(Boolean)
+      if (!data.length) throw new Error(`No hay videos para "${text}"`)
 
-    let cap = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} - ${text}* 🎃\n\n꒰ 👻 ꒱ *${(v.title||v.name||text).toString().slice(0,80)}*\n` + footer
+      let pinUrl = getUrl(data[0]) // link de pinterest tipo https://www.pinterest.com/pin/...
+      if (!pinUrl) throw new Error('No se encontró link del pin')
 
-    if (type === 'pinterestvideo') await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, cap, m)
-    else if (type === 'tiktok') await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, cap, m)
-    else if (type === 'apk') {
-      let icon = v.icon || v.thumbnail || null
-      let capApk = head + `\n‧˚꒰🦇୭ *APK - ${text}* 📦🎃\n\n꒰ 👻 ꒱ *${v.name||text}*\n` + footer
-      if (icon) {
-        try { await conn.sendFile(m.chat, icon, 'icon.jpg', capApk, m) } catch { await conn.reply(m.chat, capApk, m) }
-      } else await conn.reply(m.chat, capApk, m)
-      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${(v.name||text).replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
+      // 2. Descargar el mp4 real con el endpoint de download
+      // Stellar tiene varios nombres, probamos 3 variantes
+      let dlEndpoints = [
+        `${BASE}/download/pinterest?url=${encodeURIComponent(pinUrl)}&key=${API_KEY}`,
+        `${BASE}/download/pinterestvideo?url=${encodeURIComponent(pinUrl)}&key=${API_KEY}`,
+        `${BASE}/download/pinvid?url=${encodeURIComponent(pinUrl)}&key=${API_KEY}`,
+        `${BASE}/download/pinterestdl?url=${encodeURIComponent(pinUrl)}&key=${API_KEY}`
+      ]
+
+      let videoUrl = null
+      let title = data[0].title || text
+
+      for (let ep of dlEndpoints) {
+        try {
+          let j = await safeJSON(ep)
+          let r = j.result || j.data || j
+          let v = r.video || r.url || r.dl || r.download || r.media || r.result
+          if (typeof v === 'string' && v.startsWith('http')) { videoUrl = v; break }
+          if (v && typeof v === 'object' && v.url) { videoUrl = v.url; break }
+          // algunos devuelven { result: "https://...mp4" }
+          for (let k in r) if (typeof r[k] === 'string' && r[k].startsWith('http') && r[k].includes('.mp4')) { videoUrl = r[k]; break }
+          if (videoUrl) break
+        } catch {}
+      }
+
+      // Si aún no hay mp4, usa el pinUrl directo como último intento (algunos bots lo aceptan)
+      if (!videoUrl) videoUrl = pinUrl
+
+      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${title.toString().slice(0,80)}*\n꒰ 🔍 ꒱ ${text}\n` + footer
+      await conn.sendFile(m.chat, videoUrl, `pinvid.mp4`, cap, m)
+      await react('🎃')
+      return
     }
 
+    // TTSEARCH / APK siguen igual solo stellar
+    let json = await safeJSON(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
+    let result = json.result || json.data || json
+    let data = Array.isArray(result)? result : (result.videos || [result])
+    data = data.flat().filter(Boolean)
+    let v = data[0]
+    let mediaUrl = getUrl(v)
+    if (!mediaUrl) throw new Error('No se pudo extraer URL')
+    let cap = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} - ${text}* 🎃\n` + footer
+    if (type === 'tiktok') await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, cap, m)
+    else if (type === 'apk') {
+      let icon = v.icon || v.thumbnail
+      if (icon) try { await conn.sendFile(m.chat, icon, 'icon.jpg', cap, m) } catch {}
+      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${(v.name||text).replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
+    }
     await react('🎃')
 
   } catch (e) {
