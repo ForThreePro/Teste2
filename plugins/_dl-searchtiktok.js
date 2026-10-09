@@ -2,6 +2,7 @@ import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
+import { execSync } from 'child_process'
 import moment from 'moment-timezone'
 moment.locale('es')
 
@@ -35,45 +36,38 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
     await react('⏳')
     let list = await fetchApi(type, text)
-
-    // FALLBACK SI PINVID DA 0 RESULTADOS
-    if (type === 'pinterestvideo' &&!list.length) {
-      console.log('pinvid vacío, intentando pinterest normal')
-      let alt = await fetchApi('pinterest', text)
-      // saca los mp4 escondidos en pinterest
-      let mp4s = []
-      let str = JSON.stringify(alt)
-      let matches = str.match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
-      if (matches) mp4s = matches.map(u => ({ dl: u, title: text, duration: '', likes: 0 }))
-      // si aún no, prueba pinterest sin el texto completo
-      if (!mp4s.length) {
-        let alt2 = await fetchApi('pinterest', text.split(' ')[0])
-        let str2 = JSON.stringify(alt2)
-        let m2 = str2.match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
-        if (m2) mp4s = m2.map(u => ({ dl: u, title: text, duration: '', likes: 0 }))
-      }
-      list = mp4s.length? mp4s : alt
-    }
-
-    if (!list.length) throw new Error(`Sin resultados para ${text} en ${type}`)
+    if (type === 'pinterestvideo' &&!list.length) list = await fetchApi('pinterest', text)
+    if (!list.length) throw new Error(`Sin resultados para ${text}`)
 
     if (type === 'pinterestvideo') {
       let vids = list.filter(x => x.dl && x.dl.includes('.mp4'))
       if (!vids.length) {
         let all = JSON.stringify(list).match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
-        if (all) vids = all.map(u => ({ dl: u, title: text, duration: '', likes: 0 }))
+        if (all) vids = all.map(u => ({ dl: u, title: text }))
       }
-      if (!vids.length) throw new Error(`Stellar no devolvió mp4 para "${text}" - prueba con "${text.split(' ')[0]}"`)
+      if (!vids.length) throw new Error('No hay mp4')
 
       let v = vids[Math.floor(Math.random() * vids.length)]
       let r = await fetch(v.dl, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.pinterest.com/' } })
-      if (!r.ok) throw new Error(`Pin bloqueó ${r.status}`)
       let buf = Buffer.from(await r.arrayBuffer())
-      let tmp = path.join(tmpdir(), `pinvid-${Date.now()}.mp4`)
-      fs.writeFileSync(tmp, buf)
-      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n꒰ ⏱️ ꒱ ${v.duration || '0:00'} | ❤️ ${v.likes || 0}\n` + footer
-      await conn.sendFile(m.chat, tmp, 'pinvid.mp4', cap, m, false, { mimetype: 'video/mp4', asVideo: true })
-      try { fs.unlinkSync(tmp) } catch {}
+
+      let inFile = path.join(tmpdir(), `in_${Date.now()}.mp4`)
+      let outFile = path.join(tmpdir(), `out_${Date.now()}.mp4`)
+      fs.writeFileSync(inFile, buf)
+
+      try {
+        // Re-mux para que WhatsApp lo abra (arregla el "video no disponible")
+        execSync(`ffmpeg -y -i "${inFile}" -c copy -movflags +faststart "${outFile}"`)
+      } catch {
+        // Si no hay ffmpeg, usa el original
+        fs.copyFileSync(inFile, outFile)
+      }
+
+      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n` + footer
+
+      await conn.sendFile(m.chat, outFile, 'pinvid.mp4', cap, m, false, { mimetype: 'video/mp4' })
+
+      try { fs.unlinkSync(inFile); fs.unlinkSync(outFile) } catch {}
       await react('🎃')
       return
     }
@@ -81,11 +75,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (type === 'pinterest') {
       let imgs = list.map(o => o.dl || o.image || o.url).filter(u => u && u.startsWith('http'))
       imgs = [...new Set(imgs)].sort(() => 0.5 - Math.random()).slice(0, 5)
-      if (!imgs.length) throw new Error('No hay imágenes')
       for (let i = 0; i < imgs.length; i++) {
         let cap = i === 0? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n` + footer : `꒰ 🦇 ꒱ ${i+1}/5`
         await conn.sendFile(m.chat, imgs[i], `pin-${i}.jpg`, cap, m)
-        await new Promise(r => setTimeout(r, 400))
       }
       await react('🎃')
       return
@@ -94,7 +86,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (type === 'tiktok') {
       let v = list[Math.floor(Math.random() * list.length)]
       let url = v.dl || v.play || v.hdplay || v.video || v.url
-      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n` + footer
+      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH* 🎃\n` + footer
       await conn.sendFile(m.chat, url, 'tt.mp4', cap, m)
       await react('🎃')
       return
