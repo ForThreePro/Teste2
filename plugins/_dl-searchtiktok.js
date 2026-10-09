@@ -30,101 +30,59 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     let json = await safeJSON(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
-    let result = json.result || json.data || json
+    let result = json.data || json.result || json
     let data = Array.isArray(result)? result : (result.videos || result.pins || result.images || [result])
     data = data.flat().filter(Boolean)
-    if (!data.length) throw new Error('Sin resultados')
+    if (!data.length) throw new Error(`Sin resultados para "${text}"`)
 
-    // Extractor universal mejorado para Stellar
-    const extractUrl = (obj) => {
-      if (!obj) return null
-      if (typeof obj === 'string' && obj.startsWith('http')) return obj
-      // Tiktok Stellar usa estos keys
-      const keys = ['dl','hdplay','play','video','videoUrl','download','url','media','src','image','img','thumbnail','icon']
-      for (let k of keys) {
-        if (obj[k] && typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
-        if (obj[k] && typeof obj[k] === 'object') {
-          for (let kk of keys) {
-            if (obj[k][kk] && typeof obj[k][kk] === 'string' && obj[k][kk].startsWith('http')) return obj[k][kk]
-          }
-        }
-      }
-      // Busca cualquier http en el objeto
-      let str = JSON.stringify(obj)
-      let m1 = str.match(/https?:\/\/[^"'\s\\]+\.mp4[^"'\s\\]*/g)
-      if (m1) return m1[0].replace(/\\/g,'')
-      let m2 = str.match(/https?:\/\/[^"'\s\\]+pinimg[^"'\s\\]*/g)
-      if (m2) return m2[0].replace(/\\/g,'')
-      let m3 = str.match(/https?:\/\/[^"'\s\\]+\.jpg[^"'\s\\]*/g)
-      if (m3) return m3[0].replace(/\\/g,'')
-      let m4 = str.match(/https?:\/\/[^\s"']+/g)
-      return m4? m4[0].replace(/\\/g,'') : null
+    if (type === 'pinterestvideo') {
+      // FIX: tu API usa.dl directo
+      let vids = data.filter(x => x.dl && x.dl.startsWith('http')).slice(0, 5)
+      if (!vids.length) throw new Error('No hay dl en respuesta')
+
+      // Envía 1 random o el primero con más likes
+      let v = vids.sort((a,b) => (b.likes||0)-(a.likes||0))[0]
+
+      let caption = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n꒰ ⏱️ ꒱ ${v.duration || ''} | ❤️ ${v.likes || 0}\n꒰ 🔍 ꒱ ${text}\n` + footer
+
+      // v1.pinimg necesita buffer
+      let resVid = await fetch(v.dl)
+      let buf = await resVid.buffer()
+      await conn.sendFile(m.chat, buf, `pinvid.mp4`, caption, m)
+      await react('🎃')
+      return
     }
 
     if (type === 'pinterest') {
-      let images = []
-      for (let o of data) {
-        let u = extractUrl(o)
-        // Solo acepta pinimg para que no mande cualquier cosa
-        if (u && (u.includes('pinimg') || u.includes('pinterest') || u.includes('.jpg') || u.includes('.png'))) images.push(u)
-      }
+      // tu API pinterest también tiene dl o image
+      let images = data.map(o => o.dl || o.image || o.img || o.url || o.src).filter(u => u && u.startsWith('http') && (u.includes('pinimg') || u.includes('.jpg')))
       images = [...new Set(images)].slice(0, 5)
-      if (!images.length) throw new Error(`No hay imágenes para "${text}" - API devolvió otra cosa`)
+      if (!images.length) throw new Error(`No hay imágenes para "${text}"`)
 
-      for (let i = 0; i < images.length; i++) {
-        let caption = i === 0
-         ? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n꒰ 👻 ꒱ ${images.length} resultados\n꒰ 🔍 ꒱ ${text}\n` + footer
-          : `꒰ 🦇 ꒱ ${text} ${i+1}/${images.length}`
-        await conn.sendFile(m.chat, images[i], `pin-${i}.jpg`, caption, m)
-        await new Promise(r => setTimeout(r, 700))
+      for (let i=0;i<images.length;i++) {
+        let cap = i===0? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n꒰ 👻 ꒱ ${images.length} fotos\n` + footer : `꒰ 🦇 ꒱ ${text} ${i+1}/${images.length}`
+        await conn.sendFile(m.chat, images[i], `pin-${i}.jpg`, cap, m)
+        await new Promise(r=>setTimeout(r,600))
       }
       await react('🎃')
       return
     }
 
-    if (type === 'pinterestvideo') {
-      let v = data[0]
-      let mediaUrl = extractUrl(v)
-      if (!mediaUrl) throw new Error('No se pudo extraer URL: ' + JSON.stringify(v).slice(0,400))
+    // TTSEARCH y APK
+    const getUrl = (obj) => obj.dl || obj.play || obj.hdplay || obj.video || obj.url || obj.download || null
+    let v = data[0]
+    let mediaUrl = getUrl(v)
+    if (!mediaUrl) throw new Error('No se pudo extraer URL: ' + JSON.stringify(v).slice(0,300))
 
-      // FIX: v1.pinimg.com bloquea sendFile directo, hay que bajar a buffer
-      let caption = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n` + footer
-      try {
-        let vid = await fetch(mediaUrl)
-        let buf = await vid.buffer()
-        await conn.sendFile(m.chat, buf, `pinvid.mp4`, caption, m)
-      } catch {
-        // Si falla buffer, intenta directo
-        await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, caption, m)
-      }
-      await react('🎃')
-      return
+    let cap = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || v.name || text).slice(0,80)}*\n` + footer
+
+    if (type === 'tiktok') await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, cap, m)
+    else if (type === 'apk') {
+      if (v.icon) try { await conn.sendFile(m.chat, v.icon, 'icon.jpg', cap, m) } catch {}
+      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${(v.name||text).replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
     }
 
-    if (type === 'tiktok') {
-      let v = data[0]
-      let mediaUrl = extractUrl(v)
-      if (!mediaUrl) throw new Error('No se pudo extraer URL TT: ' + JSON.stringify(v).slice(0,500))
-
-      let caption = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || v.desc || text).slice(0,80)}*\n꒰ 🔍 ꒱ ${text}\n` + footer
-      await conn.sendFile(m.chat, mediaUrl, `tiktok.mp4`, caption, m)
-      await react('🎃')
-      return
-    }
-
-    // APK
-    if (type === 'apk') {
-      let v = data[Math.floor(Math.random() * data.length)]
-      let mediaUrl = extractUrl(v)
-      let title = v.title || v.name || text
-      let icon = v.icon || v.thumbnail
-      let captionApk = head + `\n‧˚꒰🦇୭ *APK - ${title}* 📦🎃\n\n꒰ 🔍 ꒱ ${text}\n` + footer
-      if (icon) try { await conn.sendFile(m.chat, icon, 'icon.jpg', captionApk, m) } catch { await conn.reply(m.chat, captionApk, m) }
-      else await conn.reply(m.chat, captionApk, m)
-      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title.replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
-      await react('🎃')
-      return
-    }
+    await react('🎃')
 
   } catch (e) {
     console.error(e)
