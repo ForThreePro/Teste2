@@ -5,12 +5,12 @@ moment.locale('es')
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   const head = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n꒰ ◞⁺⊹ ．${fecha}\n`
-  const footer = `\n━━━━━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇\n👻 _Powered by StellarWA_ 🕯️`
+  const footer = `\n━━━━━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`
   const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
 
   if (!text) {
     await react('💀')
-    return conn.reply(m.chat, head + `\n💀 Ingresa lo que quieres buscar\n\nEjemplo:\n*${usedPrefix + command} Bad Bunny*` + footer, m)
+    return conn.reply(m.chat, head + `\n💀 Usa: *${usedPrefix + command} Bad Bunny*` + footer, m)
   }
 
   try {
@@ -18,20 +18,21 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let res = await fetch(`https://api.stellarwa.xyz/search/tiktok?query=${encodeURIComponent(text)}&key=proyectsV2`)
     let json = await res.json()
 
-    let data = json.result
-    if (!data || !data.length) throw new Error('Sin resultados')
+    let data = json.result || []
+    if (!data.length) throw new Error('Sin resultados')
 
-    let v = data[0] // Solo el primero
+    // RANDOM - elige uno al azar de los resultados
+    let v = data[Math.floor(Math.random() * data.length)]
     let videoUrl = v.dl
     let title = v.title || 'Sin título'
 
     if (!videoUrl) throw new Error('No se pudo obtener el video')
 
-    let caption = head + `\n‧˚꒰🦇୭ *TT SEARCH - HALLOWEEN* 🎃\n\n`
+    let caption = head + `\n‧˚꒰🦇୭ *TT SEARCH - RANDOM* 🎃\n\n`
     caption += `꒰ 👻 ꒱ *Título:* ${title.slice(0, 90)}\n`
     caption += `꒰ 🔍 ꒱ *Query:* ${text}\n`
     caption += `꒰ 🆔 ꒱ *ID:* ${v.id}\n`
-    caption += `꒰ 📦 ꒱ *Resultado:* 1/1\n`
+    caption += `꒰ 🎲 ꒱ *Random:* ${data.length} videos encontrados\n`
     caption += footer
 
     await conn.sendFile(m.chat, videoUrl, 'ttsearch.mp4', caption, m)
@@ -40,7 +41,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   } catch (e) {
     console.error(e)
     await react('💀')
-    return conn.reply(m.chat, head + `\n💀 Error al buscar *${text}*\n\n> ${e.message}` + footer, m)
+    return conn.reply(m.chat, head + `\n💀 Error: ${e.message}` + footer, m)
   }
 }
 
