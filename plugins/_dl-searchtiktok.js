@@ -16,8 +16,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let type = ''
   if (['ttsearch','tiktoksearch','ttss'].includes(command)) type = 'tiktok'
   if (['pinterest','pin','pinterestsearch'].includes(command)) type = 'pinterest'
-  if (['pinterestvideo','pinvid','pinterestvid'].includes(command)) type = 'pinvid'
-  if (['ytsearch','yts'].includes(command)) type = 'yt'
+  if (['pinterestvideo','pinvid','pinterestvid'].includes(command)) type = 'pinterestvideo'
+  if (['ytsearch','yts','ytbuscar'].includes(command)) type = 'yt'
   if (['apksearch','apk'].includes(command)) type = 'apk'
   if (['soundcloud','scsearch'].includes(command)) type = 'soundcloud'
   if (['spotify','spotifysearch'].includes(command)) type = 'spotify'
@@ -27,61 +27,69 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   try {
     await react('⏳')
-    let endpoint = type === 'pinvid'? 'pinterestvideo' : type
-    let apiUrl = `${BASE}/${endpoint}?query=${encodeURIComponent(text)}&key=${API_KEY}`
+    let apiUrl = `${BASE}/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
     let res = await fetch(apiUrl)
     let json = await res.json()
 
-    // FIX: Detectar si viene con count + videos / pins
-    let result = json.result || json.data || json
+    let result = json.result || json.data || json.results || json
     let data = []
 
-    if (Array.isArray(result)) {
-      data = result
-    } else if (result.videos) {
-      data = result.videos // pinvid
-    } else if (result.pins || result.images) {
-      data = result.pins || result.images // pinterest
-    } else if (result.results) {
-      data = result.results
-    } else {
-      data = [result]
-    }
+    if (Array.isArray(result)) data = result
+    else if (result.videos) data = result.videos
+    else if (result.pins) data = result.pins
+    else if (result.images) data = result.images
+    else if (result.result) data = Array.isArray(result.result)? result.result : [result.result]
+    else if (result.data) data = Array.isArray(result.data)? result.data : [result.data]
+    else data = [result]
 
-    data = data.filter(Boolean)
-    if (!data.length) throw new Error('API sin resultados')
+    data = data.flat().filter(Boolean)
+    if (!data.length) throw new Error('Sin resultados')
 
     let v = data[Math.floor(Math.random() * data.length)]
 
-    let mediaUrl = ''
-    let title = v.title || v.name || text
-
-    if (type === 'tiktok') {
-      mediaUrl = v.dl || v.play
-    } else if (type === 'pinterest') {
-      mediaUrl = v.image || v.img || v.media || v.url
-    } else if (type === 'pinvid') {
-      mediaUrl = v.dl || v.video || v.videoUrl
-      title = v.title || text
-    } else {
-      mediaUrl = v.thumbnail || v.thumb || v.image || v.cover || v.icon || v.url
+    // EXTRACTOR UNIVERSAL - busca cualquier URL http dentro del objeto
+    const extractUrl = (obj) => {
+      if (!obj || typeof obj!== 'object') return null
+      // prioridades
+      let direct = obj.dl || obj.video || obj.videoUrl || obj.image || obj.img || obj.src || obj.media || obj.url || obj.link || obj.download
+      if (typeof direct === 'string' && direct.startsWith('http')) return direct
+      if (direct && typeof direct === 'object') {
+        let d2 = direct.url || direct.src || direct.image || direct.link
+        if (typeof d2 === 'string' && d2.startsWith('http')) return d2
+      }
+      // busca cualquier string http en el objeto
+      for (let k in obj) {
+        let val = obj[k]
+        if (typeof val === 'string' && val.startsWith('http') && (val.includes('.jpg') || val.includes('.png') || val.includes('.mp4') || val.includes('pinimg') || val.includes('pinimg.com') || val.includes('v1.pinimg'))) return val
+        if (typeof val === 'string' && val.startsWith('http')) return val
+      }
+      return null
     }
 
-    if (typeof mediaUrl === 'object') mediaUrl = mediaUrl.url || mediaUrl.src || ''
-    if (!mediaUrl ||!mediaUrl.startsWith('http')) throw new Error(`URL inválida`)
+    let mediaUrl = extractUrl(v)
+    if (!mediaUrl) {
+      // último intento: primer http del JSON completo
+      let allStrings = JSON.stringify(v).match(/https?:\/\/[^\s"']+/g)
+      if (allStrings) mediaUrl = allStrings.find(u => u.includes('pinimg') || u.includes('.jpg') || u.includes('.mp4')) || allStrings[0]
+    }
 
-    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} SEARCH* 🎃\n\n`
-    caption += `꒰ 👻 ꒱ *Título:* ${String(title).slice(0,90)}\n`
+    if (!mediaUrl ||!mediaUrl.startsWith('http')) throw new Error(`No se pudo extraer URL`)
+
+    let title = v.title || v.name || v.caption || text
+    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()}* 🎃\n\n`
+    caption += `꒰ 👻 ꒱ *${String(title).slice(0,90)}*\n`
     caption += `꒰ 🔍 ꒱ *Query:* ${text}\n`
-    if (v.likes) caption += `꒰ ❤️ ꒱ *Likes:* ${v.likes}\n`
-    if (v.duration) caption += `꒰ ⏱️ ꒱ *Duración:* ${v.duration}\n`
-    caption += `꒰ 🎲 ꒱ *Random ${data.length} encontrados*\n`
+    if (v.likes) caption += `꒰ ❤️ ꒱ ${v.likes} likes\n`
+    if (v.duration) caption += `꒰ ⏱️ ꒱ ${v.duration}\n`
+    caption += `꒰ 🎲 ꒱ ${data.length} resultados\n`
     caption += footer
 
-    if (type === 'tiktok' || type === 'pinvid') {
+    if (type === 'tiktok' || type === 'pinterestvideo') {
       await conn.sendFile(m.chat, mediaUrl, `${type}.mp4`, caption, m)
-    } else {
+    } else if (type === 'pinterest' || type === 'instagram' || type === 'facebook') {
       await conn.sendFile(m.chat, mediaUrl, `${type}.jpg`, caption, m)
+    } else {
+      await conn.sendFile(m.chat, mediaUrl, 'thumb.jpg', caption, m)
     }
 
     await react('🎃')
@@ -93,7 +101,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   }
 }
 
-handler.help = ['ttsearch <texto>', 'pinterest <texto>', 'pinvid <texto>', 'ytsearch <texto>', 'apk <texto>', 'soundcloud <texto>', 'spotify <texto>', 'deezer <texto>', 'igsearch <texto>', 'fbsearch <texto>']
+handler.help = ['ttsearch','pinterest','pinvid','ytsearch','apk','soundcloud','spotify','deezer','igsearch','fbsearch']
 handler.tags = ['search']
 handler.command = ['ttsearch','tiktoksearch','ttss','pinterest','pin','pinterestsearch','pinterestvideo','pinvid','pinterestvid','ytsearch','yts','ytbuscar','apksearch','apk','soundcloud','scsearch','spotify','spotifysearch','deezer','igsearch','instagramsearch','fbsearch','facebooksearch']
 
