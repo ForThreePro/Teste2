@@ -13,46 +13,38 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   if (!text) {
     await react('💀')
-    return conn.reply(m.chat, `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n💀 Usa: *${usedPrefix + command} Bad Bunny*`, m)
+    return conn.reply(m.chat, `💀 Usa: *${usedPrefix + command} Bad Bunny*`, m)
   }
 
   try {
     await react('⏳')
     let res = await fetch(`${api.url}?query=${encodeURIComponent(text)}&key=${api.key}`)
     let json = await res.json()
+    let data = json.result || []
+    if (!data.length) throw new Error('Sin resultados')
 
-    let data = json.result || json.data || []
-    if (!Array.isArray(data) || !data.length) throw new Error('Sin resultados')
+    let list = data.slice(0, 5)
 
-    let list = data.slice(0, 5) // 5 videos en carrusel
-
+    // 1. CARRUSEL CON IMAGEN (este SI aparece)
     let cards = list.map((v, i) => {
-      let title = (v.title || 'Sin título').slice(0, 70)
-      let videoUrl = v.dl || v.play
-
+      let title = (v.title || 'Sin título').slice(0, 60)
       return {
-        body: { text: `🎃 ${title}\n👻 ID: ${v.id}` },
+        body: { text: `🎃 ${title}\n👻 Video ${i+1}` },
         footer: { text: `LUX X YALLICO - ${fecha}` },
         header: {
           title: `${i+1}. ${title.slice(0,35)}`,
           hasMediaAttachment: true,
-          videoMessage: { url: videoUrl }
+          imageMessage: { 
+            url: v.cover || v.thumbnail || `https://telegra.ph/file/320b066dc81928b782c7b.png` 
+          }
         },
         nativeFlowMessage: {
           buttons: [
             {
               name: "quick_reply",
               buttonParamsJson: JSON.stringify({
-                display_text: "🎃 Enviar como Video",
-                id: `${usedPrefix}ttdlvid ${videoUrl}`
-              })
-            },
-            {
-              name: "cta_url",
-              buttonParamsJson: JSON.stringify({
-                display_text: "🔗 Ver en TikTok",
-                url: `https://tiktok.com/@/video/${v.id}`,
-                merchant_url: `https://tiktok.com/@/video/${v.id}`
+                display_text: "🎃 Descargar este",
+                id: `${usedPrefix}ttdl https://www.tiktok.com/@/video/${v.id}`
               })
             }
           ]
@@ -61,22 +53,33 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     })
 
     await conn.sendMessage(m.chat, {
-      text: `🎃 Buscando: ${text}`,
-      title: `‧˚꒰🎃୭ LUX X YALLICO 🦇`,
-      footer: `Resultados: ${list.length} videos`,
+      text: " ",
+      title: "🎃 LUX X YALLICO",
+      footer: "Elige un video 👻",
       interactiveMessage: {
-        body: { text: `🎃 *TT SEARCH - CARRUSEL* 👻\n🔍 Query: ${text}\n📦 Videos: ${list.length}\n\nDesliza para ver 👻` },
+        body: { text: `🎃 *TT SEARCH* 👻\n🔍 ${text}\n📦 5 resultados - Desliza 👻` },
         footer: { text: `LUX X YALLICO • ${fecha}` },
         carouselMessage: { cards }
       }
     }, { quoted: m })
+
+    // 2. MANDA LOS 5 VIDEOS DESPUES DEL CARRUSEL
+    await conn.reply(m.chat, `⏳ Enviando 5 videos de *${text}*...`, m)
+
+    for (let v of list) {
+      try {
+        let cap = `‧˚꒰🎃୭ *${(v.title||'').slice(0,80)}* 🦇\n🆔 ${v.id}`
+        await conn.sendFile(m.chat, v.dl, 'tt.mp4', cap, m)
+        await new Promise(r => setTimeout(r, 1000))
+      } catch {}
+    }
 
     await react('🎃')
 
   } catch (e) {
     console.error(e)
     await react('💀')
-    return conn.reply(m.chat, `💀 Error: ${e.message || e}`, m)
+    return conn.reply(m.chat, `💀 Error: ${e.message}`, m)
   }
 }
 
