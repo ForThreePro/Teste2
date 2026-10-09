@@ -17,10 +17,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (['ttsearch','tiktoksearch','ttss'].includes(command)) type = 'tiktok'
   if (['pinterest','pin','pinterestsearch'].includes(command)) type = 'pinterest'
   if (['pinvid','pinterestvideo','pinterestvid'].includes(command)) type = 'pinterestvideo'
-  if (['apk','apksearch','apkdl'].includes(command)) type = 'apk'
+  if (['apk','apksearch'].includes(command)) type = 'apk'
 
   try {
-    await react('⏳')
+    await react('🔍')
     let apiUrl = `${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
     let res = await fetch(apiUrl)
     let json = await res.json()
@@ -34,58 +34,73 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     else data = [result]
 
     data = data.flat().filter(Boolean)
-    if (!data.length) throw new Error('Sin resultados')
+    if (!data.length) throw new Error(`No hay resultados para "${text}"`)
 
-    let v = data[Math.floor(Math.random() * data.length)]
-    let title = v.title || v.name || text
-
-    // Extractor universal
     const getUrl = (obj) => {
-      let d = obj.dl || obj.image || obj.img || obj.src || obj.url || obj.video || obj.videoUrl || obj.download
+      let d = obj.dl || obj.image || obj.img || obj.src || obj.url || obj.video || obj.videoUrl
       if (typeof d === 'string' && d.startsWith('http')) return d
       if (d && typeof d === 'object') {
         let d2 = d.url || d.src || d.image
         if (typeof d2 === 'string' && d2.startsWith('http')) return d2
       }
-      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
-      let mm = JSON.stringify(obj).match(/https?:\/\/[^\s"']+/g)
+      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http') && (obj[k].includes('pinimg') || obj[k].includes('.jpg') || obj[k].includes('.mp4') || obj[k].includes('tik'))) return obj[k]
+      let mm = JSON.stringify(obj).match(/https?:\/\/[^\s"']+\.(?:jpg|png|mp4)/g)
       return mm? mm[0] : null
     }
 
+    if (type === 'pinterest') {
+      // Manda 3 imágenes exactas del query (no random)
+      let toSend = data.slice(0, 3)
+      for (let i = 0; i < toSend.length; i++) {
+        let v = toSend[i]
+        let mediaUrl = getUrl(v)
+        if (!mediaUrl) continue
+        let caption = head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n`
+        caption += `꒰ 👻 ꒱ *${(v.title||text).slice(0,80)}*\n`
+        caption += `꒰ 🔍 ꒱ *${text}* (${i+1}/3)\n`
+        caption += footer
+        await conn.sendFile(m.chat, mediaUrl, `pinterest-${i}.jpg`, caption, m)
+        await new Promise(r => setTimeout(r, 700))
+      }
+      await react('🎃')
+      return
+    }
+
+    if (type === 'pinterestvideo') {
+      // Video más relevante, no random
+      let v = data[0]
+      let mediaUrl = getUrl(v)
+      if (!mediaUrl) throw new Error('No se extrajo video')
+      let caption = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n`
+      caption += `꒰ 👻 ꒱ *${(v.title||text).slice(0,80)}*\n`
+      caption += `꒰ 🔍 ꒱ *Query:* ${text}\n`
+      caption += footer
+      await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, caption, m)
+      await react('🎃')
+      return
+    }
+
+    // TTSEARCH y APK con random si quieres
+    let v = data[0] // también el más relevante para ttsearch
     let mediaUrl = getUrl(v)
+    if (!mediaUrl) throw new Error('No URL')
 
-    if (!mediaUrl) throw new Error('No se pudo extraer URL')
-
-    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()}* 🎃\n\n`
-    caption += `꒰ 👻 ꒱ *${String(title).slice(0,80)}*\n`
+    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} - ${text}* 🎃\n\n`
+    caption += `꒰ 👻 ꒱ *${(v.title||v.name||text).slice(0,80)}*\n`
     caption += `꒰ 🔍 ꒱ ${text}\n`
-    if (v.likes) caption += `꒰ ❤️ ꒱ ${v.likes} likes\n`
-    caption += `꒰ 🎲 ꒱ ${data.length} encontrados\n`
     caption += footer
 
-    if (type === 'tiktok' || type === 'pinterestvideo') {
-      await conn.sendFile(m.chat, mediaUrl, `${type}.mp4`, caption, m)
-    } else if (type === 'pinterest') {
-      await conn.sendFile(m.chat, mediaUrl, `${type}.jpg`, caption, m)
+    if (type === 'tiktok') {
+      await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, caption, m)
     } else if (type === 'apk') {
-      let icon = v.icon || v.thumbnail || v.image
-      let size = v.size || ''
-      let version = v.version || v.versionName || ''
-
-      let captionApk = head + `\n‧˚꒰🦇୭ *APK DOWNLOAD* 📦🎃\n\n`
-      captionApk += `꒰ 👻 ꒱ *App:* ${title}\n`
-      if (version) captionApk += `꒰ 🧟 ꒱ *Versión:* ${version}\n`
-      if (size) captionApk += `꒰ 💀 ꒱ *Tamaño:* ${size}\n`
-      captionApk += `꒰ 🔍 ꒱ ${text}\n` + footer
-
+      let icon = v.icon || v.thumbnail
+      let captionApk = head + `\n‧˚꒰🦇୭ *APK - ${text}* 📦🎃\n\n꒰ 👻 ꒱ *${v.name||title}*\n꒰ 🔍 ꒱ ${text}\n` + footer
       if (icon) {
         try { await conn.sendFile(m.chat, icon, 'icon.jpg', captionApk, m) } catch { await conn.reply(m.chat, captionApk, m) }
       } else {
         await conn.reply(m.chat, captionApk, m)
       }
-
-      // Enviar APK como documento
-      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title}.apk` }, { quoted: m })
+      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${v.name||text}.apk` }, { quoted: m })
     }
 
     await react('🎃')
@@ -93,12 +108,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   } catch (e) {
     console.error(e)
     await react('💀')
-    return conn.reply(m.chat, head + `\n💀 Error en *${type}*: ${e.message}` + footer, m)
+    return conn.reply(m.chat, head + `\n💀 Error: ${e.message}` + footer, m)
   }
 }
 
 handler.help = ['pinterest','pinvid','ttsearch','apk']
 handler.tags = ['search']
-handler.command = ['pinterest','pin','pinterestsearch','pinvid','pinterestvideo','pinterestvid','ttsearch','tiktoksearch','ttss','apk','apksearch','apkdl']
+handler.command = ['pinterest','pin','pinterestsearch','pinvid','pinterestvideo','pinterestvid','ttsearch','tiktoksearch','ttss','apk','apksearch']
 
 export default handler
