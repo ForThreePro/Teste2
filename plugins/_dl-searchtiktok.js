@@ -22,48 +22,75 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
     await react('🔍')
 
+    let apiUrl = `${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
+    let res = await fetch(apiUrl)
+    let txt = await res.text()
+
+    // FIX del error <!DOCTYPE
+    if (txt.trim().startsWith('<!DOCTYPE') || txt.trim().startsWith('<html')) {
+      throw new Error('API Stellar devolvió HTML (está caída o key expiró)')
+    }
+
+    let json
+    try { json = JSON.parse(txt) } catch { throw new Error('API no devolvió JSON válido') }
+
+    let result = json.result || json.data || json
+    let data = []
+    if (Array.isArray(result)) data = result
+    else if (result.videos) data = result.videos
+    else if (result.pins) data = result.pins
+    else if (result.images) data = result.images
+    else data = [result]
+
+    data = data.flat().filter(Boolean)
+    if (!data.length) throw new Error(`No hay resultados para "${text}"`)
+
+    const getUrl = (obj) => {
+      if (typeof obj === 'string' && obj.startsWith('http')) return obj
+      let d = obj.dl || obj.video || obj.videoUrl || obj.url || obj.download || obj.image || obj.img || obj.src || obj.thumbnail
+      if (typeof d === 'string' && d.startsWith('http')) return d
+      if (d && typeof d === 'object') return d.url || d.src || null
+      // busca cualquier http dentro del objeto
+      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
+      return null
+    }
+
+    const getImages = (obj) => {
+      let arr = []
+      if (obj.image) arr.push(obj.image)
+      if (obj.img) arr.push(obj.img)
+      if (obj.src) arr.push(obj.src)
+      if (obj.url && obj.url.includes('pinimg')) arr.push(obj.url)
+      if (obj.images && Array.isArray(obj.images)) arr.push(...obj.images)
+      return arr.filter(u => typeof u === 'string' && u.startsWith('http'))
+    }
+
     if (type === 'pinterest') {
       let images = []
-      try {
-        let r = await fetch(`https://api.siputzx.my.id/api/s/pinterest?query=${encodeURIComponent(text)}`)
-        let j = await r.json()
-        let d = j.data || j.result || []
-        images = d.map(x => typeof x === 'string'? x : x.url || x.image).filter(u => u && u.startsWith('http'))
-      } catch {}
+      for (let o of data) images.push(...getImages(o), getUrl(o))
+      images = [...new Set(images.filter(Boolean))]
 
-      if (!images.length) {
-        try {
-          let r = await fetch(`https://api.dorratz.com/api/pinterest?query=${encodeURIComponent(text)}`)
-          let j = await r.json()
-          let d = j.result || j.data || []
-          images = d.map(x => typeof x === 'string'? x : x.image || x.url).filter(u => u && u.startsWith('http'))
-        } catch {}
-      }
-
-      if (!images.length) throw new Error(`No hay resultados para "${text}"`)
+      if (!images.length) throw new Error(`No se encontraron imágenes para "${text}"`)
 
       let toSend = images.slice(0, 5)
 
-      // ===== CARRUSEL REAL DE WHATSAPP =====
       const cards = toSend.map((url, i) => ({
-        header: { hasMediaAttachment: true, imageMessage: { url: url } },
-        body: { text: `‧˚꒰🦇୭ ${text} - ${i+1}/5 🎃` },
+        header: { hasMediaAttachment: true, imageMessage: { url } },
+        body: { text: `‧˚꒰🦇୭ ${text} - ${i+1}/${toSend.length} 🎃` },
         footer: { text: 'LUX X YALLICO' },
         nativeFlowMessage: {
-          buttons: [
-            {
-              name: 'cta_url',
-              buttonParamsJson: JSON.stringify({
-                display_text: '👻 Ver Imagen HD',
-                url: url
-              })
-            }
-          ]
+          buttons: [{
+            name: 'cta_url',
+            buttonParamsJson: JSON.stringify({
+              display_text: '👻 Ver HD',
+              url: url
+            })
+          }]
         }
       }))
 
       await conn.sendMessage(m.chat, {
-        text: head + `\n‧˚꒰🦇୭ *PINTEREST CARRUSEL - ${text}* 🎃\n\n꒰ 👻 ꒱ *${toSend.length} resultados exactos*\n꒰ 🔍 ꒱ ${text}\n` + footer,
+        text: head + `\n‧˚꒰🦇୭ *PINTEREST CARRUSEL - ${text}* 🎃\n\n꒰ 👻 ꒱ *${toSend.length} resultados*\n꒰ 🔍 ꒱ ${text}\n` + footer,
         footer: '🦇 Desliza para ver más 👉',
         cards: cards,
         header: { hasMediaAttachment: false }
@@ -73,40 +100,22 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return
     }
 
-    // RESTO IGUAL
-    let apiUrl = `${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
-    let res = await fetch(apiUrl)
-    let json = await res.json()
-    let result = json.result || json.data || json
-    let data = []
-    if (Array.isArray(result)) data = result
-    else if (result.videos) data = result.videos
-    else if (result.pins) data = result.pins
-    else data = [result]
-    data = data.flat().filter(Boolean)
-
-    const getUrl = (obj) => {
-      let d = obj.dl || obj.video || obj.videoUrl || obj.url || obj.download
-      if (typeof d === 'string' && d.startsWith('http')) return d
-      return null
-    }
-
+    // PINVID / TTSEARCH / APK
     let v = data[0]
     let mediaUrl = getUrl(v)
-    let title = v.title || v.name || text
+    if (!mediaUrl) throw new Error('No se pudo extraer URL del resultado')
 
-    if (type === 'pinterestvideo') {
-      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ ${title.slice(0,80)}\n` + footer
-      await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, cap, m)
-    } else if (type === 'tiktok') {
-      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n\n꒰ 👻 ꒱ ${title.slice(0,80)}\n` + footer
-      await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, cap, m)
-    } else if (type === 'apk') {
-      let icon = v.icon || v.thumbnail
-      let cap = head + `\n‧˚꒰🦇୭ *APK - ${text}* 📦\n\n꒰ 👻 ꒱ ${v.name||text}\n` + footer
-      if (icon) try { await conn.sendFile(m.chat, icon, 'icon.jpg', cap, m) } catch { await conn.reply(m.chat, cap, m) }
-      else await conn.reply(m.chat, cap, m)
-      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${v.name||text}.apk` }, { quoted: m })
+    let cap = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} - ${text}* 🎃\n\n꒰ 👻 ꒱ *${(v.title||v.name||text).toString().slice(0,80)}*\n` + footer
+
+    if (type === 'pinterestvideo') await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, cap, m)
+    else if (type === 'tiktok') await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, cap, m)
+    else if (type === 'apk') {
+      let icon = v.icon || v.thumbnail || null
+      let capApk = head + `\n‧˚꒰🦇୭ *APK - ${text}* 📦🎃\n\n꒰ 👻 ꒱ *${v.name||text}*\n` + footer
+      if (icon) {
+        try { await conn.sendFile(m.chat, icon, 'icon.jpg', capApk, m) } catch { await conn.reply(m.chat, capApk, m) }
+      } else await conn.reply(m.chat, capApk, m)
+      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${(v.name||text).replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
     }
 
     await react('🎃')
