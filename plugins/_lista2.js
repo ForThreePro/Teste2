@@ -25,20 +25,20 @@ let handler = async (m, { conn }) => {
 
     if (total === 0) {
         await react('📭')
-        let vacia = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        let vacia = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐁𝐎𝐑𝐑𝐀𝐑 𝐋𝐈𝐒𝐓𝐀 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`LISTA VACÍA\`\` 🗑️ —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 🎃
 📭 ➛ La lista de este grupo ya está vacía
 📭 ➛ No hay registros para borrar
-😴 ➛ Garfield: "Ni siquiera hay lasaña para borrar"
+💀 ➛ Fantasma: "Ni siquiera hay dulces para borrar"
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: vacia }, { quoted: m })
     }
@@ -46,26 +46,26 @@ let handler = async (m, { conn }) => {
     await react('🗑️')
     fs.writeFileSync(db, JSON.stringify([]))
 
-    let texto = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    let texto = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐁𝐎𝐑𝐑𝐀𝐃𝐎 ﹒ LISTA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha} ${hora}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`BORRADO EXITOSO\`\` 🗑️ —˙𖦹.꒷
 
-── *📊 INFORMACIÓN* ╏ 🍕
+── *📊 INFORMACIÓN* ╏ 🎃
 🗑️ ➛ Se eliminaron: *${total}* registro${total > 1 ? 's' : ''}
 📅 ➛ Rango: *Lunes a Sábado*
 ⏰ ➛ Hora: *${hora}*
-😼 ➛ Garfield se comió la lista
+👻 ➛ Fantasma se comió la lista
 
-── *📦 ESTADO* ╏ 🍕
+── *📦 ESTADO* ╏ 🦇
 ✅ ➛ Lista de este grupo reiniciada
-🍝 ➛ Lista limpia como plato de lasaña
+🍬 ➛ Lista limpia como calabaza vacía
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
-*Admin*: Comando ejecutado por Garfield
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
+*Admin*: Comando ejecutado por fantasma
 ━━━━━━━━━━━`
 
     return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
