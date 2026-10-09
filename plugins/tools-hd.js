@@ -21,18 +21,18 @@ let handler = async (m, { conn, text }) => {
   let link = text?.trim()
 
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Responde a una imagen para mejorar en HD\n\n‧˚꒰🌼୭ Ejemplo:.hd (respondiendo a imagen)` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n꒰🦇꒱ Responde a una imagen para mejorar en HD\n\n‧˚꒰👻୭ Ejemplo:.hd (respondiendo a imagen)` }, { quoted: m })
   }
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '📈', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
 
     if (!link) {
       let media = await q.download()
       link = await uploadEvogb(media)
     }
 
-    await conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Mejorando en HD...` }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n꒰🦇꒱ Mejorando en HD embrujado...` }, { quoted: m })
 
     const apiUrl = `https://api-faa.my.id/faa/hdv2?url=${encodeURIComponent(link)}`
     const j = await fetch(apiUrl).then(r => r.json())
@@ -44,15 +44,15 @@ let handler = async (m, { conn, text }) => {
     const res = await axios.get(resultUrl, { responseType: 'arraybuffer', headers: { 'User-Agent': 'Mozilla/5.0' } })
     const buffer = Buffer.from(res.data)
 
-    const apiText = `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n╭───INFO ꒰📈꒱────╮\n‧˚꒰🌼୭ Tipo: HDv2\n‧˚꒰🌼୭ API: FAA-BOT\n‧˚꒰🌼୭ Peso: ${(buffer.length / 1024 / 1024).toFixed(2)} MB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🍧꒱ Imagen mejorada en HD`
+    const apiText = `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n╭───INFO ꒰🎃꒱────╮\n‧˚꒰👻୭ Tipo: HDv2 Embrujado\n‧˚꒰👻୭ API: FAA-BOT\n‧˚꒰👻୭ Peso: ${(buffer.length / 1024 / 1024).toFixed(2)} MB\n╰─────── ݁ ˖Ი𐑼⋆────╯\n\n꒰🦇꒱ Imagen mejorada en HD`
 
     await conn.sendMessage(m.chat, { image: buffer, caption: apiText }, { quoted: m })
-    await conn.sendMessage(m.chat, { react: { text: '👛', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
 
   } catch (e) {
     console.error(e)
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `‧˚꒰👛୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🍧꒱ Error: ${e.message}` }, { quoted: m })
+    await conn.sendMessage(m.chat, { react: { text: '💀', key: m.key } })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🦇꒱ Error: ${e.message} 💀` }, { quoted: m })
   }
 }
 
