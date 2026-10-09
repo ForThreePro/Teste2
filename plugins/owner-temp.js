@@ -20,13 +20,13 @@ setInterval(async () => {
   let toRemove = []
   for (let i of global.tempGroups) {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const head = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n꒰ ◞⁺⊹ ．${fecha}\n`
     if (i.exitTime - now <= 300000 && i.exitTime - now > 0 && !i.warned) {
-      try { await global.conn.sendMessage(i.id, { text: head + `\n⏰ El bot saldrá en 5 minutos` }); i.warned = true; save() } catch {}
+      try { await global.conn.sendMessage(i.id, { text: head + `\n⏰ El bot se esfumará en 5 minutos 👻` }); i.warned = true; save() } catch {}
     }
     if (now >= i.exitTime) {
       try {
-        await global.conn.sendMessage(i.id, { text: head + `\n👋 Tiempo terminado, saliendo...` })
+        await global.conn.sendMessage(i.id, { text: head + `\n👋 Tiempo embrujado terminado, desapareciendo... 🎃` })
         await new Promise(r=>setTimeout(r,1200))
         await global.conn.groupLeave(i.id)
       } catch {}
@@ -38,33 +38,33 @@ setInterval(async () => {
 
 let handler = async (m, { conn, args, command }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-  const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+  const head = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n꒰ ◞⁺⊹ ．${fecha}\n`
 
-  if (!isOwner(m)) { await react(conn,m,"❌"); return m.reply(head+`\n❌ Solo owner`) }
+  if (!isOwner(m)) { await react(conn,m,"💀"); return m.reply(head+`\n💀 Solo dueño de la cripta`) }
   if (command === 'templist') {
-    if (!global.tempGroups.length) { await react(conn,m,"⚠️"); return m.reply(head+`\n⚠️ Sin temporizadores`) }
+    if (!global.tempGroups.length) { await react(conn,m,"⚠️"); return m.reply(head+`\n⚠️ Sin almas temporizadas`) }
     let list = global.tempGroups.map((v,i)=>`${i+1}. *${v.name}* - ${msToTime(v.exitTime-Date.now())}`).join('\n')
-    await react(conn,m,"📋"); return m.reply(head+`\n📋 *Grupos:*\n${list}`)
+    await react(conn,m,"📋"); return m.reply(head+`\n📋 *Grupos embrujados:*\n${list}`)
   }
   if (command === 'tempcancel') {
     let idx = global.tempGroups.findIndex(v=>v.id===m.chat)
-    if (idx===-1) { await react(conn,m,"⚠️"); return m.reply(head+`\n⚠️ Sin temporizador`) }
+    if (idx===-1) { await react(conn,m,"⚠️"); return m.reply(head+`\n⚠️ Sin temporizador embrujado`) }
     global.tempGroups.splice(idx,1); save()
-    await react(conn,m,"✅"); return m.reply(head+`\n✅ Temporizador cancelado`)
+    await react(conn,m,"🎃"); return m.reply(head+`\n🎃 Hechizo cancelado`)
   }
   // temporizador / temp
-  if (!m.isGroup) { await react(conn,m,"❌"); return m.reply(head+`\n❌ Solo en grupos`) }
-  if (!args[0]) { await react(conn,m,"❌"); return m.reply(head+`\n⏰ Usa: *.temp 1h* / *.temp 30m* / *.temp 1d*`) }
+  if (!m.isGroup) { await react(conn,m,"💀"); return m.reply(head+`\n💀 Solo en grupos embrujados`) }
+  if (!args[0]) { await react(conn,m,"💀"); return m.reply(head+`\n⏰ Usa: *.temp 1h* / *.temp 30m* / *.temp 1d*`) }
   let ms=0, rx=/(\d+)([dhm])/g, mt
   while((mt=rx.exec(args[0].toLowerCase()))!==null){ let v=parseInt(mt[1]); if(mt[2]==='d')ms+=v*86400000; if(mt[2]==='h')ms+=v*3600000; if(mt[2]==='m')ms+=v*60000 }
-  if (ms<60000) { await react(conn,m,"❌"); return m.reply(head+`\n❌ Mínimo 1m`) }
+  if (ms<60000) { await react(conn,m,"💀"); return m.reply(head+`\n💀 Mínimo 1m`) }
 
   let idx = global.tempGroups.findIndex(v=>v.id===m.chat)
   if(idx!==-1) global.tempGroups.splice(idx,1)
   global.tempGroups.push({ id:m.chat, name: await conn.getName(m.chat), exitTime: Date.now()+ms, warned:false })
   save()
-  await react(conn,m,"✅")
-  return m.reply(head+`\n✅ Temporizador activado: *${msToTime(ms)}*`)
+  await react(conn,m,"🎃")
+  return m.reply(head+`\n🎃 Temporizador embrujado activado: *${msToTime(ms)}*`)
 }
 
 handler.help = ['temporizador 30d','tempcancel','templist']
