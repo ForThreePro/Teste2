@@ -21,85 +21,91 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   try {
     await react('🔍')
+
+    if (type === 'pinterest') {
+      let images = []
+      try {
+        let r = await fetch(`https://api.siputzx.my.id/api/s/pinterest?query=${encodeURIComponent(text)}`)
+        let j = await r.json()
+        let d = j.data || j.result || []
+        images = d.map(x => typeof x === 'string'? x : x.url || x.image).filter(u => u && u.startsWith('http'))
+      } catch {}
+
+      if (!images.length) {
+        try {
+          let r = await fetch(`https://api.dorratz.com/api/pinterest?query=${encodeURIComponent(text)}`)
+          let j = await r.json()
+          let d = j.result || j.data || []
+          images = d.map(x => typeof x === 'string'? x : x.image || x.url).filter(u => u && u.startsWith('http'))
+        } catch {}
+      }
+
+      if (!images.length) throw new Error(`No hay resultados para "${text}"`)
+
+      let toSend = images.slice(0, 5)
+
+      // ===== CARRUSEL REAL DE WHATSAPP =====
+      const cards = toSend.map((url, i) => ({
+        header: { hasMediaAttachment: true, imageMessage: { url: url } },
+        body: { text: `‧˚꒰🦇୭ ${text} - ${i+1}/5 🎃` },
+        footer: { text: 'LUX X YALLICO' },
+        nativeFlowMessage: {
+          buttons: [
+            {
+              name: 'cta_url',
+              buttonParamsJson: JSON.stringify({
+                display_text: '👻 Ver Imagen HD',
+                url: url
+              })
+            }
+          ]
+        }
+      }))
+
+      await conn.sendMessage(m.chat, {
+        text: head + `\n‧˚꒰🦇୭ *PINTEREST CARRUSEL - ${text}* 🎃\n\n꒰ 👻 ꒱ *${toSend.length} resultados exactos*\n꒰ 🔍 ꒱ ${text}\n` + footer,
+        footer: '🦇 Desliza para ver más 👉',
+        cards: cards,
+        header: { hasMediaAttachment: false }
+      }, { quoted: m })
+
+      await react('🎃')
+      return
+    }
+
+    // RESTO IGUAL
     let apiUrl = `${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`
     let res = await fetch(apiUrl)
     let json = await res.json()
-
     let result = json.result || json.data || json
     let data = []
     if (Array.isArray(result)) data = result
     else if (result.videos) data = result.videos
     else if (result.pins) data = result.pins
-    else if (result.images) data = result.images
     else data = [result]
-
     data = data.flat().filter(Boolean)
-    if (!data.length) throw new Error(`No hay resultados para "${text}"`)
 
     const getUrl = (obj) => {
-      let d = obj.dl || obj.image || obj.img || obj.src || obj.url || obj.video || obj.videoUrl
+      let d = obj.dl || obj.video || obj.videoUrl || obj.url || obj.download
       if (typeof d === 'string' && d.startsWith('http')) return d
-      if (d && typeof d === 'object') {
-        let d2 = d.url || d.src || d.image
-        if (typeof d2 === 'string' && d2.startsWith('http')) return d2
-      }
-      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http') && (obj[k].includes('pinimg') || obj[k].includes('.jpg') || obj[k].includes('.mp4') || obj[k].includes('tik'))) return obj[k]
-      let mm = JSON.stringify(obj).match(/https?:\/\/[^\s"']+\.(?:jpg|png|mp4)/g)
-      return mm? mm[0] : null
+      return null
     }
 
-    if (type === 'pinterest') {
-      // Manda 3 imágenes exactas del query (no random)
-      let toSend = data.slice(0, 3)
-      for (let i = 0; i < toSend.length; i++) {
-        let v = toSend[i]
-        let mediaUrl = getUrl(v)
-        if (!mediaUrl) continue
-        let caption = head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n`
-        caption += `꒰ 👻 ꒱ *${(v.title||text).slice(0,80)}*\n`
-        caption += `꒰ 🔍 ꒱ *${text}* (${i+1}/3)\n`
-        caption += footer
-        await conn.sendFile(m.chat, mediaUrl, `pinterest-${i}.jpg`, caption, m)
-        await new Promise(r => setTimeout(r, 700))
-      }
-      await react('🎃')
-      return
-    }
+    let v = data[0]
+    let mediaUrl = getUrl(v)
+    let title = v.title || v.name || text
 
     if (type === 'pinterestvideo') {
-      // Video más relevante, no random
-      let v = data[0]
-      let mediaUrl = getUrl(v)
-      if (!mediaUrl) throw new Error('No se extrajo video')
-      let caption = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n`
-      caption += `꒰ 👻 ꒱ *${(v.title||text).slice(0,80)}*\n`
-      caption += `꒰ 🔍 ꒱ *Query:* ${text}\n`
-      caption += footer
-      await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, caption, m)
-      await react('🎃')
-      return
-    }
-
-    // TTSEARCH y APK con random si quieres
-    let v = data[0] // también el más relevante para ttsearch
-    let mediaUrl = getUrl(v)
-    if (!mediaUrl) throw new Error('No URL')
-
-    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()} - ${text}* 🎃\n\n`
-    caption += `꒰ 👻 ꒱ *${(v.title||v.name||text).slice(0,80)}*\n`
-    caption += `꒰ 🔍 ꒱ ${text}\n`
-    caption += footer
-
-    if (type === 'tiktok') {
-      await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, caption, m)
+      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ ${title.slice(0,80)}\n` + footer
+      await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, cap, m)
+    } else if (type === 'tiktok') {
+      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n\n꒰ 👻 ꒱ ${title.slice(0,80)}\n` + footer
+      await conn.sendFile(m.chat, mediaUrl, `tt.mp4`, cap, m)
     } else if (type === 'apk') {
       let icon = v.icon || v.thumbnail
-      let captionApk = head + `\n‧˚꒰🦇୭ *APK - ${text}* 📦🎃\n\n꒰ 👻 ꒱ *${v.name||title}*\n꒰ 🔍 ꒱ ${text}\n` + footer
-      if (icon) {
-        try { await conn.sendFile(m.chat, icon, 'icon.jpg', captionApk, m) } catch { await conn.reply(m.chat, captionApk, m) }
-      } else {
-        await conn.reply(m.chat, captionApk, m)
-      }
+      let cap = head + `\n‧˚꒰🦇୭ *APK - ${text}* 📦\n\n꒰ 👻 ꒱ ${v.name||text}\n` + footer
+      if (icon) try { await conn.sendFile(m.chat, icon, 'icon.jpg', cap, m) } catch { await conn.reply(m.chat, cap, m) }
+      else await conn.reply(m.chat, cap, m)
       await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${v.name||text}.apk` }, { quoted: m })
     }
 
