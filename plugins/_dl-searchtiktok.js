@@ -1,4 +1,7 @@
 import fetch from 'node-fetch'
+import fs from 'fs'
+import { tmpdir } from 'os'
+import path, { join } from 'path'
 import moment from 'moment-timezone'
 moment.locale('es')
 
@@ -19,18 +22,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (['pinvid','pinterestvideo','pinterestvid'].includes(command)) type = 'pinterestvideo'
   if (['apk','apksearch','apkdl'].includes(command)) type = 'apk'
 
-  const getBuf = async (url, isVideo = false) => {
-    let r = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Referer': isVideo ? 'https://www.pinterest.com/' : 'https://www.google.com/',
-        'Accept': '*/*'
-      }
-    })
-    if (!r.ok) throw new Error(`HTTP ${r.status}`)
-    return Buffer.from(await r.arrayBuffer())
-  }
-
   try {
     await react('⏳')
     let res = await fetch(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
@@ -38,33 +29,32 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let list = json.data?.videos || json.result?.videos || json.data || json.result || []
     if (!Array.isArray(list)) list = [list]
     list = list.flat().filter(Boolean)
-    if (!list.length) throw new Error('Sin resultados')
 
     if (type === 'pinterestvideo') {
       let vids = list.filter(x => x.dl && x.dl.includes('.mp4'))
       if (!vids.length) {
-        let m = JSON.stringify(list).match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
-        if (m) vids = m.map(u => ({ dl: u, title: text, thumb: '', likes: 0 }))
+        let match = JSON.stringify(list).match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
+        if (match) vids = match.map(u => ({ dl: u, title: text }))
       }
-      if (!vids.length) throw new Error('No hay videos')
+      if (!vids.length) throw new Error('API sin mp4 para ' + text)
 
       let v = vids[Math.floor(Math.random() * vids.length)]
+
+      // Descarga real
+      let r = await fetch(v.dl, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.pinterest.com/' } })
+      if (!r.ok) throw new Error(`Pinterest ${r.status}`)
+      let buf = Buffer.from(await r.arrayBuffer())
+
+      // Guarda temporal - ESTO ARREGLA EL "no disponible"
+      let tmpFile = join(tmpdir(), `pinvid_${Date.now()}.mp4`)
+      fs.writeFileSync(tmpFile, buf)
+
       let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n` + footer
 
-      let videoBuf = await getBuf(v.dl, true)
-      let thumbBuf = null
-      try { if (v.thumb) thumbBuf = await getBuf(v.thumb) } catch {}
+      // sendFile con archivo local SIEMPRE funciona como video
+      await conn.sendFile(m.chat, tmpFile, 'pinvid.mp4', cap, m, false, { mimetype: 'video/mp4', asVideo: true })
 
-      // VIDEO REAL, NO DOCUMENTO
-      await conn.sendMessage(m.chat, {
-        video: videoBuf,
-        mimetype: 'video/mp4',
-        caption: cap,
-        fileName: 'pinvid.mp4',
-        jpegThumbnail: thumbBuf,
-        gifPlayback: false
-      }, { quoted: m })
-
+      try { fs.unlinkSync(tmpFile) } catch {}
       await react('🎃')
       return
     }
@@ -74,9 +64,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       imgs = [...new Set(imgs)].sort(() => 0.5 - Math.random()).slice(0, 5)
       for (let i = 0; i < imgs.length; i++) {
         let cap = i === 0? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n` + footer : `꒰ 🦇 ꒱ ${i+1}/5`
-        let buf = await getBuf(imgs[i])
-        await conn.sendMessage(m.chat, { image: buf, caption: cap }, { quoted: m })
-        await new Promise(r => setTimeout(r, 300))
+        await conn.sendFile(m.chat, imgs[i], `pin-${i}.jpg`, cap, m)
+        await new Promise(r => setTimeout(r, 400))
       }
       await react('🎃')
       return
@@ -85,16 +74,15 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (type === 'tiktok') {
       let v = list[Math.floor(Math.random() * list.length)]
       let url = v.dl || v.play || v.hdplay || v.video || v.url
-      let buf = await getBuf(url, true)
-      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n\n꒰ 👻 ꒱ ${String(v.title || text).slice(0,80)}\n` + footer
-      await conn.sendMessage(m.chat, { video: buf, mimetype: 'video/mp4', caption: cap }, { quoted: m })
+      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH* 🎃\n\n꒰ 👻 ꒱ ${String(v.title || text).slice(0,80)}\n` + footer
+      await conn.sendFile(m.chat, url, 'tt.mp4', cap, m)
       await react('🎃')
       return
     }
 
     if (type === 'apk') {
       let v = list[0]
-      let dl = v.dl || v.url || v.download
+      let dl = v.dl || v.url
       let title = v.name || v.title || text
       await conn.reply(m.chat, head + `\n‧˚꒰🦇୭ *APK - ${title}* 📦🎃\n` + footer, m)
       await conn.sendMessage(m.chat, { document: { url: dl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title.replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
