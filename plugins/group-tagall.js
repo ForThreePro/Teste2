@@ -9,13 +9,13 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 
   try {
     if (!(isAdmin || isOwner)) {
-      await react('❌')
+      await react('💀')
       return conn.sendMessage(m.chat, {
-        text: `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🍕\n❌ ➛ Solo admins pueden usar este comando\n😼 ➛ Garfield solo obedece a los admins pe\n━━━━━━━━━━━\n🍕 *LUX X YALLICO - GARFIELD EDITION* 😼`
+        text: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。\n꒰ ◞⁺⊹ ．${fecha}\n\n── *📝 AVISO* ╏ 🎃\n❌ ➛ Solo admins pueden invocar a los espíritus\n👻 ➛ Fantasma solo obedece a los admins pe\n━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`
       }, { quoted: m })
     }
 
-    const customMessage = args.join(' ') || '📢 INVOCACIÓN GENERAL - GARFIELD EDITION'
+    const customMessage = args.join(' ') || '🎃 INVOCACIÓN EMBRUJADA - HALLOWEEN EDITION'
     const groupMetadata = await conn.groupMetadata(m.chat).catch(() => ({ subject: 'Grupo', participants: [] }))
     const groupName = groupMetadata.subject
 
@@ -62,20 +62,20 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
 
     const catalogoImg = { url: 'https://files.evogb.win/EvvgAh.jpg' }
 
-    let messageText = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    let messageText = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐈𝐍𝐕𝐎𝐂𝐀𝐂𝐈𝐎𝐍 ﹒ GENERAL ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`TAGALL\`\` 📢 —˙𖦹.꒷
-😼 Garfield los está llamando... ¡Despierten! 🍝
+.⃟𖥔 ݁. 𖦹˙— \`\`TAGALL\`\` 👻 —˙𖦹.꒷
+👻 Fantasma los está invocando... ¡Despierten! 🎃
 
-── *📊 INFO GARFIELD* ╏ 🍕
+── *📊 INFO FANTASMA* ╏ 🎃
 👥 ➛ Grupo: *${groupName}*
-👤 ➛ Integrantes: *${participants.length}*
+👤 ➛ Almas: *${participants.length}*
 💬 ➛ Mensaje: *${customMessage}*
 
-── *🌍 MIEMBROS POR PAÍS* ╏ 🍕
+── *🌍 ALMAS POR PAÍS* ╏ 🦇
 `
 
     for (const flag of orderedFlags) {
@@ -89,12 +89,12 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
     }
 
     messageText += `
-── *📝 NOTA* ╏ 😼
-📢 ➛ Todos fueron mencionados
-🍕 ➛ Lux X Yallico - Garfield Edition los invocó
+── *📝 NOTA* ╏ 👻
+🎃 ➛ Todos fueron invocados
+🦇 ➛ Lux X Yallico - Halloween Edition los llamó
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
@@ -103,24 +103,24 @@ const handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
       mentions: participants.map(a => a.jid || a.id)
     }, { quoted: m })
 
-    await react('📢')
+    await react('🎃')
 
   } catch (error) {
     console.error("[ERROR EN TODOS]:", error)
-    await react('❌')
-    let errorMsg = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    await react('💀')
+    let errorMsg = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TAGALL ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 🎃
 ❌ ➛ Ocurrió un error al ejecutar el comando
-😴 ➛ Garfield se quedó dormido
+👻 ➛ Fantasma se asustó
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
     conn.sendMessage(m.chat, { text: errorMsg }, { quoted: m })
   }
