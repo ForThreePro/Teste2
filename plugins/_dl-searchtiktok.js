@@ -25,93 +25,106 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const safeJSON = async (url) => {
       let r = await fetch(url)
       let t = await r.text()
-      if (t.trim().startsWith('<!DOCTYPE') || t.trim().startsWith('<html')) throw new Error('API Stellar devolvió HTML')
+      if (t.trim().startsWith('<!DOCTYPE') || t.trim().startsWith('<html')) throw new Error('Stellar devolvió HTML')
       return JSON.parse(t)
     }
 
     let json = await safeJSON(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
     let result = json.result || json.data || json
-    let data = []
-    if (Array.isArray(result)) data = result
-    else if (result.videos) data = result.videos
-    else if (result.pins) data = result.pins
-    else if (result.images) data = result.images
-    else data = [result]
+    let data = Array.isArray(result)? result : (result.videos || result.pins || result.images || [result])
     data = data.flat().filter(Boolean)
     if (!data.length) throw new Error('Sin resultados')
 
-    const getUrl = (obj) => {
+    // Extractor universal mejorado para Stellar
+    const extractUrl = (obj) => {
+      if (!obj) return null
       if (typeof obj === 'string' && obj.startsWith('http')) return obj
-      let d = obj.dl || obj.video || obj.videoUrl || obj.url || obj.download || obj.image || obj.img || obj.src
-      if (typeof d === 'string' && d.startsWith('http')) return d
-      if (d && typeof d === 'object') {
-        let d2 = d.url || d.src || d.image
-        if (typeof d2 === 'string' && d2.startsWith('http')) return d2
+      // Tiktok Stellar usa estos keys
+      const keys = ['dl','hdplay','play','video','videoUrl','download','url','media','src','image','img','thumbnail','icon']
+      for (let k of keys) {
+        if (obj[k] && typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
+        if (obj[k] && typeof obj[k] === 'object') {
+          for (let kk of keys) {
+            if (obj[k][kk] && typeof obj[k][kk] === 'string' && obj[k][kk].startsWith('http')) return obj[k][kk]
+          }
+        }
       }
-      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http') && obj[k].includes('.mp4')) return obj[k]
-      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http') && obj[k].includes('pinimg')) return obj[k]
-      for (let k in obj) if (typeof obj[k] === 'string' && obj[k].startsWith('http')) return obj[k]
-      return null
+      // Busca cualquier http en el objeto
+      let str = JSON.stringify(obj)
+      let m1 = str.match(/https?:\/\/[^"'\s\\]+\.mp4[^"'\s\\]*/g)
+      if (m1) return m1[0].replace(/\\/g,'')
+      let m2 = str.match(/https?:\/\/[^"'\s\\]+pinimg[^"'\s\\]*/g)
+      if (m2) return m2[0].replace(/\\/g,'')
+      let m3 = str.match(/https?:\/\/[^"'\s\\]+\.jpg[^"'\s\\]*/g)
+      if (m3) return m3[0].replace(/\\/g,'')
+      let m4 = str.match(/https?:\/\/[^\s"']+/g)
+      return m4? m4[0].replace(/\\/g,'') : null
     }
 
-    // ===== PINTEREST 5 FOTOS EN CARRUSEL =====
     if (type === 'pinterest') {
       let images = []
       for (let o of data) {
-        let u = getUrl(o)
-        if (u) images.push(u)
+        let u = extractUrl(o)
+        // Solo acepta pinimg para que no mande cualquier cosa
+        if (u && (u.includes('pinimg') || u.includes('pinterest') || u.includes('.jpg') || u.includes('.png'))) images.push(u)
       }
-      images = [...new Set(images)].filter(u => u.startsWith('http')).slice(0, 5)
-      if (!images.length) throw new Error(`No hay imágenes para "${text}"`)
+      images = [...new Set(images)].slice(0, 5)
+      if (!images.length) throw new Error(`No hay imágenes para "${text}" - API devolvió otra cosa`)
 
       for (let i = 0; i < images.length; i++) {
         let caption = i === 0
-         ? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n꒰ 👻 ꒱ *${text}* (${i+1}/${images.length})\n꒰ 🎲 ꒱ ${data.length} encontrados\n` + footer
+         ? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n꒰ 👻 ꒱ ${images.length} resultados\n꒰ 🔍 ꒱ ${text}\n` + footer
           : `꒰ 🦇 ꒱ ${text} ${i+1}/${images.length}`
-        await conn.sendFile(m.chat, images[i], `pinterest-${i}.jpg`, caption, m)
-        await new Promise(r => setTimeout(r, 600))
+        await conn.sendFile(m.chat, images[i], `pin-${i}.jpg`, caption, m)
+        await new Promise(r => setTimeout(r, 700))
       }
       await react('🎃')
       return
     }
 
-    // ===== PINVID FIX - YA VIENE MP4 DIRECTO =====
     if (type === 'pinterestvideo') {
       let v = data[0]
-      let mediaUrl = getUrl(v)
-      if (!mediaUrl) throw new Error('No se pudo extraer URL de video')
+      let mediaUrl = extractUrl(v)
+      if (!mediaUrl) throw new Error('No se pudo extraer URL: ' + JSON.stringify(v).slice(0,400))
 
-      // Ya es mp4 directo de v1.pinimg.com, no necesita download
-      let caption = head + `\n‧˚꒰🦇୭ *PINVID* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n꒰ 🔍 ꒱ ${text}\n` + footer
-      await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, caption, m)
+      // FIX: v1.pinimg.com bloquea sendFile directo, hay que bajar a buffer
+      let caption = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n` + footer
+      try {
+        let vid = await fetch(mediaUrl)
+        let buf = await vid.buffer()
+        await conn.sendFile(m.chat, buf, `pinvid.mp4`, caption, m)
+      } catch {
+        // Si falla buffer, intenta directo
+        await conn.sendFile(m.chat, mediaUrl, `pinvid.mp4`, caption, m)
+      }
       await react('🎃')
       return
     }
 
-    // TTSEARCH y APK normal
-    let v = data[Math.floor(Math.random() * data.length)]
-    let title = v.title || v.name || text
-    let mediaUrl = getUrl(v)
-    if (!mediaUrl) throw new Error('No se pudo extraer URL')
-
-    let caption = head + `\n‧˚꒰🦇୭ *${type.toUpperCase()}* 🎃\n\n꒰ 👻 ꒱ *${String(title).slice(0,80)}*\n꒰ 🔍 ꒱ ${text}\n꒰ 🎲 ꒱ ${data.length} encontrados\n` + footer
-
     if (type === 'tiktok') {
-      await conn.sendFile(m.chat, mediaUrl, `${type}.mp4`, caption, m)
-    } else if (type === 'apk') {
-      let icon = v.icon || v.thumbnail || v.image
-      let size = v.size || ''
-      let version = v.version || v.versionName || ''
-      let captionApk = head + `\n‧˚꒰🦇୭ *APK DOWNLOAD* 📦🎃\n\n꒰ 👻 ꒱ *App:* ${title}\n`
-      if (version) captionApk += `꒰ 🧟 ꒱ *Versión:* ${version}\n`
-      if (size) captionApk += `꒰ 💀 ꒱ *Tamaño:* ${size}\n`
-      captionApk += `꒰ 🔍 ꒱ ${text}\n` + footer
-      if (icon) { try { await conn.sendFile(m.chat, icon, 'icon.jpg', captionApk, m) } catch { await conn.reply(m.chat, captionApk, m) } }
-      else await conn.reply(m.chat, captionApk, m)
-      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title.replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
+      let v = data[0]
+      let mediaUrl = extractUrl(v)
+      if (!mediaUrl) throw new Error('No se pudo extraer URL TT: ' + JSON.stringify(v).slice(0,500))
+
+      let caption = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || v.desc || text).slice(0,80)}*\n꒰ 🔍 ꒱ ${text}\n` + footer
+      await conn.sendFile(m.chat, mediaUrl, `tiktok.mp4`, caption, m)
+      await react('🎃')
+      return
     }
 
-    await react('🎃')
+    // APK
+    if (type === 'apk') {
+      let v = data[Math.floor(Math.random() * data.length)]
+      let mediaUrl = extractUrl(v)
+      let title = v.title || v.name || text
+      let icon = v.icon || v.thumbnail
+      let captionApk = head + `\n‧˚꒰🦇୭ *APK - ${title}* 📦🎃\n\n꒰ 🔍 ꒱ ${text}\n` + footer
+      if (icon) try { await conn.sendFile(m.chat, icon, 'icon.jpg', captionApk, m) } catch { await conn.reply(m.chat, captionApk, m) }
+      else await conn.reply(m.chat, captionApk, m)
+      await conn.sendMessage(m.chat, { document: { url: mediaUrl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title.replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
+      await react('🎃')
+      return
+    }
 
   } catch (e) {
     console.error(e)
