@@ -13,119 +13,119 @@ let handler = async (m, { conn, text }) => {
     }
 
     if (!text) {
-        await react('❌')
-        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        await react('💀')
+        let error = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ YOUTUBE ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 🎃
 ❌ ➛ ¿Qué deseas buscar en YouTube?
-😼 ➛ Garfield dice: escribe algo pe
+👻 ➛ Fantasma dice: escribe algo pe
 
-── *💡 EJEMPLO* ╏ 🍕
-➛.ytsearch Bad Bunny
+── *💡 EJEMPLO* ╏ 🦇
+➛.ytsearch Thriller Halloween
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
-    await react('🔍')
-    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    await react('🎃')
+    await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` 🔍 —˙𖦹.꒷
 
-── *📊 ESTADO* ╏ 🍕
+── *📊 ESTADO* ╏ 🎃
 🔍 ➛ Buscando: *${text}*
-⏳ ➛ Conectando a StellarWA...
-😼 ➛ Garfield buscando mientras come
+⏳ ➛ Invocando a StellarWA...
+👻 ➛ Fantasma buscando entre niebla
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`)
 
     try {
         let { data } = await axios.get(`https://api.stellarwa.xyz/search/yt?query=${encodeURIComponent(text)}&key=${APIKEY}`)
 
         if (!data.status ||!data.result || data.result.length === 0) {
-            await react('❌')
-            let vacio = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+            await react('💀')
+            let vacio = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐒𝐈𝐍 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`VACIO\`\` 📭 —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 🎃
 📭 ➛ No se encontraron resultados para: *${text}*
-😴 ➛ Garfield no encontró ni las migajas
+💀 ➛ Fantasma no encontró ni huesos
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
         }
 
         let res = data.result.slice(0, 5).map((v, i) => 
-`── *${i+1}* ╏ 🍕
+`── *${i+1}* ╏ 🎃
 📺 ➛ *${v.title}*
 ⏱️ ➛ Duración: *${v.duration}*
 👁️ ➛ Vistas: *${v.views}*
 👤 ➛ Canal: *${v.author}*
 🔗 ➛ ${v.url}`).join('\n\n')
 
-        let caption = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        let caption = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐓𝐎𝐏 𝟓 ﹒ RESULTADOS ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`RESULTADOS\`\` 📺 —˙𖦹.꒷
 
-── *📊 BÚSQUEDA* ╏ 🍕
+── *📊 BÚSQUEDA* ╏ 🎃
 🔎 ➛ ${text}
 
 ${res}
 
 ━━━━━━━━━━━
-── *📋 INFORMACIÓN* ╏ 🍕
+── *📋 INFORMACIÓN* ╏ 🦇
 👤 ➛ Solicitado por: ${user}
 👥 ➛ Grupo: *${groupName}*
-😼 ➛ Buscado por Garfield
+👻 ➛ Buscado por fantasma
 
-── *💡 TIP* ╏ 🍕
+── *💡 TIP* ╏ 🕯️
 ➛.ytmp4 + link
 ➛.ytmp3 + link
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: caption, mentions: [m.sender] }, { quoted: m })
-        await react('✅')
+        await react('🎃')
     } catch (e) { 
         console.error(e)
-        await react('❌')
-        let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        await react('💀')
+        let error = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
-⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ YOUTUBE ：✿ 。
+⤷ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ YOUTUBE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 🎃
 ❌ ➛ Error al conectar con StellarWA
 🔧 ➛ Intenta más tarde
-😼 ➛ Garfield dice: el api se fue a dormir
+👻 ➛ Fantasma dice: el api se fue al más allá
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
