@@ -3,7 +3,8 @@ import moment from 'moment-timezone'
 moment.locale('es')
 
 const api = {
-  url: 'https://api.stellarwa.xyz/search/tiktok',
+  search: 'https://api.stellarwa.xyz/search/tiktok',
+  dl: 'https://api.stellarwa.xyz/dl/tiktok',
   key: 'proyectsV2'
 }
 
@@ -19,51 +20,50 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   try {
     await react('⏳')
-    let url = `${api.url}?query=${encodeURIComponent(text)}&key=${api.key}`
-    console.log('TTSEARCH URL:', url)
-    
-    let res = await fetch(url)
+    let urlSearch = `${api.search}?query=${encodeURIComponent(text)}&key=${api.key}`
+    let res = await fetch(urlSearch)
     let json = await res.json()
-    console.log('TTSEARCH JSON:', JSON.stringify(json).slice(0, 1000))
 
-    // Detecta cualquier formato posible
     let data = json.result || json.data || json.results || json.videos || []
     if (data.data) data = data.data
     if (data.videos) data = data.videos
-    if (data.result) data = data.result
-    
-    if (!Array.isArray(data)) {
-      if (typeof data === 'object' && data !== null) data = Object.values(data)
-      else data = [data]
-    }
+    if (!Array.isArray(data)) data = Object.values(data)
 
-    // Filtra solo objetos válidos
-    data = data.filter(v => v && (v.url || v.link || v.videoUrl || v.play || v.title))
+    data = data.filter(v => v && (v.url || v.link || v.videoUrl))
 
     if (!data.length) {
       await react('💀')
-      return conn.reply(m.chat, head + `\n💀 No se encontraron resultados para *${text}*\n\nRespuesta API: ${JSON.stringify(json).slice(0,500)}`, m)
+      return conn.reply(m.chat, head + `\n💀 Sin resultados para *${text}*\n\n${JSON.stringify(json).slice(0,400)}`, m)
     }
 
-    let list = data.slice(0, 10)
-
-    let txt = head + `\n🎃 *TT SEARCH* 👻\n🔍 *Query:* ${text}\n📦 *Resultados:* ${list.length}\n\n`
+    let list = data.slice(0, 2) // Solo 2 videos
+    await conn.reply(m.chat, head + `\n🎃 *TT SEARCH* 👻\n🔍 Query: ${text}\n📦 Enviando ${list.length} videos...`, m)
 
     for (let i = 0; i < list.length; i++) {
       let v = list[i]
-      let title = v.title || v.desc || v.description || v.caption || v.text || 'Sin título'
-      let author = v.author || v.username || v.nickname || v.creator || v.author_name || 'TikTok'
-      let videoUrl = v.url || v.link || v.videoUrl || v.play || v.video_url || v.downloadUrl || ''
+      let title = v.title || v.desc || v.caption || 'Sin título'
+      let author = v.author || v.username || v.nickname || 'TikTok'
+      let tiktokUrl = v.url || v.link || v.videoUrl || v.play
 
-      txt += `*${i+1}. ${String(title).slice(0,70)}*\n`
-      txt += `👻 Autor: ${author}\n`
-      if (videoUrl) txt += `🔗 ${videoUrl}\n`
-      txt += `\n`
+      try {
+        // Intenta descargar con la API dl de StellarWA
+        let dlUrl = `${api.dl}?url=${encodeURIComponent(tiktokUrl)}&key=${api.key}`
+        let dlRes = await fetch(dlUrl)
+        let dlJson = await dlRes.json()
+
+        let videoDl = dlJson.result?.video || dlJson.result?.play || dlJson.result?.url || dlJson.data?.play || dlJson.url || tiktokUrl
+        if (typeof videoDl === 'object') videoDl = videoDl.url || videoDl.play
+
+        let caption = `‧˚꒰🎃୭ *TT SEARCH #${i+1}* 🦇\n\n👻 *Título:* ${String(title).slice(0,80)}\n🦇 *Autor:* ${author}\n🔍 *Query:* ${text}\n🔗 *Link:* ${tiktokUrl}\n\n━━━━━━━━━━━\n🎃 *LUX X YALLICO*`
+
+        await conn.sendFile(m.chat, videoDl, `ttsearch_${i+1}.mp4`, caption, m)
+        await new Promise(r => setTimeout(r, 1500))
+      } catch (e) {
+        console.log('Error video', i, e)
+        continue
+      }
     }
 
-    txt += `━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN* 🦇`
-    
-    await conn.reply(m.chat, txt, m)
     await react('🎃')
 
   } catch (e) {
