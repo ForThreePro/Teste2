@@ -16,25 +16,35 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
     await react('🔍')
     let res = await fetch(`${BASE}/search/pinterestvideo?query=${encodeURIComponent(text)}&key=${API_KEY}`)
-    let txt = await res.text()
-    if (txt.startsWith('<!DOCTYPE')) throw new Error('Stellar caída')
-    let json = JSON.parse(txt)
-
-    let videos = json.data?.videos || json.result?.videos || json.result || []
-    videos = videos.filter(v => v.dl && v.dl.includes('pinimg'))
+    let json = await res.json()
+    let videos = json.data?.videos || json.result?.videos || []
+    videos = videos.filter(v => v.dl && v.dl.startsWith('http'))
     if (!videos.length) throw new Error('Sin videos')
-
+    
     let v = videos.sort((a,b) => (b.likes||0)-(a.likes||0))[0]
     let dl = v.dl
 
     let caption = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n꒰ ⏱️ ꒱ ${v.duration} | ❤️ ${v.likes}\n` + footer
 
-    // FIX quoqued - no uses sendFile, usa sendMessage con url directa
+    // FIX: Descargar con headers para evitar 403 de pinimg
+    let vidRes = await fetch(dl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer': 'https://www.pinterest.com/',
+        'Accept': 'video/mp4,video/*,*/*'
+      }
+    })
+
+    if (!vidRes.ok) throw new Error(`Pinterest bloqueó video ${vidRes.status}`)
+
+    let buffer = await vidRes.buffer()
+
+    // Enviar buffer, no URL
     await conn.sendMessage(m.chat, {
-      video: { url: dl },
+      video: buffer,
       mimetype: 'video/mp4',
       caption: caption,
-      fileName: `pinvid-${text}.mp4`
+      fileName: `pinvid.mp4`
     }, { quoted: m })
 
     await react('🎃')
@@ -42,15 +52,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   } catch (e) {
     console.error(e)
     await react('💀')
-    // Si falla por quoted, intenta sin quoted
-    try {
-      let res = await fetch(`${BASE}/search/pinterestvideo?query=${encodeURIComponent(text)}&key=${API_KEY}`)
-      let json = await res.json()
-      let dl = json.data.videos[0].dl
-      await conn.sendMessage(m.chat, { video: { url: dl }, mimetype: 'video/mp4', caption: `🎃 ${text}` })
-      await react('🎃')
-    } catch {}
-    return conn.reply(m.chat, head + `\n💀 Error: ${e.message}` + footer, m)
+    return conn.reply(m.chat, head + `\n💀 Error: ${e.message}\n\nTip: prueba con otro término, a veces el mp4 de Pinterest expira` + footer, m)
   }
 }
 
