@@ -1,11 +1,11 @@
 import fetch from 'node-fetch'
 import fs from 'fs'
+import path from 'path'
 import { tmpdir } from 'os'
-import path, { join } from 'path'
 import moment from 'moment-timezone'
 moment.locale('es')
 
-const API_KEY = 'proyectsV2'
+const API_KEY = 'api-proyectsV2'
 const BASE = 'https://api.stellarwa.xyz'
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
@@ -24,37 +24,40 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   try {
     await react('⏳')
-    let res = await fetch(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
-    let json = await res.json()
-    let list = json.data?.videos || json.result?.videos || json.data || json.result || []
+    let apiRes = await fetch(`${BASE}/search/${type}?query=${encodeURIComponent(text)}&key=${API_KEY}`)
+    let apiTxt = await apiRes.text()
+    if (apiTxt.startsWith('<!DOCTYPE')) throw new Error('Stellar caído')
+    let json = JSON.parse(apiTxt)
+    let list = json.data?.videos || json.result?.videos || json.data?.pins || json.data || json.result || []
     if (!Array.isArray(list)) list = [list]
     list = list.flat().filter(Boolean)
+    if (!list.length) throw new Error(`Sin resultados para ${text}`)
 
     if (type === 'pinterestvideo') {
       let vids = list.filter(x => x.dl && x.dl.includes('.mp4'))
       if (!vids.length) {
-        let match = JSON.stringify(list).match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
-        if (match) vids = match.map(u => ({ dl: u, title: text }))
+        let all = JSON.stringify(list).match(/https:\/\/v1\.pinimg[^\"]+\.mp4/g)
+        if (all) vids = all.map(u => ({ dl: u, title: text, duration: '', likes: 0, thumb: '' }))
       }
-      if (!vids.length) throw new Error('API sin mp4 para ' + text)
+      if (!vids.length) throw new Error('No hay dl mp4')
 
+      // RANDOM para que no repita
       let v = vids[Math.floor(Math.random() * vids.length)]
 
-      // Descarga real
       let r = await fetch(v.dl, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.pinterest.com/' } })
-      if (!r.ok) throw new Error(`Pinterest ${r.status}`)
+      if (!r.ok) throw new Error(`Pin bloqueó ${r.status}`)
       let buf = Buffer.from(await r.arrayBuffer())
 
-      // Guarda temporal - ESTO ARREGLA EL "no disponible"
-      let tmpFile = join(tmpdir(), `pinvid_${Date.now()}.mp4`)
-      fs.writeFileSync(tmpFile, buf)
+      // Archivo temporal para evitar "video no disponible"
+      let tmp = path.join(tmpdir(), `pinvid-${Date.now()}.mp4`)
+      fs.writeFileSync(tmp, buf)
 
-      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n` + footer
+      let cap = head + `\n‧˚꒰🦇୭ *PINVID - ${text}* 🎃\n\n꒰ 👻 ꒱ *${String(v.title || text).slice(0,80)}*\n꒰ ⏱️ ꒱ ${v.duration || '0:00'} | ❤️ ${v.likes || 0}\n` + footer
 
-      // sendFile con archivo local SIEMPRE funciona como video
-      await conn.sendFile(m.chat, tmpFile, 'pinvid.mp4', cap, m, false, { mimetype: 'video/mp4', asVideo: true })
+      // VIDEO REAL - NO DOCUMENTO
+      await conn.sendFile(m.chat, tmp, 'pinvid.mp4', cap, m, false, { mimetype: 'video/mp4', asVideo: true })
 
-      try { fs.unlinkSync(tmpFile) } catch {}
+      try { fs.unlinkSync(tmp) } catch {}
       await react('🎃')
       return
     }
@@ -62,8 +65,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (type === 'pinterest') {
       let imgs = list.map(o => o.dl || o.image || o.url).filter(u => u && u.startsWith('http'))
       imgs = [...new Set(imgs)].sort(() => 0.5 - Math.random()).slice(0, 5)
+      if (!imgs.length) throw new Error('No hay imágenes')
+
       for (let i = 0; i < imgs.length; i++) {
-        let cap = i === 0? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n` + footer : `꒰ 🦇 ꒱ ${i+1}/5`
+        let cap = i === 0? head + `\n‧˚꒰🦇୭ *PINTEREST - ${text}* 🎃\n\n꒰ 👻 ꒱ ${imgs.length} fotos\n` + footer : `꒰ 🦇 ꒱ ${i+1}/5`
         await conn.sendFile(m.chat, imgs[i], `pin-${i}.jpg`, cap, m)
         await new Promise(r => setTimeout(r, 400))
       }
@@ -74,7 +79,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (type === 'tiktok') {
       let v = list[Math.floor(Math.random() * list.length)]
       let url = v.dl || v.play || v.hdplay || v.video || v.url
-      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH* 🎃\n\n꒰ 👻 ꒱ ${String(v.title || text).slice(0,80)}\n` + footer
+      let cap = head + `\n‧˚꒰🦇୭ *TTSEARCH - ${text}* 🎃\n\n꒰ 👻 ꒱ ${String(v.title || text).slice(0,80)}\n` + footer
       await conn.sendFile(m.chat, url, 'tt.mp4', cap, m)
       await react('🎃')
       return
@@ -82,9 +87,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     if (type === 'apk') {
       let v = list[0]
-      let dl = v.dl || v.url
+      let dl = v.dl || v.url || v.download
       let title = v.name || v.title || text
-      await conn.reply(m.chat, head + `\n‧˚꒰🦇୭ *APK - ${title}* 📦🎃\n` + footer, m)
+      let cap = head + `\n‧˚꒰🦇୭ *APK - ${title}* 📦🎃\n` + footer
+      await conn.reply(m.chat, cap, m)
       await conn.sendMessage(m.chat, { document: { url: dl }, mimetype: 'application/vnd.android.package-archive', fileName: `${title.replace(/[^a-z0-9]/gi,'_')}.apk` }, { quoted: m })
       await react('🎃')
       return
