@@ -6,22 +6,22 @@ let mutedUsers = new Set()
 let handler = async (m, { conn, command, participants }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
-    const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const head = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n꒰ ◞⁺⊹ ．${fecha}\n`
 
     let mentionedJid = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
-    if (!mentionedJid) { await react('❌'); return m.reply(head+`\n❌ Menciona o responde a un usuario\nEj: *.mute @user*`, m) }
+    if (!mentionedJid) { await react('💀'); return m.reply(head+`\n💀 Menciona o responde a un usuario\nEj: *.mute @user*`, m) }
 
-    if (participants.find(p=>p.id===mentionedJid)?.admin) { await react('❌'); return m.reply(head+`\n❌ No puedes silenciar admins`, m) }
-    if (mentionedJid===conn.user.jid) { await react('❌'); return m.reply(head+`\n❌ No puedo silenciarme`, m) }
+    if (participants.find(p=>p.id===mentionedJid)?.admin) { await react('💀'); return m.reply(head+`\n💀 No puedes exorcizar admins`, m) }
+    if (mentionedJid===conn.user.jid) { await react('💀'); return m.reply(head+`\n💀 No puedo silenciarme`, m) }
 
     if (command==="mute") {
-        if (mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⚠️ Ya está silenciado`, m) }
+        if (mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⚠️ Ya está en el ataúd`, m) }
         mutedUsers.add(mentionedJid); await react('🔇')
-        return conn.sendMessage(m.chat, { text: head+`\n🔇 Silenciado: @${mentionedJid.split('@')[0]}`, mentions:[mentionedJid] }, { quoted:m })
+        return conn.sendMessage(m.chat, { text: head+`\n🔇 Silenciado en la cripta: @${mentionedJid.split('@')[0]} 👻`, mentions:[mentionedJid] }, { quoted:m })
     } else {
-        if (!mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⚠️ No está silenciado`, m) }
+        if (!mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⚠️ No está en la cripta`, m) }
         mutedUsers.delete(mentionedJid); await react('🔊')
-        return conn.sendMessage(m.chat, { text: head+`\n🔊 Desilenciado: @${mentionedJid.split('@')[0]}`, mentions:[mentionedJid] }, { quoted:m })
+        return conn.sendMessage(m.chat, { text: head+`\n🔊 Liberado del hechizo: @${mentionedJid.split('@')[0]} 🎃`, mentions:[mentionedJid] }, { quoted:m })
     }
 }
 
