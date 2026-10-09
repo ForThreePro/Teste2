@@ -3,33 +3,33 @@ moment.locale('es')
 
 let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-  const head = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕\n\n꒰ ◞⁺⊹ ．${fecha}\n`
-  const footer = `\n━━━━━━━━━━━\n🍕 *LUX X YALLICO* 😼`
+  const head = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+  const footer = `\n━━━━━━━━━━━\n🎃 *LUX X YALLICO - HALLOWEEN* 🦇`
   const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
   const reply = (txt) => conn.sendMessage(m.chat, { text: head + `\n${txt}` + footer }, { quoted: m })
 
-  if (!isAdmin && !isOwner) { await react('❌'); return reply(`❌ Solo admins`) }
+  if (!isAdmin && !isOwner) { await react('💀'); return reply(`💀 Solo admins embrujados`) }
 
   if (['resetlink','revokelink'].includes(command)) {
     try {
       await react('🔗')
       await conn.groupRevokeInvite(m.chat)
       let code = await conn.groupInviteCode(m.chat)
-      await react('✅')
-      return reply(`🔗 Nuevo link:\nhttps://chat.whatsapp.com/${code}`)
-    } catch { await react('❌'); return reply(`❌ Necesito ser admin`) }
+      await react('🎃')
+      return reply(`🔗 Nuevo link de la cripta:\nhttps://chat.whatsapp.com/${code}`)
+    } catch { await react('💀'); return reply(`💀 Necesito ser admin`) }
   }
 
   if (['setname','setgroupname'].includes(command)) {
-    if (!text) { await react('❌'); return reply(`❌ Usa: *${usedPrefix}setname Nuevo nombre*`) }
-    try { await react('⏳'); await conn.groupUpdateSubject(m.chat, text); await react('✅'); return reply(`✅ Nombre cambiado a: *${text}*`) }
-    catch { await react('❌'); return reply(`❌ Error al cambiar nombre`) }
+    if (!text) { await react('💀'); return reply(`💀 Usa: *${usedPrefix}setname Nuevo nombre*`) }
+    try { await react('⏳'); await conn.groupUpdateSubject(m.chat, text); await react('🎃'); return reply(`🎃 Nombre cambiado a: *${text}*`) }
+    catch { await react('💀'); return reply(`💀 Error al cambiar nombre`) }
   }
 
   if (['setdesc','setgroupdesc'].includes(command)) {
-    if (!text) { await react('❌'); return reply(`❌ Usa: *${usedPrefix}setdesc Nueva descripción*`) }
-    try { await react('⏳'); await conn.groupUpdateDescription(m.chat, text); await react('✅'); return reply(`✅ Descripción actualizada`) }
-    catch { await react('❌'); return reply(`❌ Error al cambiar descripción`) }
+    if (!text) { await react('💀'); return reply(`💀 Usa: *${usedPrefix}setdesc Nueva descripción*`) }
+    try { await react('⏳'); await conn.groupUpdateDescription(m.chat, text); await react('🎃'); return reply(`🎃 Descripción embrujada actualizada`) }
+    catch { await react('💀'); return reply(`💀 Error al cambiar descripción`) }
   }
 
   if (['setfoto','setppgroup','setppgc'].includes(command)) {
@@ -42,15 +42,15 @@ let handler = async (m, { conn, usedPrefix, text, command, isAdmin, isOwner }) =
       } else if (/image/.test(mime)) {
         let img = await q.download()
         await conn.updateProfilePicture(m.chat, img)
-      } else { await react('❌'); return reply(`❌ Responde a una imagen o pasa un link`) }
-      await react('✅')
-      return reply(`✅ Foto actualizada`)
-    } catch { await react('❌'); return reply(`❌ Error al actualizar foto`) }
+      } else { await react('💀'); return reply(`💀 Responde a una imagen o pasa un link`) }
+      await react('🎃')
+      return reply(`🎃 Foto de la cripta actualizada`)
+    } catch { await react('💀'); return reply(`💀 Error al actualizar foto`) }
   }
 }
 
 handler.help = ['resetlink','setname','setdesc','setfoto']
-handler.tags = ['group']
+handler.tags = ['grupos']
 handler.command = ['resetlink','revokelink','setname','setgroupname','setdesc','setgroupdesc','setfoto','setppgroup','setppgc']
 handler.group = true
 handler.admin = true
