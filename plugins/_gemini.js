@@ -11,54 +11,54 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
     if (!text) {
-        let menuUso = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        let menuUso = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐈𝐀 𝐕𝐎𝐙 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🤖 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Hablando como Garfield después de 3 lasañas"*
+> *"Hablando como fantasma después de 3 sustos"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`IA\`\` 🤖 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`IA HALLOWEEN\`\` 🤖 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 🤖 ➛ Responde con IA usando Gemini
 🔊 ➛ Convierte la respuesta a audio PTT
-😼 ➛ Voz de Garfield serio
+👻 ➛ Voz de fantasma serio
 
-── *📖 USO* ╏ 🍕
+── *📖 USO* ╏ 🦇
 ➛.${command} <tu pregunta>
 ➛.${command} ¿qué tal causa?
 
-── *⚙️ NOTAS* ╏ 🍕
+── *⚙️ NOTAS* ╏ 🕯️
 📏 ➛ Máx 2 líneas de respuesta
 🗣️ ➛ Voz en español latino
-🍝 ➛ Garfield opina corto y al grano
+🎃 ➛ Fantasma opina corto y al grano
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
     }
 
-    await m.react('⏳')
-    await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    await m.react('🎃')
+    await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`PENSANDO\`\` 🤖 —˙𖦹.꒷
 
-── *📊 ESTADO* ╏ 🍕
-🧠 ➛ Consultando a Gemini...
-🗣️ ➛ Generando voz...
-📤 ➛ Enviando audio...
-😼 ➛ Garfield despertando de siesta...
+── *📊 ESTADO* ╏ 🎃
+🧠 ➛ Consultando al espíritu Gemini...
+🗣️ ➛ Generando voz embrujada...
+📤 ➛ Enviando audio maldito...
+👻 ➛ Fantasma despertando...
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`)
 
     try {
@@ -66,7 +66,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let aiRes = await fetch(aiUrl)
         let aiJson = await aiRes.json()
 
-        let respuesta = aiJson.result || aiJson.data || aiJson.response || "No te entendí pe causa, Garfield tiene hambre"
+        let respuesta = aiJson.result || aiJson.data || aiJson.response || "No te entendí pe causa, el fantasma tiene hambre"
 
         if(respuesta.length > 200) respuesta = respuesta.substring(0, 200) + "..."
 
@@ -81,16 +81,16 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-        .audioCodec('libopus')
-        .toFormat('opus')
-        .outputOptions([
+       .audioCodec('libopus')
+       .toFormat('opus')
+       .outputOptions([
                     '-avoid_negative_ts make_zero',
                     '-ac 1',
                     '-b:a 64k'
                 ])
-        .on('end', () => resolve(true))
-        .on('error', (err) => reject(err))
-        .save(tmpFilePath)
+       .on('end', () => resolve(true))
+       .on('error', (err) => reject(err))
+       .save(tmpFilePath)
         })
 
         let audioBuffer = fs.readFileSync(tmpFilePath)
@@ -102,30 +102,30 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         }, { quoted: m })
 
         if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath)
-        await m.react('✅')
+        await m.react('🎃')
 
     } catch (e) {
         console.log(e)
-        await m.react('❌')
+        await m.react('💀')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        await m.reply(`😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+        await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 DESCRIPCIÓN* ╏ 🍕
+── *📝 DESCRIPCIÓN* ╏ 🎃
 ❌ ➛ ${e.message}
-😴 ➛ Garfield se durmió con el error
+💀 ➛ El fantasma se asustó
 
-── *💡 SOLUCIÓN* ╏ 🍕
+── *💡 SOLUCIÓN* ╏ 🕯️
 🔧 ➛ Intenta con un texto más corto
 🔧 ➛ Verifica tu conexión
-🍕 ➛ Garfield dice: menos texto, más lasaña
+🎃 ➛ Fantasma dice: menos texto, más dulces
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`)
     }
 }
