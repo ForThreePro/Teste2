@@ -8,24 +8,24 @@ let handler = async (m, { conn }) => {
   }
 
   if (!m.quoted) {
-    await react('❌')
-    let error = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+    await react('💀')
+    let error = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐑 ﹒ MENSAJE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
-.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` ❌ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`ERROR\`\` 💀 —˙𖦹.꒷
 
-── *📝 AVISO* ╏ 🍕
+── *📝 AVISO* ╏ 🎃
 ❌ ➛ Responde al mensaje que deseas eliminar
-😼 ➛ Garfield dice: responde al mensaje pe
+👻 ➛ Fantasma dice: responde al mensaje pe
 
-── *💡 EJEMPLO* ╏ 🍕
+── *💡 EJEMPLO* ╏ 🦇
 ➛ Responde a un mensaje + .del
 ➛ Responde a un mensaje + .delete
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
@@ -40,20 +40,20 @@ let handler = async (m, { conn }) => {
     await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
   }
 
-  let ok = `😼 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🍕
+  let ok = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ MENSAJE ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`EXITO\`\` 🗑️ —˙𖦹.꒷
 
-── *📊 INFORMACIÓN* ╏ 🍕
+── *📊 INFORMACIÓN* ╏ 🎃
 🗑️ ➛ Mensaje eliminado
 👤 ➛ Por: @${m.sender.split('@')[0]}
-😼 ➛ Garfield lo borró durmiendo
+👻 ➛ Fantasma lo borró asustado
 
 ━━━━━━━━━━━
-🍕 *LUX X YALLICO - GARFIELD EDITION* 😼
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
   conn.sendMessage(m.chat, { text: ok, mentions: [m.sender] }, { quoted: m })
 }
