@@ -1,8 +1,8 @@
-import fetch from 'node-fetch'
-import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'
 import path from 'path'
 import { tmpdir } from 'os'
+import { createCanvas, registerFont } from 'canvas'
+import ffmpeg from 'fluent-ffmpeg'
 import moment from 'moment-timezone'
 moment.locale('es')
 
@@ -11,50 +11,104 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
   const head = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n꒰ ◞⁺⊹ ．${fecha}\n`
 
-  let q = m.quoted ? m.quoted : m
-  let txt = text || q.text || q.caption || ''
-  if (!txt) {
-    await react('💀')
-    return m.reply(head + `\n💀 Usa: *${usedPrefix}${command} Tu texto*`, m)
-  }
+  let txt = text || m.quoted?.text || m.quoted?.caption || ''
+  if (!txt) return m.reply(head + `\n💀 Usa: *${usedPrefix}${command} Tu texto*`, m)
+
+  // ===== CAMBIA LA FUENTE AQUÍ =====
+  // 1 = Brat Classic Blur
+  // 2 = Bold Gruesa (Impact style)
+  // 3 = Cute Redonda
+  // 4 = Typewriter fea chida
+  let estilo = 2
 
   try {
     await react('⏳')
-    // Intenta con params por si Stellar los agrega luego
-    let apiUrl = `https://api.stellarwa.xyz/tools/brat?text=${encodeURIComponent(txt)}&bg=%2392D1D6&fg=%23000000&color=92D1D6&background=92D1D6&textcolor=000000&key=proyectsV2`
-    let res = await fetch(apiUrl)
-    if (!res.ok) throw new Error(`API ${res.status}`)
-    let inputBuffer = await res.buffer()
+    txt = txt.toLowerCase().slice(0, 60)
 
-    let tmpInput = path.join(tmpdir(), `brat-${Date.now()}.gif`)
-    let tmpRecolor = path.join(tmpdir(), `brat-c-${Date.now()}.gif`)
-    let tmpOutput = path.join(tmpdir(), `brat-${Date.now()}.webp`)
-    fs.writeFileSync(tmpInput, inputBuffer)
+    const size = 1024
+    const canvas = createCanvas(size, size)
+    const ctx = canvas.getContext('2d')
 
-    // CAMBIA BLANCO (#FFFFFF) POR #92D1D6 (146,209,214) - deja negro intacto
-    await new Promise((resolve, reject) => {
-      ffmpeg(tmpInput)
-        .videoFilters(
-          "format=rgba,geq=r='if(gt(r(X,Y),200)*gt(g(X,Y),200)*gt(b(X,Y),200),146,r(X,Y))':g='if(gt(r(X,Y),200)*gt(g(X,Y),200)*gt(b(X,Y),200),209,g(X,Y))':b='if(gt(r(X,Y),200)*gt(g(X,Y),200)*gt(b(X,Y),200),214,b(X,Y))'"
-        )
-        .on('end', resolve).on('error', reject)
-        .save(tmpRecolor)
+    ctx.fillStyle = '#92D1D6'
+    ctx.fillRect(0, 0, size, size)
+
+    // ruido
+    ctx.fillStyle = 'rgba(0,0,0,0.05)'
+    for (let i = 0; i < 5000; i++) ctx.fillRect(Math.random()*size, Math.random()*size, 2, 2)
+
+    let fontFamily = ''
+    let blur = 6
+    let fontSizeBase = 130
+    let stretch = 1.15
+
+    if (estilo === 1) {
+      fontFamily = 'Arial Narrow, Arial, sans-serif'
+      blur = 7
+      fontSizeBase = 120
+      stretch = 1.15
+    } else if (estilo === 2) {
+      fontFamily = 'Impact, Anton, Arial Black, sans-serif'
+      blur = 4
+      fontSizeBase = 140
+      stretch = 1.05
+    } else if (estilo === 3) {
+      fontFamily = 'Verdana, Rounded, "Comic Sans MS", sans-serif'
+      blur = 2
+      fontSizeBase = 110
+      stretch = 1
+    } else if (estilo === 4) {
+      fontFamily = '"Courier New", monospace'
+      blur = 1
+      fontSizeBase = 100
+      stretch = 1
+    }
+
+    ctx.fillStyle = '#000000'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+
+    // wrap
+    ctx.font = `bold ${fontSizeBase}px ${fontFamily}`
+    let words = txt.split(' ')
+    let lines = [], line = ''
+    for (let w of words) {
+      let test = line + ' ' + w
+      if (ctx.measureText(test).width > size - 140) {
+        lines.push(line.trim())
+        line = w
+      } else line = test
+    }
+    lines.push(line.trim())
+
+    let fontSize = lines.length === 1? fontSizeBase : fontSizeBase - 20
+    ctx.font = `bold ${fontSize}px ${fontFamily}`
+
+    ctx.save()
+    ctx.scale(stretch, 1)
+    ctx.filter = `blur(${blur}px)`
+    let startY = size/2 - ((lines.length-1)*(fontSize+10))/2
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], (size/2)/stretch, startY + i*(fontSize+18))
+    }
+    ctx.restore()
+
+    let tmpPng = path.join(tmpdir(), `brat-${Date.now()}.png`)
+    let tmpWebp = path.join(tmpdir(), `brat-${Date.now()}.webp`)
+    fs.writeFileSync(tmpPng, canvas.toBuffer('image/png'))
+
+    await new Promise((res, rej) => {
+      ffmpeg(tmpPng).size('512x512').aspect('1:1').autopad()
+      .outputOptions('-vcodec','libwebp','-lossless','0','-q:v','90','-preset','picture','-an')
+      .toFormat('webp').on('end',res).on('error',rej).save(tmpWebp)
     })
 
-    await new Promise((resolve, reject) => {
-      ffmpeg(tmpRecolor).frames(1).size('512x512').aspect('1:1').autopad()
-        .outputOptions('-vcodec','libwebp','-lossless','0','-q:v','80','-preset','picture','-an','-vsync','0')
-        .toFormat('webp').on('end',resolve).on('error',reject).save(tmpOutput)
-    })
-
-    let stickerBuffer = fs.readFileSync(tmpOutput)
-    await conn.sendMessage(m.chat, { sticker: stickerBuffer }, { quoted: m })
-    try { fs.unlinkSync(tmpInput); fs.unlinkSync(tmpRecolor); fs.unlinkSync(tmpOutput) } catch {}
+    await conn.sendMessage(m.chat, { sticker: fs.readFileSync(tmpWebp) }, { quoted: m })
+    try { fs.unlinkSync(tmpPng); fs.unlinkSync(tmpWebp) } catch {}
     await react('🎃')
   } catch (e) {
     console.error(e)
     await react('💀')
-    await m.reply(head + `\n💀 Error al generar sticker embrujado: ${e.message}`, m)
+    await m.reply(head + `\n💀 Error: ${e.message}`, m)
   }
 }
 
