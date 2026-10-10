@@ -19,7 +19,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   // 2 = Bold Gruesa (Impact style)
   // 3 = Cute Redonda
   // 4 = Typewriter fea chida
-  let estilo = 2
+  let estilo = 3
 
   try {
     await react('⏳')
