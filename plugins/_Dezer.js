@@ -89,10 +89,9 @@ const handler = async (m, { conn, command }) => {
         const thumb = (await conn.getFile(thumbnail)).data
         const vistas = formatViews(views)
 
-        // ✅ ARREGLO: Descargar a Buffer, no mandar URL
-        await m.reply('⬇️ ➛ Descargando audio embrujado... 🍬')
-        let audioBuffer = await getAudioBuffer(shortUrl)
-        if (!audioBuffer) throw new Error('No se pudo obtener el audio (YouTube bloqueó la API)')
+        // ✅ ARREGLO ENTREGA: Descargar a Buffer y convertir a OPUS
+        const audioBuffer = await getAudioBuffer(shortUrl)
+        if (!audioBuffer) throw new Error('No se pudo obtener el audio')
 
         if (command === 'song') {
             await conn.sendMessage(m.chat, {
@@ -121,12 +120,10 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ AHORA SI MANDA BUFFER
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
-                fileName: `${title}.mp3`,
-                mimetype: 'audio/mpeg',
-                ptt: false
+                mimetype: 'audio/ogg; codecs=opus',
+                ptt: true
             }, { quoted: m })
         }
 
@@ -161,9 +158,8 @@ const handler = async (m, { conn, command }) => {
 
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
-                fileName: `${title}.mp3`,
-                mimetype: 'audio/mpeg',
-                ptt: false
+                mimetype: 'audio/ogg; codecs=opus',
+                ptt: true
             }, { quoted: m })
         }
 
@@ -222,52 +218,44 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
         const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-t', String(seconds), '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
         const chunks = []
         ff.stdout.on('data', c => chunks.push(c))
-        ff.on('close', () => { try { fs.unlinkSync(tmpIn) } catch { }; resolve(chunks.length ? Buffer.concat(chunks) : buffer) })
+        ff.on('close', () => { try { fs.unlinkSync(tmpIn) } catch {} ; resolve(chunks.length ? Buffer.concat(chunks) : buffer) })
     })
 }
 
-// ✅ NUEVO: 3 APIs de respaldo + descarga a Buffer + convierte a MP3 real
-async function getAudioBuffer(youtubeUrl) {
-    const apis = [
-        `https://api.sventy.store/api/ytdl?url=${encodeURIComponent(youtubeUrl)}`,
-        `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(youtubeUrl)}`,
-        `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(youtubeUrl)}&key=proyectsV2`
-    ]
-
-    for (let apiUrl of apis) {
-        try {
-            let json = await fetch(apiUrl).then(r => r.json()).catch(() => null)
-            if (!json) continue
-            // Cada API devuelve el link con nombre diferente
-            let dl = json.data?.download || json.result?.download || json.result?.url || json.data?.url || json.url || json.download
-            if (!dl) continue
-
-            let res = await fetch(dl)
-            if (!res.ok) continue
-            let arr = await res.arrayBuffer()
-            let buf = Buffer.from(arr)
-            if (buf.length < 10000) continue // archivo corrupto / vacío
-
-            // Convertir a MP3 real con ffmpeg para que WhatsApp sí lo reproduzca
-            return await convertToMp3(buf)
-        } catch (e) {
-            console.log('API falló:', apiUrl, e.message)
-            continue
+// ✅ NUEVO: Descarga el audio a Buffer y lo convierte a OPUS (lo que WhatsApp SÍ reproduce)
+async function getAudioBuffer(url) {
+    try {
+        const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
+        let dl = res.data?.download || null
+        if (!dl) {
+            console.log('[SONG] sventy no devolvió download:', JSON.stringify(res).slice(0, 300))
+            return null
         }
+        console.log('[SONG] Descargando audio desde:', dl.slice(0, 100))
+        let audioRes = await fetch(dl)
+        if (!audioRes.ok) {
+            console.log('[SONG] Falló descarga, status:', audioRes.status)
+            return null
+        }
+        let buf = Buffer.from(await audioRes.arrayBuffer())
+        console.log('[SONG] Audio descargado, tamaño:', buf.length)
+        if (buf.length < 10000) return null
+        return await convertToOpus(buf)
+    } catch (e) {
+        console.log('[SONG] Error getAudioBuffer:', e.message)
+        return null
     }
-    return null
 }
 
-function convertToMp3(buffer) {
+function convertToOpus(buffer) {
     return new Promise(resolve => {
         const tmpIn = path.join(os.tmpdir(), `in_${Date.now()}`)
         fs.writeFileSync(tmpIn, buffer)
-        const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
+        const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'libopus', '-b:a', '64k', '-ar', '48000', '-f', 'ogg', 'pipe:1'])
         const chunks = []
         ff.stdout.on('data', c => chunks.push(c))
         ff.on('close', () => {
-            try { fs.unlinkSync(tmpIn) } catch { }
-            // Si ffmpeg falla, devolvemos el buffer original
+            try { fs.unlinkSync(tmpIn) } catch {}
             resolve(chunks.length ? Buffer.concat(chunks) : buffer)
         })
         ff.on('error', () => resolve(buffer))
