@@ -18,10 +18,10 @@ const handler = async (m, { conn, command }) => {
     try {
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
         const ownerNum = global.owner?.[0]?.[0] || '51927174369'
-        let q = m.quoted? m.quoted : m
+        let q = m.quoted ? m.quoted : m
         let mime = (q.msg || q).mimetype || ''
 
-        if (!mime ||!/audio|video/.test(mime)) {
+        if (!mime || !/audio|video/.test(mime)) {
             let menuUso = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐃𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
@@ -88,10 +88,13 @@ const handler = async (m, { conn, command }) => {
         const shortUrl = `https://youtu.be/${videoId}`
         const thumb = (await conn.getFile(thumbnail)).data
         const vistas = formatViews(views)
-        const mediaUrl = await getMediaUrl(shortUrl)
-        if (!mediaUrl) throw new Error('No se pudo obtener el audio')
 
-        if(command === 'song'){
+        // ✅ ARREGLO: Descargar a Buffer, no mandar URL
+        await m.reply('⬇️ ➛ Descargando audio embrujado... 🍬')
+        let audioBuffer = await getAudioBuffer(shortUrl)
+        if (!audioBuffer) throw new Error('No se pudo obtener el audio (YouTube bloqueó la API)')
+
+        if (command === 'song') {
             await conn.sendMessage(m.chat, {
                 image: thumb,
                 caption: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
@@ -118,18 +121,20 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
+            // ✅ AHORA SI MANDA BUFFER
             await conn.sendMessage(m.chat, {
-                audio: { url: mediaUrl },
+                audio: audioBuffer,
                 fileName: `${title}.mp3`,
-                mimetype: 'audio/mpeg'
+                mimetype: 'audio/mpeg',
+                ptt: false
             }, { quoted: m })
         }
 
-        if(command === 'letra'){
+        if (command === 'letra') {
             await m.react('📝')
             const lyricsRes = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(song.artist)}/${encodeURIComponent(song.title)}`).then(r => r.json())
             let lyrics = lyricsRes.lyrics || 'No se encontró la letra'
-            if(lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga, como siesta de fantasma 😴'
+            if (lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga, como siesta de fantasma 😴'
 
             await conn.sendMessage(m.chat, {
                 text: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
@@ -155,15 +160,16 @@ const handler = async (m, { conn, command }) => {
             }, { quoted: m })
 
             await conn.sendMessage(m.chat, {
-                audio: { url: mediaUrl },
+                audio: audioBuffer,
                 fileName: `${title}.mp3`,
-                mimetype: 'audio/mpeg'
+                mimetype: 'audio/mpeg',
+                ptt: false
             }, { quoted: m })
         }
 
         await m.react('🎃')
 
-    } catch(e) {
+    } catch (e) {
         await m.react('💀')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
         let menuError = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
@@ -190,43 +196,82 @@ const handler = async (m, { conn, command }) => {
 }
 
 async function recognizeUrl(audioUrl) {
-  const res = await fetch(SONGFINDER_API, {
-    method: 'POST',
-    headers: {'content-type': 'application/json', 'origin': 'https://songfinder.gg'},
-    body: JSON.stringify({ url: audioUrl, startTime: 0, recaptchaToken: crypto.randomBytes(24).toString('base64url') })
-  })
-  const json = await res.json()
-  if (!json?.success ||!json?.track) throw new Error('No se encontró la canción')
-  return json.track
+    const res = await fetch(SONGFINDER_API, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'origin': 'https://songfinder.gg' },
+        body: JSON.stringify({ url: audioUrl, startTime: 0, recaptchaToken: crypto.randomBytes(24).toString('base64url') })
+    })
+    const json = await res.json()
+    if (!json?.success || !json?.track) throw new Error('No se encontró la canción')
+    return json.track
 }
 
 async function uploadUguu(buffer) {
-  const { ext, mime } = (await fileTypeFromBuffer(buffer)) || { ext: 'mp3', mime: 'audio/mpeg' }
-  const blob = new Blob([buffer], { type: mime })
-  const form = new FormData()
-  form.append('files[]', blob, crypto.randomBytes(5).toString('hex') + '.' + ext)
-  const res = await fetch(UGUU_UPLOAD, { method: 'POST', body: form })
-  return (await res.json())?.files?.[0]?.url
+    const { ext, mime } = (await fileTypeFromBuffer(buffer)) || { ext: 'mp3', mime: 'audio/mpeg' }
+    const blob = new Blob([buffer], { type: mime })
+    const form = new FormData()
+    form.append('files[]', blob, crypto.randomBytes(5).toString('hex') + '.' + ext)
+    const res = await fetch(UGUU_UPLOAD, { method: 'POST', body: form })
+    return (await res.json())?.files?.[0]?.url
 }
 
 function prepareClip(buffer, seconds = CLIP_SECONDS) {
-  return new Promise(resolve => {
-    const tmpIn = path.join(os.tmpdir(), `sf_${Date.now()}`)
-    fs.writeFileSync(tmpIn, buffer)
-    const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-t', String(seconds), '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
-    const chunks = []
-    ff.stdout.on('data', c => chunks.push(c))
-    ff.on('close', () => { try{fs.unlinkSync(tmpIn)}catch{}; resolve(chunks.length? Buffer.concat(chunks) : buffer) })
-  })
+    return new Promise(resolve => {
+        const tmpIn = path.join(os.tmpdir(), `sf_${Date.now()}`)
+        fs.writeFileSync(tmpIn, buffer)
+        const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-t', String(seconds), '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
+        const chunks = []
+        ff.stdout.on('data', c => chunks.push(c))
+        ff.on('close', () => { try { fs.unlinkSync(tmpIn) } catch { }; resolve(chunks.length ? Buffer.concat(chunks) : buffer) })
+    })
 }
 
-async function getMediaUrl(url) {
-    try {
-        const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
-        return res.data?.download || null
-    } catch {
-        return null
+// ✅ NUEVO: 3 APIs de respaldo + descarga a Buffer + convierte a MP3 real
+async function getAudioBuffer(youtubeUrl) {
+    const apis = [
+        `https://api.sventy.store/api/ytdl?url=${encodeURIComponent(youtubeUrl)}`,
+        `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(youtubeUrl)}`,
+        `https://api.stellarwa.xyz/dow/ytmp3?url=${encodeURIComponent(youtubeUrl)}&key=proyectsV2`
+    ]
+
+    for (let apiUrl of apis) {
+        try {
+            let json = await fetch(apiUrl).then(r => r.json()).catch(() => null)
+            if (!json) continue
+            // Cada API devuelve el link con nombre diferente
+            let dl = json.data?.download || json.result?.download || json.result?.url || json.data?.url || json.url || json.download
+            if (!dl) continue
+
+            let res = await fetch(dl)
+            if (!res.ok) continue
+            let arr = await res.arrayBuffer()
+            let buf = Buffer.from(arr)
+            if (buf.length < 10000) continue // archivo corrupto / vacío
+
+            // Convertir a MP3 real con ffmpeg para que WhatsApp sí lo reproduzca
+            return await convertToMp3(buf)
+        } catch (e) {
+            console.log('API falló:', apiUrl, e.message)
+            continue
+        }
     }
+    return null
+}
+
+function convertToMp3(buffer) {
+    return new Promise(resolve => {
+        const tmpIn = path.join(os.tmpdir(), `in_${Date.now()}`)
+        fs.writeFileSync(tmpIn, buffer)
+        const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
+        const chunks = []
+        ff.stdout.on('data', c => chunks.push(c))
+        ff.on('close', () => {
+            try { fs.unlinkSync(tmpIn) } catch { }
+            // Si ffmpeg falla, devolvemos el buffer original
+            resolve(chunks.length ? Buffer.concat(chunks) : buffer)
+        })
+        ff.on('error', () => resolve(buffer))
+    })
 }
 
 function formatViews(views) {
