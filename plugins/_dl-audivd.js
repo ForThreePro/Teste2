@@ -89,9 +89,10 @@ const handler = async (m, { conn, command }) => {
         const thumb = (await conn.getFile(thumbnail)).data
         const vistas = formatViews(views)
 
-        // ✅ ARREGLO: Buffer MP3 REAL, no URL
         const audioBuffer = await getAudioBuffer(shortUrl)
         if (!audioBuffer) throw new Error('No se pudo obtener el audio')
+
+        const cleanTitle = title.replace(/[^\w\s-]/gi, '').trim() || 'song'
 
         if (command === 'song') {
             await conn.sendMessage(m.chat, {
@@ -112,7 +113,7 @@ const handler = async (m, { conn, command }) => {
 👻 ➛ Encontrado por fantasma Garfield
 
 ── *📥 DESCARGA* ╏ 🦇
-⬇️ ➛ Enviando audio embrujado...
+⬇️ ➛ Enviando archivo MP3...
 🍬 ➛ Preparando dulce sonoro...
 
 ━━━━━━━━━━━
@@ -120,11 +121,11 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
+            // ✅ MP3 ARCHIVO - NO nota de voz
             await conn.sendMessage(m.chat, {
-                audio: audioBuffer,
+                document: audioBuffer,
                 mimetype: 'audio/mpeg',
-                fileName: `${title}.mp3`,
-                ptt: false
+                fileName: `${cleanTitle}.mp3`
             }, { quoted: m })
         }
 
@@ -150,18 +151,18 @@ const handler = async (m, { conn, command }) => {
 \`\`${lyrics}\`\`
 
 ── *📥 DESCARGA* ╏ 🦇
-⬇️ ➛ Enviando audio embrujado...
+⬇️ ➛ Enviando archivo MP3...
 
 ━━━━━━━━━━━
 🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
             }, { quoted: m })
 
+            // ✅ MP3 ARCHIVO - NO nota de voz
             await conn.sendMessage(m.chat, {
-                audio: audioBuffer,
+                document: audioBuffer,
                 mimetype: 'audio/mpeg',
-                fileName: `${title}.mp3`,
-                ptt: false
+                fileName: `${cleanTitle}.mp3`
             }, { quoted: m })
         }
 
@@ -224,7 +225,6 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
     })
 }
 
-// ✅ NUEVO: Descarga y convierte a MP3 REAL
 async function getAudioBuffer(url) {
     try {
         const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
@@ -233,13 +233,10 @@ async function getAudioBuffer(url) {
             console.log('[SONG] sventy no devolvió download:', JSON.stringify(res).slice(0, 300))
             return null
         }
-        console.log('[SONG] Descargando desde:', dl.slice(0, 100))
         let audioRes = await fetch(dl)
         if (!audioRes.ok) return null
         let buf = Buffer.from(await audioRes.arrayBuffer())
-        console.log('[SONG] Tamaño descargado:', buf.length)
         if (buf.length < 10000) return null
-        // Igual que .audivd: convertir a MP3 real 192k
         return await convertToMp3(buf)
     } catch (e) {
         console.log('[SONG] Error getAudioBuffer:', e.message)
