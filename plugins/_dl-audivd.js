@@ -113,7 +113,7 @@ const handler = async (m, { conn, command }) => {
 👻 ➛ Encontrado por fantasma Garfield
 
 ── *📥 DESCARGA* ╏ 🦇
-⬇️ ➛ Enviando archivo MP3...
+⬇️ ➛ Enviando audio con barra naranja...
 🍬 ➛ Preparando dulce sonoro...
 
 ━━━━━━━━━━━
@@ -121,11 +121,12 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ MP3 ARCHIVO - NO nota de voz
+            // ✅ BARRA NARANJA - Audio MP3, NO nota de voz, NO documento
             await conn.sendMessage(m.chat, {
-                document: audioBuffer,
+                audio: audioBuffer,
                 mimetype: 'audio/mpeg',
-                fileName: `${cleanTitle}.mp3`
+                fileName: `${cleanTitle}.mp3`,
+                ptt: false
             }, { quoted: m })
         }
 
@@ -151,18 +152,19 @@ const handler = async (m, { conn, command }) => {
 \`\`${lyrics}\`\`
 
 ── *📥 DESCARGA* ╏ 🦇
-⬇️ ➛ Enviando archivo MP3...
+⬇️ ➛ Enviando audio con barra naranja...
 
 ━━━━━━━━━━━
 🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ MP3 ARCHIVO - NO nota de voz
+            // ✅ BARRA NARANJA - Audio MP3, NO nota de voz, NO documento
             await conn.sendMessage(m.chat, {
-                document: audioBuffer,
+                audio: audioBuffer,
                 mimetype: 'audio/mpeg',
-                fileName: `${cleanTitle}.mp3`
+                fileName: `${cleanTitle}.mp3`,
+                ptt: false
             }, { quoted: m })
         }
 
