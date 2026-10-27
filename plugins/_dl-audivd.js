@@ -121,12 +121,12 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ BARRA NARANJA - Audio MP3, NO nota de voz, NO documento
+            // ✅ BARRA NARANJA - NO documento, NO nota de voz
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
-                mimetype: 'audio/mpeg',
-                fileName: `${cleanTitle}.mp3`,
-                ptt: false
+                mimetype: 'audio/mp4',
+                ptt: false,
+                fileName: `${cleanTitle}.m4a`
             }, { quoted: m })
         }
 
@@ -159,12 +159,12 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ BARRA NARANJA - Audio MP3, NO nota de voz, NO documento
+            // ✅ BARRA NARANJA - NO documento, NO nota de voz
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
-                mimetype: 'audio/mpeg',
-                fileName: `${cleanTitle}.mp3`,
-                ptt: false
+                mimetype: 'audio/mp4',
+                ptt: false,
+                fileName: `${cleanTitle}.m4a`
             }, { quoted: m })
         }
 
@@ -232,30 +232,37 @@ async function getAudioBuffer(url) {
         const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
         let dl = res.data?.download || null
         if (!dl) {
-            console.log('[SONG] sventy no devolvió download:', JSON.stringify(res).slice(0, 300))
+            console.log('[SONG] sventy no devolvió download')
             return null
         }
         let audioRes = await fetch(dl)
         if (!audioRes.ok) return null
         let buf = Buffer.from(await audioRes.arrayBuffer())
         if (buf.length < 10000) return null
-        return await convertToMp3(buf)
+        return await convertToM4a(buf)
     } catch (e) {
         console.log('[SONG] Error getAudioBuffer:', e.message)
         return null
     }
 }
 
-function convertToMp3(buffer) {
+function convertToM4a(buffer) {
     return new Promise(resolve => {
         const tmpIn = path.join(os.tmpdir(), `song_in_${Date.now()}`)
+        const tmpOut = path.join(os.tmpdir(), `song_out_${Date.now()}.m4a`)
         fs.writeFileSync(tmpIn, buffer)
-        const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-ar', '44100', '-ac', '2', '-b:a', '192k', '-f', 'mp3', 'pipe:1'])
-        const chunks = []
-        ff.stdout.on('data', c => chunks.push(c))
-        ff.on('close', () => {
+        const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-ac', '2', tmpOut])
+        ff.on('close', (code) => {
+            try {
+                if (fs.existsSync(tmpOut)) {
+                    let out = fs.readFileSync(tmpOut)
+                    fs.unlinkSync(tmpIn)
+                    fs.unlinkSync(tmpOut)
+                    if (out.length > 10000) return resolve(out)
+                }
+            } catch {}
             try { fs.unlinkSync(tmpIn) } catch {}
-            resolve(chunks.length ? Buffer.concat(chunks) : buffer)
+            resolve(buffer)
         })
         ff.on('error', () => resolve(buffer))
     })
