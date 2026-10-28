@@ -22,14 +22,57 @@ const handler = async (m, { conn, command }) => {
         let mime = (q.msg || q).mimetype || ''
 
         if (!mime || !/audio|video/.test(mime)) {
-            return conn.sendMessage(m.chat, { text: `Responde a un audio/video con .${command}` }, { quoted: m })
+            let menuUso = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐁𝐔𝐒𝐂𝐀𝐃𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+  ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
+🎃 ࣪ ꕀ.${command} ˚. ᵎᵎ
+> *"Hasta el fantasma reconoce música en Halloween"*
+
+.⃟𖥔 ݁. 𖦹˙— \`\`BUSCADOR HALLOWEEN\`\` 🔍 —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🎃
+🎵 ➛ Identifica canciones respondiendo a audios o videos
+🎃 ➛.song = Descarga el audio embrujado
+👻 ➛.letra = Muestra la letra + descarga el audio
+
+── *📖 USO* ╏ 🦇
+1️⃣ ➛ Responde a un audio con:.*${command}*
+2️⃣ ➛ Responde a un video con:.*${command}*
+
+── *⏱️ NOTA* ╏ 🕯️
+📦 ➛ Analiza los primeros *${CLIP_SECONDS}s*
+🦇 ➛ Garfield con disfraz escucha mejor
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
+*Owner*: @${ownerNum}
+━━━━━━━━━━━`
+            return conn.sendMessage(m.chat, { text: menuUso, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
         }
 
         await m.react('🎃')
         let buffer = await q.download()
         if (!buffer) throw new Error('Error al descargar el archivo')
 
-        await m.reply(`Detectando... ${fecha}`)
+        await m.reply(`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`PROCESANDO\`\` 🎶 —˙𖦹.꒷
+
+── *📊 PROCESO* ╏ 🎃
+🕸️ ➛ Analizando ${CLIP_SECONDS}s de audio...
+📤 ➛ Subiendo al cementerio temporal...
+🎶 ➛ Invocando coincidencia...
+👻 ➛ Garfield fantasma afinando bigotes...
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
+━━━━━━━━━━━`)
 
         let clip = await prepareClip(buffer, CLIP_SECONDS)
         let url = await uploadUguu(clip)
@@ -47,7 +90,7 @@ const handler = async (m, { conn, command }) => {
         const vistas = formatViews(views)
 
         const audioData = await getAudioBuffer(shortUrl)
-        if (!audioData) throw new Error('No se pudo obtener el audio')
+        if (!audioData) throw new Error('No se pudo convertir el audio - revisa ffmpeg')
 
         const cleanTitle = title.replace(/[^\w\s-]/gi, '').trim() || 'song'
         const duration = seconds || 200
@@ -55,10 +98,31 @@ const handler = async (m, { conn, command }) => {
         if (command === 'song') {
             await conn.sendMessage(m.chat, {
                 image: thumb,
-                caption: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n📌 Título: *${title}*\n👤 Artista: *${author.name}*\n👁️ Vistas: *${vistas}*\n⏱️ Duración: *${timestamp}*\n🔗 Link: ${shortUrl}`
+                caption: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` 🎃 —˙𖦹.꒷
+
+── *📊 INFORMACIÓN* ╏ 🎃
+📌 ➛ Título: *${title}*
+👤 ➛ Artista: *${author.name}*
+👁️ ➛ Vistas: *${vistas}*
+⏱️ ➛ Duración: *${timestamp}*
+🔗 ➛ Link: ${shortUrl}
+👻 ➛ Encontrado por fantasma Garfield
+
+── *📥 DESCARGA* ╏ 🦇
+⬇️ ➛ Enviando audio con barra naranja...
+🍬 ➛ Preparando dulce sonoro...
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
+━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ FIX DEFINITIVO - MP3 REAL, NO M4A FALSO
+            // ✅ SOLO SVENTY + MP3 REAL = BARRA NARANJA
             await conn.sendMessage(m.chat, {
                 audio: audioData.buffer,
                 mimetype: 'audio/mpeg',
@@ -72,9 +136,30 @@ const handler = async (m, { conn, command }) => {
             await m.react('📝')
             const lyricsRes = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(song.artist)}/${encodeURIComponent(song.title)}`).then(r => r.json())
             let lyrics = lyricsRes.lyrics || 'No se encontró la letra'
-            if (lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...'
+            if (lyrics.length > 1500) lyrics = lyrics.slice(0, 1500) + '\n\n...Letra muy larga, como siesta de fantasma 😴'
 
-            await conn.sendMessage(m.chat, { text: `📌 *${title}* - *${author.name}*\n\n${lyrics}` }, { quoted: m })
+            await conn.sendMessage(m.chat, {
+                text: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+
+⤷ ┇ 𝐋𝐄𝐓𝐑𝐀 ﹒ LETRA ：✿ 。
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`LETRA HALLOWEEN\`\` 🎤 —˙𖦹.꒷
+
+── *📊 CANCIÓN* ╏ 🎃
+📌 ➛ *${title}* - *${author.name}*
+👻 ➛ Garfield fantasma tararea esto
+
+── *📜 LETRA* ╏ 🕯️
+\`\`${lyrics}\`\`
+
+── *📥 DESCARGA* ╏ 🦇
+⬇️ ➛ Enviando audio con barra naranja...
+
+━━━━━━━━━━━
+🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
+━━━━━━━━━━━`
+            }, { quoted: m })
 
             await conn.sendMessage(m.chat, {
                 audio: audioData.buffer,
@@ -89,7 +174,8 @@ const handler = async (m, { conn, command }) => {
 
     } catch (e) {
         await m.react('💀')
-        return conn.sendMessage(m.chat, { text: `❌ ${e.message}` }, { quoted: m })
+        const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+        return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇\n\n❌ ➛ ${e.message}\n\n${fecha}` }, { quoted: m })
     }
 }
 
@@ -124,19 +210,21 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
     })
 }
 
+// ✅ SOLO SVENTY - LA QUE SÍ TE FUNCIONA
 async function getAudioBuffer(url) {
     try {
+        console.log('[SONG] Sventy pidiendo:', url)
         const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
-        let dl = res.data?.download || null
+        console.log('[SONG] Sventy responde:', JSON.stringify(res).slice(0, 400))
+        let dl = res.data?.download || res.download || res.url || null
         if (!dl) {
-            console.log('[SONG] sventy no devolvió download', JSON.stringify(res).slice(0,500))
+            console.log('[SONG] Sventy no devolvió download')
             return null
         }
-        console.log('[SONG] Descargando de:', dl.slice(0,100))
-        let audioRes = await fetch(dl)
+        let audioRes = await fetch(dl, { headers: { 'User-Agent': 'Mozilla/5.0' } })
         if (!audioRes.ok) return null
         let buf = Buffer.from(await audioRes.arrayBuffer())
-        console.log('[SONG] Buffer original:', buf.length, 'bytes, primeros bytes:', buf.slice(0,10).toString('hex'))
+        console.log('[SONG] Buffer:', buf.length, 'bytes')
         if (buf.length < 10000) return null
         return await convertToMp3(buf)
     } catch (e) {
@@ -145,20 +233,18 @@ async function getAudioBuffer(url) {
     }
 }
 
-// ✅ ESTE ES EL FIX QUE ARREGLA TU CAPTURA
+// ✅ ESTE ES EL FIX REAL - NO MANDA WEBM COMO MP3
 function convertToMp3(buffer) {
     return new Promise(async (resolve) => {
-        // Detectar formato real del buffer
         const detected = await fileTypeFromBuffer(buffer)
         console.log('[SONG] Formato detectado:', detected)
 
-        // Si ya es MP3 de verdad, NO lo toques, mándalo tal cual
+        // Si ya es MP3 de verdad, mándalo tal cual
         if (detected?.ext === 'mp3') {
-            console.log('[SONG] Ya es MP3, no convierto')
             return resolve({ buffer, mimetype: 'audio/mpeg', ext: 'mp3' })
         }
 
-        // Si es otro formato, convertir a MP3 con extensión correcta en el temporal
+        // Si es webm/opus/mp4, convertir a MP3 REAL con extensión correcta
         const inExt = detected?.ext || 'webm'
         const tmpIn = path.join(os.tmpdir(), `song_in_${Date.now()}.${inExt}`)
         const tmpOut = path.join(os.tmpdir(), `song_out_${Date.now()}.mp3`)
@@ -178,9 +264,7 @@ function convertToMp3(buffer) {
                     }
                 }
             } catch {}
-            console.log('[SONG] ffmpeg falló con código', code, '- mando original como MP3 NO, mando error')
-            // Si ffmpeg falló, NO mandamos el webm como mp3 porque daría el mismo error de tu captura
-            // Mejor devolvemos null para que te diga "No se pudo obtener el audio" y veamos el log
+            console.log('[SONG] ffmpeg falló código', code, '- NO mando audio corrupto')
             resolve(null)
         })
         ff.on('error', (err) => {
