@@ -90,7 +90,7 @@ const handler = async (m, { conn, command }) => {
         const vistas = formatViews(views)
 
         const audioData = await getAudioBuffer(shortUrl)
-        if (!audioData) throw new Error('No se pudo convertir el audio - revisa ffmpeg')
+        if (!audioData) throw new Error('No se pudo obtener el audio de Sventy')
 
         const cleanTitle = title.replace(/[^\w\s-]/gi, '').trim() || 'song'
         const duration = seconds || 200
@@ -122,12 +122,11 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ SOLO SVENTY + MP3 REAL = BARRA NARANJA
             await conn.sendMessage(m.chat, {
                 audio: audioData.buffer,
-                mimetype: 'audio/mpeg',
+                mimetype: audioData.mimetype,
                 ptt: false,
-                fileName: `${cleanTitle}.mp3`,
+                fileName: `${cleanTitle}.${audioData.ext}`,
                 seconds: duration
             }, { quoted: m })
         }
@@ -163,9 +162,9 @@ const handler = async (m, { conn, command }) => {
 
             await conn.sendMessage(m.chat, {
                 audio: audioData.buffer,
-                mimetype: 'audio/mpeg',
+                mimetype: audioData.mimetype,
                 ptt: false,
-                fileName: `${cleanTitle}.mp3`,
+                fileName: `${cleanTitle}.${audioData.ext}`,
                 seconds: duration
             }, { quoted: m })
         }
@@ -203,14 +202,16 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
     return new Promise(resolve => {
         const tmpIn = path.join(os.tmpdir(), `sf_${Date.now()}`)
         fs.writeFileSync(tmpIn, buffer)
+        // Si no hay ffmpeg, prepareClip devuelve el buffer original y sigue
         const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-t', String(seconds), '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
         const chunks = []
         ff.stdout.on('data', c => chunks.push(c))
+        ff.on('error', () => { try { fs.unlinkSync(tmpIn) } catch {} ; resolve(buffer) })
         ff.on('close', () => { try { fs.unlinkSync(tmpIn) } catch {} ; resolve(chunks.length ? Buffer.concat(chunks) : buffer) })
     })
 }
 
-// ✅ SOLO SVENTY - LA QUE SÍ TE FUNCIONA
+// ✅ FIX SIN FFMPEG OBLIGATORIO - SOLO SVENTY
 async function getAudioBuffer(url) {
     try {
         console.log('[SONG] Sventy pidiendo:', url)
@@ -226,49 +227,53 @@ async function getAudioBuffer(url) {
         let buf = Buffer.from(await audioRes.arrayBuffer())
         console.log('[SONG] Buffer:', buf.length, 'bytes')
         if (buf.length < 10000) return null
-        return await convertToMp3(buf)
+
+        const detected = await fileTypeFromBuffer(buf)
+        console.log('[SONG] Formato detectado:', detected)
+
+        // Si ya es MP3 o M4A, NO convertir, mandar tal cual - NO necesita ffmpeg
+        if (detected?.ext === 'mp3') return { buffer: buf, mimetype: 'audio/mpeg', ext: 'mp3' }
+        if (detected?.ext === 'm4a' || detected?.ext === 'mp4') return { buffer: buf, mimetype: 'audio/mp4', ext: 'm4a' }
+
+        // Si es webm/opus, intentar convertir, si no hay ffmpeg mandarlo como webm
+        if (detected?.ext === 'webm' || detected?.ext === 'opus') {
+            const converted = await convertToMp3(buf, detected.ext)
+            if (converted) return converted
+            console.log('[SONG] Sin ffmpeg, mando webm original')
+            return { buffer: buf, mimetype: 'audio/webm', ext: 'webm' }
+        }
+
+        // Formato desconocido, intentar convertir, si falla mandar original
+        const converted = await convertToMp3(buf, detected?.ext || 'webm')
+        if (converted) return converted
+        return { buffer: buf, mimetype: 'audio/mpeg', ext: 'mp3' }
+
     } catch (e) {
         console.log('[SONG] Error getAudioBuffer:', e.message)
         return null
     }
 }
 
-// ✅ ESTE ES EL FIX REAL - NO MANDA WEBM COMO MP3
-function convertToMp3(buffer) {
-    return new Promise(async (resolve) => {
-        const detected = await fileTypeFromBuffer(buffer)
-        console.log('[SONG] Formato detectado:', detected)
-
-        // Si ya es MP3 de verdad, mándalo tal cual
-        if (detected?.ext === 'mp3') {
-            return resolve({ buffer, mimetype: 'audio/mpeg', ext: 'mp3' })
-        }
-
-        // Si es webm/opus/mp4, convertir a MP3 REAL con extensión correcta
-        const inExt = detected?.ext || 'webm'
+function convertToMp3(buffer, inExt = 'webm') {
+    return new Promise((resolve) => {
         const tmpIn = path.join(os.tmpdir(), `song_in_${Date.now()}.${inExt}`)
         const tmpOut = path.join(os.tmpdir(), `song_out_${Date.now()}.mp3`)
         fs.writeFileSync(tmpIn, buffer)
-
         const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'libmp3lame', '-b:a', '128k', '-ar', '44100', '-ac', '2', tmpOut])
-
         ff.on('close', (code) => {
             try { fs.unlinkSync(tmpIn) } catch {}
             try {
                 if (code === 0 && fs.existsSync(tmpOut)) {
                     let out = fs.readFileSync(tmpOut)
                     fs.unlinkSync(tmpOut)
-                    if (out.length > 10000) {
-                        console.log('[SONG] Convertido a MP3 OK:', out.length)
-                        return resolve({ buffer: out, mimetype: 'audio/mpeg', ext: 'mp3' })
-                    }
+                    if (out.length > 10000) return resolve({ buffer: out, mimetype: 'audio/mpeg', ext: 'mp3' })
                 }
             } catch {}
-            console.log('[SONG] ffmpeg falló código', code, '- NO mando audio corrupto')
+            console.log('[SONG] ffmpeg falló código', code)
             resolve(null)
         })
         ff.on('error', (err) => {
-            console.log('[SONG] ffmpeg error:', err.message)
+            console.log('[SONG] ffmpeg NO EXISTE:', err.message)
             resolve(null)
         })
     })
