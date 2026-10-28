@@ -84,14 +84,16 @@ const handler = async (m, { conn, command }) => {
         let result = search.videos[0]
         if (!result) throw new Error('No se encontró la canción en YouTube')
 
-        const { title, thumbnail, timestamp, views, videoId, author } = result
+        const { title, thumbnail, timestamp, views, videoId, author, seconds } = result
         const shortUrl = `https://youtu.be/${videoId}`
         const thumb = (await conn.getFile(thumbnail)).data
         const vistas = formatViews(views)
 
-        // ✅ ARREGLO ENTREGA: Descargar a Buffer y convertir a OPUS
         const audioBuffer = await getAudioBuffer(shortUrl)
         if (!audioBuffer) throw new Error('No se pudo obtener el audio')
+
+        const cleanTitle = title.replace(/[^\w\s-]/gi, '').trim() || 'song'
+        const duration = seconds || 200
 
         if (command === 'song') {
             await conn.sendMessage(m.chat, {
@@ -112,7 +114,7 @@ const handler = async (m, { conn, command }) => {
 👻 ➛ Encontrado por fantasma Garfield
 
 ── *📥 DESCARGA* ╏ 🦇
-⬇️ ➛ Enviando audio embrujado...
+⬇️ ➛ Enviando audio con barra naranja...
 🍬 ➛ Preparando dulce sonoro...
 
 ━━━━━━━━━━━
@@ -120,10 +122,13 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
+            // ✅ BARRA NARANJA - IGUAL QUE LA PRUEBA QUE SÍ FUNCIONÓ
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
-                mimetype: 'audio/ogg; codecs=opus',
-                ptt: true
+                mimetype: 'audio/mp4',
+                ptt: false,
+                fileName: `${cleanTitle}.m4a`,
+                seconds: duration
             }, { quoted: m })
         }
 
@@ -149,17 +154,20 @@ const handler = async (m, { conn, command }) => {
 \`\`${lyrics}\`\`
 
 ── *📥 DESCARGA* ╏ 🦇
-⬇️ ➛ Enviando audio embrujado...
+⬇️ ➛ Enviando audio con barra naranja...
 
 ━━━━━━━━━━━
 🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
 ━━━━━━━━━━━`
             }, { quoted: m })
 
+            // ✅ BARRA NARANJA - IGUAL QUE LA PRUEBA QUE SÍ FUNCIONÓ
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
-                mimetype: 'audio/ogg; codecs=opus',
-                ptt: true
+                mimetype: 'audio/mp4',
+                ptt: false,
+                fileName: `${cleanTitle}.m4a`,
+                seconds: duration
             }, { quoted: m })
         }
 
@@ -222,41 +230,42 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
     })
 }
 
-// ✅ NUEVO: Descarga el audio a Buffer y lo convierte a OPUS (lo que WhatsApp SÍ reproduce)
 async function getAudioBuffer(url) {
     try {
         const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
         let dl = res.data?.download || null
         if (!dl) {
-            console.log('[SONG] sventy no devolvió download:', JSON.stringify(res).slice(0, 300))
+            console.log('[SONG] sventy no devolvió download')
             return null
         }
-        console.log('[SONG] Descargando audio desde:', dl.slice(0, 100))
         let audioRes = await fetch(dl)
-        if (!audioRes.ok) {
-            console.log('[SONG] Falló descarga, status:', audioRes.status)
-            return null
-        }
+        if (!audioRes.ok) return null
         let buf = Buffer.from(await audioRes.arrayBuffer())
-        console.log('[SONG] Audio descargado, tamaño:', buf.length)
         if (buf.length < 10000) return null
-        return await convertToOpus(buf)
+        return await convertToM4a(buf)
     } catch (e) {
         console.log('[SONG] Error getAudioBuffer:', e.message)
         return null
     }
 }
 
-function convertToOpus(buffer) {
+function convertToM4a(buffer) {
     return new Promise(resolve => {
-        const tmpIn = path.join(os.tmpdir(), `in_${Date.now()}`)
+        const tmpIn = path.join(os.tmpdir(), `song_in_${Date.now()}`)
+        const tmpOut = path.join(os.tmpdir(), `song_out_${Date.now()}.m4a`)
         fs.writeFileSync(tmpIn, buffer)
-        const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'libopus', '-b:a', '64k', '-ar', '48000', '-f', 'ogg', 'pipe:1'])
-        const chunks = []
-        ff.stdout.on('data', c => chunks.push(c))
-        ff.on('close', () => {
+        const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-ac', '2', tmpOut])
+        ff.on('close', (code) => {
+            try {
+                if (fs.existsSync(tmpOut)) {
+                    let out = fs.readFileSync(tmpOut)
+                    fs.unlinkSync(tmpIn)
+                    fs.unlinkSync(tmpOut)
+                    if (out.length > 10000) return resolve(out)
+                }
+            } catch {}
             try { fs.unlinkSync(tmpIn) } catch {}
-            resolve(chunks.length ? Buffer.concat(chunks) : buffer)
+            resolve(buffer)
         })
         ff.on('error', () => resolve(buffer))
     })
