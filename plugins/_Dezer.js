@@ -89,8 +89,8 @@ const handler = async (m, { conn, command }) => {
         const thumb = (await conn.getFile(thumbnail)).data
         const vistas = formatViews(views)
 
-        const audioBuffer = await getAudioBuffer(shortUrl)
-        if (!audioBuffer) throw new Error('No se pudo obtener el audio')
+        const audioData = await getAudioBuffer(shortUrl)
+        if (!audioData) throw new Error('No se pudo obtener el audio')
 
         const cleanTitle = title.replace(/[^\w\s-]/gi, '').trim() || 'song'
         const duration = seconds || 200
@@ -122,12 +122,12 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ BARRA NARANJA - IGUAL QUE LA PRUEBA QUE SÍ FUNCIONÓ
+            // ✅ FIX BUENO - BARRA NARANJA SIN ERROR DE CARGA
             await conn.sendMessage(m.chat, {
-                audio: audioBuffer,
-                mimetype: 'audio/mp4',
+                audio: audioData.buffer,
+                mimetype: audioData.mimetype,
                 ptt: false,
-                fileName: `${cleanTitle}.m4a`,
+                fileName: `${cleanTitle}.${audioData.ext}`,
                 seconds: duration
             }, { quoted: m })
         }
@@ -161,12 +161,12 @@ const handler = async (m, { conn, command }) => {
 ━━━━━━━━━━━`
             }, { quoted: m })
 
-            // ✅ BARRA NARANJA - IGUAL QUE LA PRUEBA QUE SÍ FUNCIONÓ
+            // ✅ FIX BUENO - BARRA NARANJA SIN ERROR DE CARGA
             await conn.sendMessage(m.chat, {
-                audio: audioBuffer,
-                mimetype: 'audio/mp4',
+                audio: audioData.buffer,
+                mimetype: audioData.mimetype,
                 ptt: false,
-                fileName: `${cleanTitle}.m4a`,
+                fileName: `${cleanTitle}.${audioData.ext}`,
                 seconds: duration
             }, { quoted: m })
         }
@@ -249,25 +249,29 @@ async function getAudioBuffer(url) {
     }
 }
 
+// ✅ ESTE ES EL FIX WONG / BUENO
 function convertToM4a(buffer) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const tmpIn = path.join(os.tmpdir(), `song_in_${Date.now()}`)
         const tmpOut = path.join(os.tmpdir(), `song_out_${Date.now()}.m4a`)
         fs.writeFileSync(tmpIn, buffer)
-        const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-ac', '2', tmpOut])
+        const ff = spawn('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-vn', '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-ac', '2', '-movflags', '+faststart', tmpOut])
         ff.on('close', (code) => {
+            try { fs.unlinkSync(tmpIn) } catch {}
             try {
-                if (fs.existsSync(tmpOut)) {
+                if (code === 0 && fs.existsSync(tmpOut)) {
                     let out = fs.readFileSync(tmpOut)
-                    fs.unlinkSync(tmpIn)
                     fs.unlinkSync(tmpOut)
-                    if (out.length > 10000) return resolve(out)
+                    if (out.length > 10000) {
+                        console.log('[SONG] Convertido a M4A OK:', out.length)
+                        return resolve({ buffer: out, mimetype: 'audio/mp4', ext: 'm4a' })
+                    }
                 }
             } catch {}
-            try { fs.unlinkSync(tmpIn) } catch {}
-            resolve(buffer)
+            console.log('[SONG] ffmpeg falló, mandando como MP3')
+            resolve({ buffer, mimetype: 'audio/mpeg', ext: 'mp3' })
         })
-        ff.on('error', () => resolve(buffer))
+        ff.on('error', () => resolve({ buffer, mimetype: 'audio/mpeg', ext: 'mp3' }))
     })
 }
 
