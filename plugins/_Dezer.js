@@ -1,34 +1,24 @@
 import fetch from "node-fetch"
 import { FormData, Blob } from 'formdata-node'
 import { fileTypeFromBuffer } from 'file-type'
-import { spawn } from 'child_process'
 import crypto from 'crypto'
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
 
 const STELLAR_API = 'https://api.stellarwa.xyz/tools/whatmusic'
-const STELLAR_KEY = 'proyectsV2'
+const STELLAR_KEY = 'api-b9YNP' // ✅ KEY CORRECTA
 
 const handler = async (m, { conn, command }) => {
     let q = m.quoted ? m.quoted : m
     let mime = (q.msg || q).mimetype || ''
 
-    // 1. DETECTA VIDEO Y AUDIO
     if (!mime || !/audio|video/.test(mime)) {
         return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
 
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓𝐀𝐑 ﹒ ${command.toUpperCase()}
 > *Ventas | +51 927 174 369*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`¿QUÉ CANCIÓN ES?\`\` 🎵 —˙𖦹.꒷
-
 ── *📝 USO* ╏ 🎃
 1️⃣ ➛ Responde a un *audio* con: *.${command}*
 2️⃣ ➛ Responde a un *video* con: *.${command}*
-
-── *📌 EJEMPLO* ╏ 🦇
-> Responde a un audio de WhatsApp / TikTok / Reel
 
 ━━━━━━━━━━━
 🎃 *PHANTOM IA - VENTAS* 🦇
@@ -37,34 +27,20 @@ const handler = async (m, { conn, command }) => {
 
     try {
         await m.react('🎃')
-
-        await conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
-
-🎵 Detectando canción...
-🕸️ Analizando audio...` }, { quoted: m })
-
-        // 2. DESCARGAR AUDIO / VIDEO DE WHATSAPP
         let buffer = await q.download()
-        if (!buffer) throw new Error('No pude descargar el audio/video')
+        if (!buffer) throw new Error('No pude descargar el audio')
 
-        // 3. RECORTAR A 15s - Stellar solo necesita un pedazo
-        let clip = await recortar(buffer, 15)
-
-        // 4. SUBIR PARA TENER LINK PÚBLICO
-        let audioUrl = await subir(clip, mime)
-        if (!audioUrl) throw new Error('No se pudo subir el audio a Catbox/Uguu')
+        let audioUrl = await subir(buffer, mime)
+        if (!audioUrl) throw new Error('No se pudo subir el audio')
 
         console.log('[PHANTOM] Link subido:', audioUrl)
 
-        // 5. MANDAR A STELLAR
         let song = await detectarStellar(audioUrl)
         console.log('[PHANTOM] Stellar devolvió:', song)
 
         if (!song) throw new Error('Stellar no reconoció la canción. Prueba con un audio más claro, con música y sin que hables encima.')
 
         await m.react('✅')
-
-        // 6. SOLO DEVUELVE EL NOMBRE - NADA MÁS
         return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
 
 ⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ ${command.toUpperCase()}
@@ -74,7 +50,13 @@ const handler = async (m, { conn, command }) => {
 ── *🎵 CANCIÓN* ╏ 🎃
 📌 ➛ *Título:* ${song.title}
 👤 ➛ *Artista:* ${song.artist}
-💿 ➛ *Álbum:* ${song.album || 'No disponible'}
+💿 ➛ *Álbum:* ${song.album}
+🎼 ➛ *Género:* ${song.genres}
+⏱️ ➛ *Duración:* ${song.duration}
+📅 ➛ *Lanzamiento:* ${song.release_date}
+
+── *🔗 ESCUCHAR* ╏ 🦇
+${song.url.map(u => `> ${u}`).join('\n')}
 
 ━━━━━━━━━━━
 🎃 *PHANTOM IA - VENTAS* 🦇
@@ -84,65 +66,43 @@ const handler = async (m, { conn, command }) => {
     } catch (e) {
         console.error(e)
         await m.react('💀')
-        return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
-
-❌ *Error:* ${e.message}
-
-🔧 Prueba con un audio más claro y con más volumen.
-
-━━━━━━━━━━━
-🎃 *PHANTOM IA - VENTAS* 🦇
-━━━━━━━━━━━` }, { quoted: m })
+        return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇\n\n❌ *Error:* ${e.message}` }, { quoted: m })
     }
 }
 
-// ⭐ STELLAR - SOLO DETECTA
+// ⭐ FORMATO REAL DE STELLAR - data es un ARRAY
 async function detectarStellar(audioUrl) {
-    const urls = [
-        `${STELLAR_API}?key=${STELLAR_KEY}&url=${encodeURIComponent(audioUrl)}`,
-        `${STELLAR_API}?url=${encodeURIComponent(audioUrl)}&key=${STELLAR_KEY}`,
-    ]
+    const apiUrl = `${STELLAR_API}?url=${encodeURIComponent(audioUrl)}&key=${STELLAR_KEY}`
 
-    for (let apiUrl of urls) {
-        try {
-            let res = await fetch(apiUrl, { signal: AbortSignal.timeout(30000) })
-            let text = await res.text()
-            console.log('[PHANTOM] Stellar raw:', text.slice(0, 1000))
+    let res = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(35000)
+    })
 
-            let json
-            try { json = JSON.parse(text) } catch { continue }
+    let json = await res.json()
+    console.log('[PHANTOM] Stellar raw:', JSON.stringify(json).slice(0, 1000))
 
-            // Stellar puede devolver en diferentes formatos, normalizamos todo
-            let d = json.result || json.data || json.response || json
+    // ✅ Stellar devuelve: { status: true, data: [ {title, artist...} ] }
+    if (!json?.status || !Array.isArray(json.data) || !json.data.length) return null
 
-            // Caso Shazam: result.track.title / result.track.subtitle
-            if (d?.track) d = { title: d.track.title, artist: d.track.subtitle, album: d.track.sections?.[0]?.metadata?.[0]?.text, cover: d.track.images?.coverart }
+    let d = json.data[0] // Primer resultado = el más preciso
 
-            let title = d?.title || d?.song || d?.name || d?.trackTitle
-            let artist = d?.artist || d?.artists || d?.singer || d?.author || d?.subtitle || ''
-
-            // Si artist viene como array
-            if (Array.isArray(artist)) artist = artist.map(a => a.name || a).join(', ')
-
-            if (title) {
-                return {
-                    title: String(title).trim(),
-                    artist: String(artist || 'Desconocido').trim(),
-                    album: d?.album || d?.album_name || '',
-                    cover: d?.cover || d?.image || d?.thumbnail || ''
-                }
-            }
-        } catch (e) {
-            console.log('[PHANTOM] Stellar intento falló:', e.message)
-        }
+    return {
+        title: d.title || 'Desconocido',
+        artist: d.artist || 'Desconocido',
+        album: d.album || 'No disponible',
+        genres: d.genres || 'No disponible',
+        duration: d.duration || 'No disponible',
+        release_date: d.release_date || 'No disponible',
+        url: Array.isArray(d.url) ? d.url : (d.url ? [d.url] : [])
     }
-    return null
 }
 
-// SUBIR A UGUU / CATBOX - CON EXTENSIÓN CORRECTA
+// SUBIR SIN CONVERTIR - MANTIENE .opus
 async function subir(buffer, whatsappMime = '') {
-    let ext = 'mp3', mime = 'audio/mpeg'
-    if (whatsappMime.includes('ogg') || whatsappMime.includes('opus')) { ext = 'ogg'; mime = 'audio/ogg' }
+    let ext = 'opus', mime = 'audio/ogg'
+    if (whatsappMime.includes('ogg') || whatsappMime.includes('opus')) { ext = 'opus'; mime = 'audio/ogg' }
     else if (whatsappMime.includes('mp3')) { ext = 'mp3'; mime = 'audio/mpeg' }
     else if (whatsappMime.includes('mp4') || whatsappMime.includes('m4a')) { ext = 'm4a'; mime = 'audio/mp4' }
     else if (whatsappMime.includes('video')) { ext = 'mp4'; mime = 'video/mp4' }
@@ -153,7 +113,7 @@ async function subir(buffer, whatsappMime = '') {
 
     let filename = crypto.randomBytes(5).toString('hex') + '.' + ext
 
-    // Intento 1: Catbox (más estable)
+    // 1. Catbox
     try {
         let blob = new Blob([buffer], { type: mime })
         let form = new FormData()
@@ -164,7 +124,7 @@ async function subir(buffer, whatsappMime = '') {
         if (url.startsWith('https://')) return url
     } catch (e) { console.log('Catbox falló:', e.message) }
 
-    // Intento 2: Uguu
+    // 2. Uguu
     try {
         let blob = new Blob([buffer], { type: mime })
         let form = new FormData()
@@ -175,23 +135,6 @@ async function subir(buffer, whatsappMime = '') {
     } catch (e) { console.log('Uguu falló:', e.message) }
 
     return null
-}
-
-// RECORTAR CON FFMPEG - SI FALLA DEVUELVE EL ORIGINAL
-function recortar(buffer, segundos = 15) {
-    return new Promise(resolve => {
-        let tmpIn = path.join(os.tmpdir(), `ph_${Date.now()}`)
-        fs.writeFileSync(tmpIn, buffer)
-        let ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', tmpIn, '-t', String(segundos), '-vn', '-acodec', 'libmp3lame', '-ar', '44100', '-ac', '2', '-b:a', '128k', '-f', 'mp3', 'pipe:1'])
-        let chunks = []
-        ff.stdout.on('data', c => chunks.push(c))
-        ff.on('error', () => { try { fs.unlinkSync(tmpIn) } catch {}; resolve(buffer) })
-        ff.on('close', (code) => {
-            try { fs.unlinkSync(tmpIn) } catch {}
-            if (code === 0 && chunks.length && Buffer.concat(chunks).length > 10000) resolve(Buffer.concat(chunks))
-            else resolve(buffer)
-        })
-    })
 }
 
 handler.help = ['whatmusic', 'detectar', 'song']
