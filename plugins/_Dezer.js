@@ -10,9 +10,9 @@ import path from 'path'
 import moment from 'moment-timezone'
 moment.locale('es')
 
-const SONGFINDER_API = 'https://songfinder.gg/api/recognize/url'
-const UGUU_UPLOAD = 'https://uguu.se/upload'
-const CLIP_SECONDS = 30
+const STELLAR_API = 'https://api.stellarwa.xyz/tools/whatmusic'
+const STELLAR_KEY = 'proyectsV2'
+const CLIP_SECONDS = 20
 
 const handler = async (m, { conn, command }) => {
     try {
@@ -60,7 +60,6 @@ const handler = async (m, { conn, command }) => {
         if (!buffer) throw new Error('Error al descargar el archivo')
 
         await m.reply(`‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
-
 ⤷ ┇ 𝐃𝐄𝐓𝐄𝐂𝐓𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
@@ -68,7 +67,7 @@ const handler = async (m, { conn, command }) => {
 
 ── *📊 PROCESO* ╏ 🎃
 🕸️ ➛ Analizando ${CLIP_SECONDS}s de audio...
-📤 ➛ Subiendo al cementerio temporal...
+📤 ➛ Subiendo a Stellar...
 🎶 ➛ Invocando coincidencia...
 👻 ➛ Phantom fantasma afinando oído...
 
@@ -76,11 +75,15 @@ const handler = async (m, { conn, command }) => {
 🎃 *PHANTOM IA - VENTAS* 🦇
 ━━━━━━━━━━━`)
 
+        // 1. Recortar y subir para tener URL pública
         let clip = await prepareClip(buffer, CLIP_SECONDS)
-        let url = await uploadConRespaldo(clip, mime)
-        if (!url) throw new Error('No se pudo subir el audio (Uguu/Catbox caídos)')
-        let song = await recognizeConRespaldo(url)
-        if (!song) throw new Error('No se encontró la canción - prueba con un audio más claro, con voz y sin ruido')
+        let audioUrl = await uploadConRespaldo(clip, mime)
+        if (!audioUrl) throw new Error('No se pudo subir el audio (Uguu/Catbox caídos)')
+
+        // 2. ⭐ NUEVA API STELLAR
+        let song = await recognizeStellar(audioUrl)
+        if (!song) throw new Error('Stellar no reconoció la canción - prueba con un audio más claro, con voz y sin ruido')
+
         let searchQuery = `${song.title} ${song.artist}`.replace(/\[.*?\]|\(feat.*?\)/gi, '').trim()
 
         await m.react('🦇')
@@ -102,7 +105,6 @@ const handler = async (m, { conn, command }) => {
             await conn.sendMessage(m.chat, {
                 image: thumb,
                 caption: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
-
 ⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
@@ -114,11 +116,10 @@ const handler = async (m, { conn, command }) => {
 👁️ ➛ Vistas: *${vistas}*
 ⏱️ ➛ Duración: *${timestamp}*
 🔗 ➛ Link: ${shortUrl}
-👻 ➛ Encontrado por fantasma Phantom
+👻 ➛ Encontrado por Phantom con Stellar
 
 ── *📥 DESCARGA* ╏ 🦇
 ⬇️ ➛ Enviando audio embrujado...
-🍬 ➛ Preparando dulce sonoro...
 
 ━━━━━━━━━━━
 🎃 *PHANTOM IA - VENTAS* 🦇
@@ -143,7 +144,6 @@ const handler = async (m, { conn, command }) => {
 
             await conn.sendMessage(m.chat, {
                 text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
-
 ⤷ ┇ 𝐋𝐄𝐓𝐑𝐀 ﹒ LETRA ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
@@ -180,7 +180,6 @@ const handler = async (m, { conn, command }) => {
         await m.react('💀')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
         let menuError = `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
-
 ⤷ ┇ 𝐄𝐑𝐎𝐑 ﹒ ${command.toUpperCase()} ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
@@ -188,7 +187,7 @@ const handler = async (m, { conn, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ 🎃
 ❌ ➛ ${e.message}
-😿 ➛ El fantasma no pudo reconocerlo, se asustó
+😿 ➛ El fantasma no pudo reconocerlo
 
 ── *💡 SOLUCIÓN* ╏ 🕯️
 🔧 ➛ Usa un audio/video más claro
@@ -203,19 +202,50 @@ const handler = async (m, { conn, command }) => {
     }
 }
 
-// ✅ SUBIDA CON RESPALDO + FIX OPUS - NO MENTIR EN LA EXTENSIÓN
+// ⭐ NUEVA FUNCIÓN - STELLAR WHATMUSIC
+async function recognizeStellar(audioUrl) {
+    // Stellar acepta ?url= , probamos 2 formas comunes
+    const tries = [
+        `${STELLAR_API}?key=${STELLAR_KEY}&url=${encodeURIComponent(audioUrl)}`,
+        `${STELLAR_API}?url=${encodeURIComponent(audioUrl)}&key=${STELLAR_KEY}`,
+        `${STELLAR_API}?key=${STELLAR_KEY}&audio=${encodeURIComponent(audioUrl)}`,
+    ]
+
+    for (let apiUrl of tries) {
+        try {
+            console.log('[PHANTOM] Stellar intentando:', apiUrl.slice(0, 80))
+            const res = await fetch(apiUrl, { signal: AbortSignal.timeout(35000) })
+            const text = await res.text()
+            console.log('[PHANTOM] Stellar respuesta:', text.slice(0, 500))
+            let json
+            try { json = JSON.parse(text) } catch { continue }
+
+            // Normaliza cualquier formato que devuelva Stellar
+            const data = json.result || json.data || json.response || json
+            const title = data?.title || data?.song || data?.name
+            const artist = data?.artist || data?.artists?.[0]?.name || data?.author || data?.singer || ''
+            const album = data?.album || data?.album_name || ''
+            const cover = data?.cover || data?.image || data?.thumbnail || data?.artwork || ''
+
+            if (title) return { title, artist: artist || 'Desconocido', album, cover, raw: data }
+
+            // Si Stellar devuelve error, pasa al siguiente intento
+            if (json?.status === false || json?.error) continue
+        } catch (e) {
+            console.log('[PHANTOM] Stellar falló:', e.message)
+        }
+        await new Promise(r => setTimeout(r, 1000))
+    }
+    return null
+}
+
 async function uploadConRespaldo(buffer, whatsappMime = '') {
-    let ext = 'mp3'
-    let mime = 'audio/mpeg'
-    if (whatsappMime.includes('ogg') || whatsappMime.includes('opus')) {
-        ext = 'ogg'; mime = 'audio/ogg'
-    } else if (whatsappMime.includes('mp3') || whatsappMime.includes('mpeg')) {
-        ext = 'mp3'; mime = 'audio/mpeg'
-    } else if (whatsappMime.includes('mp4') || whatsappMime.includes('m4a')) {
-        ext = 'm4a'; mime = 'audio/mp4'
-    } else if (whatsappMime.includes('video')) {
-        ext = 'mp4'; mime = 'video/mp4'
-    } else {
+    let ext = 'mp3', mime = 'audio/mpeg'
+    if (whatsappMime.includes('ogg') || whatsappMime.includes('opus')) { ext = 'ogg'; mime = 'audio/ogg' }
+    else if (whatsappMime.includes('mp3') || whatsappMime.includes('mpeg')) { ext = 'mp3'; mime = 'audio/mpeg' }
+    else if (whatsappMime.includes('mp4') || whatsappMime.includes('m4a')) { ext = 'm4a'; mime = 'audio/mp4' }
+    else if (whatsappMime.includes('video')) { ext = 'mp4'; mime = 'video/mp4' }
+    else {
         const detected = await fileTypeFromBuffer(buffer)
         if (detected) { ext = detected.ext; mime = detected.mime }
         else { ext = 'ogg'; mime = 'audio/ogg' }
@@ -225,7 +255,7 @@ async function uploadConRespaldo(buffer, whatsappMime = '') {
         const blob = new Blob([buffer], { type: mime })
         const form = new FormData()
         form.append('files[]', blob, filename)
-        const res = await fetch(UGUU_UPLOAD, { method: 'POST', body: form, signal: AbortSignal.timeout(20000) })
+        const res = await fetch('https://uguu.se/upload', { method: 'POST', body: form, signal: AbortSignal.timeout(20000) })
         const json = await res.json()
         if (json?.files?.[0]?.url) return json.files[0].url
     } catch (e) { console.log('[PHANTOM] Uguu falló:', e.message) }
@@ -241,24 +271,6 @@ async function uploadConRespaldo(buffer, whatsappMime = '') {
     return null
 }
 
-// ✅ RECONOCIMIENTO CON 3 INTENTOS
-async function recognizeConRespaldo(audioUrl) {
-    for (let i = 1; i <= 3; i++) {
-        try {
-            const res = await fetch(SONGFINDER_API, {
-                method: 'POST',
-                headers: { 'content-type': 'application/json', 'origin': 'https://songfinder.gg' },
-                body: JSON.stringify({ url: audioUrl, startTime: 0, recaptchaToken: crypto.randomBytes(24).toString('base64url') }),
-                signal: AbortSignal.timeout(30000)
-            })
-            const json = await res.json()
-            if (json?.success && json?.track) return json.track
-            await new Promise(r => setTimeout(r, 2000))
-        } catch (e) { console.log(`[PHANTOM] SongFinder intento ${i} falló:`, e.message) }
-    }
-    return null
-}
-
 function prepareClip(buffer, seconds = CLIP_SECONDS) {
     return new Promise(resolve => {
         const tmpIn = path.join(os.tmpdir(), `sf_${Date.now()}`)
@@ -267,7 +279,7 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
         const chunks = []
         let hasError = false
         ff.stdout.on('data', c => chunks.push(c))
-        ff.on('error', () => { hasError = true; try { fs.unlinkSync(tmpIn) } catch {} ; resolve(buffer) })
+        ff.on('error', () => { hasError = true; try { fs.unlinkSync(tmpIn) } catch {}; resolve(buffer) })
         ff.on('close', (code) => {
             try { fs.unlinkSync(tmpIn) } catch {}
             if (!hasError && code === 0 && chunks.length && Buffer.concat(chunks).length > 10000) resolve(Buffer.concat(chunks))
@@ -276,7 +288,6 @@ function prepareClip(buffer, seconds = CLIP_SECONDS) {
     })
 }
 
-// ✅ FIX SVENTY - SIN FFMPEG OBLIGATORIO, MANDA BUFFER NO URL
 async function getAudioBuffer(url) {
     try {
         const res = await fetch(`https://api.sventy.store/api/ytdl?url=${encodeURIComponent(url)}`).then(r => r.json())
