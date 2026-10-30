@@ -38,7 +38,20 @@ let handler = async (m, { conn, text, command }) => {
   let mime = (q.msg || q).mimetype || ''
 
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n꒰👻꒱ Responde a una foto para convertirla en anime embrujado\n\n꒰🦇୭.${command}` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
+
+⤷ ┇ 𝐀𝐈 ﹒ TOANIME
+
+.⃟𖥔 ݁. 𖦹˙— \`\`CONVERTIR A ANIME\`\` 🎵 —˙𖦹.꒷
+
+── *📝 USO* ╏ 🎃
+👻 ➛ Responde a una foto con *.${command}*
+🦇 ➛ O manda *.${command} + link de imagen*
+
+━━━━━━━━━━━
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━` }, { quoted: m })
   }
 
   try {
@@ -49,14 +62,46 @@ let handler = async (m, { conn, text, command }) => {
       link = await myCloud(media)
     }
 
-    await conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰🕸️꒱ Convirtiendo a anime Halloween...` }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
+
+⤷ ┇ 𝐀𝐈 ﹒ CONVIRTIENDO
+
+── *📝 ESTADO* ╏ 🎃
+🕸️ ➛ Convirtiendo a anime...
+👻 ➛ Espera un momento
+
+━━━━━━━━━━━
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━` }, { quoted: m })
 
     const buf = await faaBuffer(`https://api-faa.my.id/faa/toanime?url=${encodeURIComponent(link)}`)
 
-    await conn.sendMessage(m.chat, { image: buf, caption: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰👻꒱ Anime Halloween listo\n‧˚꒰🦇୭ ${(buf.length/1024).toFixed(0)} KB` }, { quoted: m })
+    await conn.sendMessage(m.chat, { image: buf, caption: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
+
+⤷ ┇ 𝐀𝐈 ﹒ ANIME LISTO
+
+── *📝 DETALLE* ╏ 🎃
+👻 ➛ Anime listo
+🦇 ➛ Peso: ${(buf.length/1024).toFixed(0)} KB
+
+━━━━━━━━━━━
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━` }, { quoted: m })
 
   } catch (e) {
-    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰💀꒱ Error: ${e.message}` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
+
+⤷ ┇ 𝐀𝐈 ﹒ ERROR
+
+── *💀 ERROR* ╏ 🎃
+❌ ➛ ${e.message}
+
+━━━━━━━━━━━
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━` }, { quoted: m })
   }
 }
 
