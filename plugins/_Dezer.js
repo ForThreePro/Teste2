@@ -12,7 +12,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 
-const STELLAR_KEY = 'proyectsV2'
+const STELLAR_KEY = 'api-b9YNP'
 const STELLAR_WHATMUSIC = 'https://api.stellarwa.xyz/tools/whatmusic'
 
 const handler = async (m, { conn, command, text }) => {
@@ -23,30 +23,35 @@ const handler = async (m, { conn, command, text }) => {
 
   if (!query && (!mime || !/audio|video/.test(mime))) {
     return conn.reply(m.chat, 
-`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+`‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
 
-⤷ ┇ 𝐘𝐓 ﹒ ${command.toUpperCase()} ：✿ 。
+⤷ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ 𝐒𝐎𝐍𝐆 ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
-🎃 ࣪ ꕀ.${command} bad bunny dtmf ˚. ᵎᵎ
-🎃 ࣪ ꕀ.${command} (respondiendo a audio/video) ˚. ᵎᵎ
+🎃 ࣪ ꕀ.song ˚. ᵎᵎ
+> *"Detectando hasta la última canción"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`EJEMPLO\`\` 🕯️ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`SONG - DETECTAR Y DESCARGAR\`\` 🕸️ —˙𖦹.꒷
+
+── *📝 DESCRIPCIÓN* ╏ 🎃
+🎵 ➛ Detecta qué canción es de un audio/video
+⬇️ ➛ La descarga en MP3
+
+── *📖 USO* ╏ 🦇
 👻 ➛.song diles - bad bunny
 🦇 ➛.song (respondiendo a audio)
 🎃 ➛.song (respondiendo a video)
 
 ━━━━━━━━━━━
-🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`, m)
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━`, m)
   }
 
   try {
     await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
 
-    // ════════════════════════════════════
-    // 1. DETECTAR
-    // ════════════════════════════════════
     if (!query && mime && /audio|video/.test(mime)) {
       let buffer = await q.download()
       if (!buffer) throw new Error('No pude descargar el audio/video')
@@ -61,7 +66,6 @@ const handler = async (m, { conn, command, text }) => {
       if (!song) throw new Error('Stellar no reconoció la canción')
       query = `${song.title} ${song.artist}`
 
-      // ⭐ DISEÑO PHANTOM IA - ENCONTRADO - EXACTO COMO LO MANDASTE
       let spotify = song.url.find(u => u.includes('spotify')) || ''
       let deezer = song.url.find(u => u.includes('deezer')) || ''
       let escuchar = ''
@@ -93,9 +97,6 @@ ${escuchar}
 ━━━━━━━━━━━`, m)
     }
 
-    // ════════════════════════════════════
-    // 2. TU PLAY - yts + FAA
-    // ════════════════════════════════════
     let link = query
     let info = null
     if (!/^https?:\/\//.test(query)) {
@@ -110,13 +111,13 @@ ${escuchar}
     if (!j.status || !j.result) throw new Error('API FAA está caída')
 
     const downloadUrl = j.result.mp3
-    const title = (j.result.title || info?.title || 'lux').replace(/[^\w\s-]/gi, '').trim()
+    const title = (j.result.title || info?.title || 'phantom').replace(/[^\w\s-]/gi, '').trim()
 
     if (info) {
       const preview = 
-`‧˚꒰🎃୭ 𓆩 𝗬𝗧 - 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+`‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
 
-⤷ ┇ 𝐏𝐑𝐄𝐕𝐈𝐄𝐖 ﹒ ${command.toUpperCase()} ：✿ 。
+⤷ ┇ 𝐏𝐑𝐄𝐕𝐈𝐄𝐖 ﹒ SONG ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`INFO\`\` 🕸️ —˙𖦹.꒷
@@ -129,11 +130,13 @@ ${escuchar}
 🔗 ➛ Link: ${info.url}
 
 ── *📥 ESTADO* ╏ 🦇
-⬇️ ➛ Enviando audio embrujado...
+⬇️ ➛ Enviando audio...
 👻 ➛ Espera un momento
 
 ━━━━━━━━━━━
-🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`.trim()
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━`.trim()
       await conn.reply(m.chat, preview, m)
     }
 
@@ -142,9 +145,9 @@ ${escuchar}
     const size = (buffer.length / 1024 / 1024).toFixed(2)
 
     const finalText = 
-`‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
+`‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
 
-⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀 ﹒ AUDIO EMBRUJADO 🎃 ：✿ 。
+⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀 ﹒ AUDIO 🎃 ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
 
 .⃟𖥔 ݁. 𖦹˙— \`\`INFO\`\` 🕯️ —˙𖦹.꒷
@@ -153,21 +156,22 @@ ${escuchar}
 🎵 ➛ Título: *${title}*
 🔌 ➛ API: *FAA-BOT*
 ⚖️ ➛ Peso: *${size} MB*
-✨ ➛ Estado: *Listo - Embrujado*
+✨ ➛ Estado: *Listo*
 
 ━━━━━━━━━━━
-🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇`.trim()
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━`.trim()
 
     await conn.reply(m.chat, finalText, m)
     return conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3` }, { quoted: m })
 
   } catch (e) {
     console.log(e)
-    return conn.reply(m.chat, `‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎_*\n\n꒰💀꒱ Error: ${e.message}\n꒰👻꒱ El fantasma no encontró la canción`, m)
+    return conn.reply(m.chat, `‧˚꒰🎃୭ *_𝐏𝐇𝐀𝐍𝐓𝐎𝐌 𝐈𝐀_*\n\n꒰💀꒱ Error: ${e.message}\n꒰👻꒱ No se encontró la canción\n\n━━━━━━━━━━━\n🎃 *PHANTOM IA - VENTAS* 🦇\n*Contacto:* +51 927 174 369\n━━━━━━━━━━━`, m)
   }
 }
 
-// ⭐ AHORA DEVUELVE TODO: álbum, género, duración, lanzamiento, links
 async function detectarStellar(audioUrl) {
   const apiUrl = `${STELLAR_WHATMUSIC}?url=${encodeURIComponent(audioUrl)}&key=${STELLAR_KEY}`
   let res = await fetch(apiUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(35000) })
