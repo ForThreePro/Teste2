@@ -1,4 +1,3 @@
-
 import { existsSync, promises as fs } from 'fs'
 import path from 'path'
 import moment from 'moment-timezone'
@@ -15,7 +14,7 @@ var handler = async (m, { conn }) => {
     if (!sessionPath) return m.reply('🧐 *No encontré la carpeta de sesión*')
 
     await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
-    await m.reply(`‧˚꒰🎃୭ *_𝐋𝐔𝐗 𝐗 𝐘𝐀𝐋𝐋𝐈𝐂𝐎 - 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍_*\n\n꒰👻꒱ Garfield con disfraz de fantasma limpiando... 🕸️`)
+    await m.reply(`‧˚꒰🎃୭ *_𝐏𝐇𝐀𝐍𝐓𝐎𝐌 𝐈𝐀_*\n\n꒰👻꒱ Limpiando sesión... 🕸️`)
 
     let files = await fs.readdir(sessionPath)
     let filesDeleted = 0
@@ -36,7 +35,7 @@ var handler = async (m, { conn }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
-    let menu = `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗜𝗖𝗢 𓆪 🦇
+    let menu = `‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
 
 ⤷ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ 𝐇𝐀𝐋𝐋𝐎𝐖𝐄𝐄𝐍 𝐅𝐈𝐗 ：✿ 。
 ꒰ ◞⁺⊹ ．${fecha}
@@ -45,12 +44,11 @@ var handler = async (m, { conn }) => {
 🎃 ࣪ ꕀ.dsowner ˚. ᵎᵎ
 > *"Limpiando hasta el último fantasma de la sesión"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`FIX DE SESIÓN HALLOWEEN\`\` [${filesDeleted}] 🕸️ —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`FIX DE SESIÓN\`\` [${filesDeleted}] 🕸️ —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ 🎃
-🧹 ➛ Elimina archivos de caché basura embrujados
+🧹 ➛ Elimina archivos de caché basura
 🔒 ➛ No borra \`creds\` ni \`app-state\` para que no se desconecte
-👻 ➛ Garfield disfrazado: *"Más rápido, que hay dulces esperando"* 🍬
 
 ── *📖 USO* ╏ 🦇
 👑 ➛ Usar solo en el número principal del bot
@@ -58,14 +56,12 @@ var handler = async (m, { conn }) => {
 
 ── *📊 RESULTADO* ╏ 🕯️
 ✅ ➛ Archivos eliminados: *${filesDeleted}*
-💀 ➛ Estado: *${filesDeleted === 0? 'Todo limpio - Sin fantasmas 😸' : 'Exorcismo completado - Hora de pedir dulces 🎃'}*
+💀 ➛ Estado: *${filesDeleted === 0? 'Todo limpio - Sin fantasmas 😸' : 'Limpieza completada 🎃'}*
 
 ━━━━━━━━━━━
-🎃 *LUX X YALLICO - HALLOWEEN EDITION* 🦇
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
 *Owner*: @${ownerNum}
-*Version*: 2.6 HALLOWEEN PRO
-
-> "Odio los lunes, pero amo una sesión sin fantasmas" 😼🎃
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
