@@ -4,7 +4,6 @@ import yts from 'yt-search'
 import moment from 'moment-timezone'
 moment.locale('es')
 
-// Para detectar (Stellar)
 import { FormData, Blob } from 'formdata-node'
 import { fileTypeFromBuffer } from 'file-type'
 import { spawn } from 'child_process'
@@ -13,7 +12,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 
-const STELLAR_KEY = 'api-b9YNP'
+const STELLAR_KEY = 'proyectsV2'
 const STELLAR_WHATMUSIC = 'https://api.stellarwa.xyz/tools/whatmusic'
 
 const handler = async (m, { conn, command, text }) => {
@@ -22,9 +21,8 @@ const handler = async (m, { conn, command, text }) => {
   let mime = (q.msg || q).mimetype || ''
   let query = (text || '').trim()
 
-  // ── MENU SI NO HAY NADA ──
   if (!query && (!mime || !/audio|video/.test(mime))) {
-    return conn.reply(m.chat,
+    return conn.reply(m.chat, 
 `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐘𝐓 ﹒ ${command.toUpperCase()} ：✿ 。
@@ -32,7 +30,7 @@ const handler = async (m, { conn, command, text }) => {
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🎃 ࣪ ꕀ.${command} bad bunny dtmf ˚. ᵎᵎ
-🎃 ࣪ ꕀ.${command} (respondiendo a un audio/video) ˚. ᵎᵎ
+🎃 ࣪ ꕀ.${command} (respondiendo a audio/video) ˚. ᵎᵎ
 
 .⃟𖥔 ݁. 𖦹˙— \`\`EJEMPLO\`\` 🕯️ —˙𖦹.꒷
 👻 ➛.song diles - bad bunny
@@ -47,10 +45,9 @@ const handler = async (m, { conn, command, text }) => {
     await conn.sendMessage(m.chat, { react: { text: '🎃', key: m.key } })
 
     // ════════════════════════════════════
-    // 1. SI ES RESPUESTA A AUDIO/VIDEO → DETECTAR CON STELLAR
+    // 1. DETECTAR
     // ════════════════════════════════════
     if (!query && mime && /audio|video/.test(mime)) {
-      await conn.reply(m.chat, `🎵 Detectando canción...`, m)
       let buffer = await q.download()
       if (!buffer) throw new Error('No pude descargar el audio/video')
       if (mime.includes('video')) {
@@ -63,11 +60,41 @@ const handler = async (m, { conn, command, text }) => {
       let song = await detectarStellar(audioUrl)
       if (!song) throw new Error('Stellar no reconoció la canción')
       query = `${song.title} ${song.artist}`
-      await conn.reply(m.chat, `✅ Detectado: *${query}*\n⬇️ Descargando...`, m)
+
+      // ⭐ DISEÑO PHANTOM IA - ENCONTRADO - EXACTO COMO LO MANDASTE
+      let spotify = song.url.find(u => u.includes('spotify')) || ''
+      let deezer = song.url.find(u => u.includes('deezer')) || ''
+      let escuchar = ''
+      if (spotify) escuchar += `> ${spotify}\n`
+      if (deezer) escuchar += `> ${deezer}`
+      if (!escuchar) escuchar = `> No disponible`
+
+      await conn.reply(m.chat,
+`‧˚꒰🎃୭ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 🦇
+
+⤷ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG
+
+.⃟𖥔 ݁. 𖦹˙— \`\`¿QUÉ CANCIÓN ES?\`\` 🎵 —˙𖦹.꒷
+
+── *🎵 CANCIÓN* ╏ 🎃
+📌 ➛ *Título:* ${song.title}
+👤 ➛ *Artista:* ${song.artist}
+💿 ➛ *Álbum:* ${song.album}
+🎼 ➛ *Género:* ${song.genres}
+⏱️ ➛ *Duración:* ${song.duration}
+📅 ➛ *Lanzamiento:* ${song.release_date}
+
+── *🔗 ESCUCHAR* ╏ 🦇
+${escuchar}
+
+━━━━━━━━━━━
+🎃 *PHANTOM IA - VENTAS* 🦇
+*Contacto:* +51 927 174 369
+━━━━━━━━━━━`, m)
     }
 
     // ════════════════════════════════════
-    // 2. TU CÓDIGO DE PLAY - yts + FAA (ESTO SÍ FUNCIONA)
+    // 2. TU PLAY - yts + FAA
     // ════════════════════════════════════
     let link = query
     let info = null
@@ -78,7 +105,6 @@ const handler = async (m, { conn, command, text }) => {
       link = info.url
     }
 
-    // Solo audio, como tu .play
     const apiUrl = `https://api-faa.my.id/faa/ytmp3?url=${encodeURIComponent(link)}`
     const j = await fetch(apiUrl).then(r => r.json())
     if (!j.status || !j.result) throw new Error('API FAA está caída')
@@ -87,7 +113,7 @@ const handler = async (m, { conn, command, text }) => {
     const title = (j.result.title || info?.title || 'lux').replace(/[^\w\s-]/gi, '').trim()
 
     if (info) {
-      const preview =
+      const preview = 
 `‧˚꒰🎃୭ 𓆩 𝗬𝗧 - 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐏𝐑𝐄𝐕𝐈𝐄𝐖 ﹒ ${command.toUpperCase()} ：✿ 。
@@ -115,7 +141,7 @@ const handler = async (m, { conn, command, text }) => {
     const buffer = Buffer.from(res.data)
     const size = (buffer.length / 1024 / 1024).toFixed(2)
 
-    const finalText =
+    const finalText = 
 `‧˚꒰🎃୭ 𓆩 𝗟𝗨𝗫 𝗫 𝗬𝗔𝗟𝗟𝗜𝗖𝗢 𓆪 🦇
 
 ⤷ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀 ﹒ AUDIO EMBRUJADO 🎃 ：✿ 。
@@ -141,14 +167,22 @@ const handler = async (m, { conn, command, text }) => {
   }
 }
 
-// ⭐ DETECTAR CON STELLAR - whatmusic
+// ⭐ AHORA DEVUELVE TODO: álbum, género, duración, lanzamiento, links
 async function detectarStellar(audioUrl) {
   const apiUrl = `${STELLAR_WHATMUSIC}?url=${encodeURIComponent(audioUrl)}&key=${STELLAR_KEY}`
   let res = await fetch(apiUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(35000) })
   let json = await res.json()
   if (!json?.status || !Array.isArray(json.data) || !json.data.length) return null
   let d = json.data[0]
-  return { title: d.title || 'Desconocido', artist: d.artist || 'Desconocido' }
+  return {
+    title: d.title || 'Desconocido',
+    artist: d.artist || 'Desconocido',
+    album: d.album || 'No disponible',
+    genres: d.genres || 'No disponible',
+    duration: d.duration || 'No disponible',
+    release_date: d.release_date || 'No disponible',
+    url: Array.isArray(d.url) ? d.url : (d.url ? [d.url] : [])
+  }
 }
 
 async function subir(buffer, whatsappMime = '') {
