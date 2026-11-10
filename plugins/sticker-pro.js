@@ -7,10 +7,14 @@ const api = { url: 'https://api.stellarwa.xyz', key: 'proyectsV2' }
 
 let handler = async (m, { conn, text, usedPrefix, command, args }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
-    const footer = `\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`
+    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const footer = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
     const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
-    const error = (msg) => conn.sendMessage(m.chat, { text: head + `\n❌ ${msg}` + footer }, { quoted: m })
+    const error = (msg) => conn.sendMessage(m.chat, { text: head + `\n⤷ ┇ 𝐒𝐓𝐈𝐂𝐊𝐄𝐑 ﹒ ERROR ：✿ 。\n\n❌ ${msg}` + footer }, { quoted: m })
+
+    // Marca de ventas fija para stickers
+    const PACK = 'PHANTOM PLUS'
+    const AUTHOR = '@whois.yallico • +51 927 174 369'
 
     if (['wm','take','robar'].includes(command)) {
         if (!m.quoted || !/webp/.test(m.quoted.mimetype||'')) { await react('❌'); return error('Responde a un *sticker*') }
@@ -19,7 +23,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         try {
             await react('⏳')
             let img = await m.quoted.download()
-            let stiker = await addExif(img, packname || '', author || '')
+            let stiker = await addExif(img, packname?.trim() || PACK, author?.trim() || AUTHOR)
             await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
             await react('❄️')
         } catch { await react('❌'); error('Error al cambiar marca') }
@@ -33,7 +37,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
         try {
             await react('⏳')
             let img = await q.download()
-            let stiker = await sticker(img, false, '', '')
+            let stiker = await sticker(img, false, PACK, AUTHOR)
             await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
             await react('❄️')
         } catch { await react('❌'); error('Error al crear sticker') }
@@ -52,7 +56,7 @@ let handler = async (m, { conn, text, usedPrefix, command, args }) => {
               messages:[{ entities:[], avatar:true, from:{id:1,name:authorName,photo:{url:pp}}, text:txt, replyMessage:{}}] }
             const json = await axios.post('https://btzqc.betabotz.eu.org/generate', obj, { headers:{'Content-Type':'application/json'} })
             const buffer = Buffer.from(json.data.result.image, 'base64')
-            let stiker = await sticker(buffer, false, '', '')
+            let stiker = await sticker(buffer, false, PACK, AUTHOR)
             await conn.sendFile(m.chat, stiker, 'quotly.webp', '', m)
             await react('❄️')
         } catch { await react('❌'); error('Error al generar') }
