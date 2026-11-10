@@ -1,5 +1,7 @@
 import axios from 'axios'
 import FormData from 'form-data'
+import moment from 'moment-timezone'
+moment.locale('es')
 
 async function stellarUpscale(buffer, scale, key) {
   let form = new FormData()
@@ -28,39 +30,43 @@ async function stellarUpscale(buffer, scale, key) {
 }
 
 let handler = async (m, { conn, usedPrefix }) => {
+  const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
+  const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
+  const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+  const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
+
   let q = m.quoted ? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
   if (!/image/.test(mime)) {
-    return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n*PHANTOM FROST Edition*\n\n❄️ Responde a una imagen con *${usedPrefix}hd*\n\n> ❄️ Hará: x2 y luego automático a x4`, m)
+    await react('❌')
+    return conn.reply(m.chat, head + `\n⤷ ┇ 𝐇𝐃 ﹒ USO ：✿ 。\n\n❄️ Responde a una imagen con *${usedPrefix}hd*\n\n➛ Hará: x2 y luego automático a x4` + foot, m)
   }
 
   let key = 'proyectsV2'
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
+    await react('⏳')
     let media = await q.download()
+    if (!media || !media.length) throw new Error('No se pudo descargar la imagen')
+    if (media.length > 8 * 1024 * 1024) throw new Error(`Imagen muy pesada (${(media.length / 1024 / 1024).toFixed(2)}MB), usa una foto de menos de 8MB para no dar timeout`)
 
-    // PASO 1: x2
-    await conn.reply(m.chat, '❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❄️ *PASO 1/2:* Mejorando a x2...', m)
+    // PASO 1: x2 - solo reacciona, sin mensaje
+    await react('1️⃣')
     let firstHD = await stellarUpscale(media, 2, key)
 
-    // PASO 2: x2 de nuevo = x4 total
-    await conn.reply(m.chat, '❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❄️ *PASO 2/2:* Mejorando a x4 automático...', m)
+    // PASO 2: x2 de nuevo = x4 total - solo reacciona, sin mensaje
+    await react('2️⃣')
     let finalHD = await stellarUpscale(firstHD, 2, key)
 
-    await conn.sendFile(m.chat, finalHD, 'hd-x4.jpg', 
-`❄️ 𓆩 *HD x4 COMPLETADO* 𓆪 ⚡
+    await conn.sendFile(m.chat, finalHD, 'hd-x4.jpg',
+      head + `\n⤷ ┇ 𝐇𝐃 ﹒ COMPLETADO ：✿ 。\n\n.⃟𖥔 ݁. 𖦹˙— \`\`RESULTADO\`\` ❄️ —˙𖦹.꒷\n\n❄️ *HD x4 COMPLETADO*\n\n── *📊 DATOS* ╏ ❄️\n✿ ➛ x2 → x4 automático\n✿ ➛ Stellar API` + foot, m)
 
-> ✿ x2 → x4 automático
-> ✿ PHANTOM IA | FROST
-> ✿ Stellar API`, m)
-
-    await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
+    await react('❄️')
 
   } catch (e) {
     console.error(e)
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Error: ${e.message}`, m)
+    await react('❌')
+    conn.reply(m.chat, head + `\n❌ Error: ${e.message}` + foot, m)
   }
 }
 
