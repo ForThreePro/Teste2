@@ -7,7 +7,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   // TRIVIA - COOLDOWN 30 SEG
   if (command === 'trivia') {
     if (cooldowns.trivia[m.sender] && Date.now() - cooldowns.trivia[m.sender] < 30000)
-      return m.reply(`❄️ Espera ${Math.ceil((30000 - (Date.now() - cooldowns.trivia[m.sender])) / 1000)}s, PHANTOM está pensando ⚡`)
+      return m.reply(`❄️ Espera ${Math.ceil((30000 - (Date.now() - cooldowns.trivia[m.sender])) / 1000)}s, PHANTOM PLUS está pensando ⚡`)
     const preguntas = [
       { q: '¿Cuántos días tiene una semana?', a: '7' },
       { q: '¿De qué color es el cielo despejado?', a: 'azul' },
@@ -20,7 +20,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     ]
     let trivia = preguntas[Math.floor(Math.random() * preguntas.length)]
     cooldowns.trivia[m.sender] = Date.now()
-    await conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🎮 *TRIVIA PHANTOM* 🎮\n> *PHANTOM pregunta, tú respondes*\n\n${trivia.q}\n\n⏳ Tienes 15 segundos ⚡\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, m)
+    await conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🎮 *TRIVIA PHANTOM PLUS* 🎮\n> *PHANTOM PLUS pregunta, tú respondes*\n\n${trivia.q}\n\n⏳ Tienes 15 segundos ⚡\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
     global.db.data.trivia = global.db.data.trivia || {}
     global.db.data.trivia[m.sender] = { answer: trivia.a.toLowerCase(), chat: m.chat, timeout: setTimeout(() => delete global.db.data.trivia[m.sender], 15000) }
     return
@@ -34,21 +34,21 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let monto = parseInt(args[1])
     user.coin = Number(user.coin) || 0
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ No puedes apostar con deuda\n\nUsa ${usedPrefix}pagardeuda <monto> o ${usedPrefix}work\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ No puedes apostar con deuda\n\nUsa ${usedPrefix}pagardeuda <monto> o ${usedPrefix}work\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     if (!['red', 'black', 'rojo', 'negro'].includes(color)) return m.reply('❄️ Usa: red/rojo o black/negro ⚡')
     if (isNaN(monto) || monto < 10) return m.reply('❄️ Apuesta mínima: 10 monedas ⚡')
     if (user.coin < monto) return m.reply(`❄️ No tienes suficiente. Saldo: ${user.coin} 🪙\n⛓️ Sistema bloqueado`)
     user.coin -= monto
     let resultado = Math.random() < 0.5? 'red' : 'black'
     let colorElegido = color === 'rojo'? 'red' : color === 'negro'? 'black' : color
-    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🎰 *RULETA PHANTOM* 🎰\n⚡ Apostaste: ${monto} 🪙 a ${colorElegido === 'red'? '🔴 Rojo Frost' : '⚫ Negro Phantom'}\n\n❄️ Girando sistema...`)
+    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🎰 *RULETA PHANTOM PLUS* 🎰\n⚡ Apostaste: ${monto} 🪙 a ${colorElegido === 'red'? '🔴 Rojo Frost' : '⚫ Negro Phantom PLUS'}\n\n❄️ Girando sistema...\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     await new Promise(resolve => setTimeout(resolve, 1500))
     if (resultado === colorElegido) {
       let ganancia = monto * 2
       user.coin += ganancia
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🎰 *¡GANASTE!* 🎰\n👻 Salió: ${resultado === 'red'? '🔴' : '⚫'}\n💎 Ganaste: ${ganancia} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🎰 *¡GANASTE!* 🎰\n👻 Salió: ${resultado === 'red'? '🔴' : '⚫'}\n💎 Ganaste: ${ganancia} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     } else {
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🎰 *PERDISTE* 🎰\n💀 Salió: ${resultado === 'red'? '🔴' : '⚫'}\n⛓️ Perdiste: ${monto} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🎰 *PERDISTE* 🎰\n💀 Salió: ${resultado === 'red'? '🔴' : '⚫'}\n⛓️ Perdiste: ${monto} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
   }
 
@@ -57,7 +57,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     let monto = parseInt(text)
     user.coin = Number(user.coin) || 0
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\nUsa ${usedPrefix}pagardeuda o ${usedPrefix}work\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\nUsa ${usedPrefix}pagardeuda o ${usedPrefix}work\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     if (isNaN(monto) || monto < 10) return m.reply(`❄️ Apuesta mínima: 10\n⚡ Uso: ${usedPrefix + command} <monto>`)
     if (user.coin < monto) return m.reply(`❄️ Saldo: ${user.coin} 🪙\n⛓️ No alcanza`)
     user.coin -= monto
@@ -79,9 +79,9 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     if (multiplicador > 0) {
       let ganancia = monto * multiplicador
       user.coin += ganancia
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🎰 *SLOTS PHANTOM* 🎰\n\n${a} | ${b} | ${c}\n\n🎉 *x${multiplicador}* - ¡JACKPOT PHANTOM! 💎\nGanaste: ${ganancia} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🎰 *SLOTS PHANTOM PLUS* 🎰\n\n${a} | ${b} | ${c}\n\n🎉 *x${multiplicador}* - ¡JACKPOT PHANTOM PLUS! 💎\nGanaste: ${ganancia} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     } else {
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🎰 *SLOTS* 🎰\n\n${a} | ${b} | ${c}\n\n💔 *PERDISTE* - El sistema te ganó\nPerdiste: ${monto} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🎰 *SLOTS* 🎰\n\n${a} | ${b} | ${c}\n\n💔 *PERDISTE* - El sistema te ganó\nPerdiste: ${monto} 🪙\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
   }
 
@@ -90,15 +90,15 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     user.deuda = Number(user.deuda) || 0
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000
     if (cooldowns.work[m.sender] && Date.now() - cooldowns.work[m.sender] < tiempoEspera)
-      return m.reply(`❄️ PHANTOM ya trabajó, espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.work[m.sender])) / 60000)} min ⚡`)
+      return m.reply(`❄️ PHANTOM PLUS ya trabajó, espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.work[m.sender])) / 60000)} min ⚡`)
 
     cooldowns.work[m.sender] = Date.now()
     const trabajos = [
-      { texto: '👻 Hackeaste el sistema PHANTOM y ganaste', min: 80, max: 200 },
+      { texto: '👻 Hackeaste el sistema PHANTOM PLUS y ganaste', min: 80, max: 200 },
       { texto: '⚡ Vendiste hielo eléctrico y ganaste', min: 50, max: 120 },
       { texto: '❄️ Congelaste la bóveda y ganaste', min: 30, max: 150 },
-      { texto: '🦂 Cuidaste al escorpión PHANTOM y ganaste', min: 40, max: 100 },
-      { texto: '⛓️ Minaste en la cadena PHANTOM y ganaste', min: 60, max: 180 }
+      { texto: '🦂 Cuidaste al escorpión PHANTOM PLUS y ganaste', min: 40, max: 100 },
+      { texto: '⛓️ Minaste en la cadena PHANTOM PLUS y ganaste', min: 60, max: 180 }
     ]
     let trabajo = trabajos[Math.floor(Math.random() * trabajos.length)]
     let ganancia = Math.floor(Math.random() * (trabajo.max - trabajo.min + 1)) + trabajo.min
@@ -109,24 +109,24 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       let sobrante = ganancia - pagoDeuda
       if (sobrante > 0) {
         user.coin = (Number(user.coin) || 0) + sobrante
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💼 *TRABAJO PHANTOM* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\n💸 Pagaste ${pagoDeuda} a tu deuda\n💰 Te quedaron ${sobrante} monedas\n\n🚔 *DEUDA RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💼 *TRABAJO PHANTOM PLUS* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\n💸 Pagaste ${pagoDeuda} a tu deuda\n💰 Te quedaron ${sobrante} monedas\n\n🚔 *DEUDA RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
       } else {
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💼 *TRABAJO PHANTOM* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\n💸 *TODO SE FUE A PAGAR TU DEUDA*\n\n🚔 *DEUDA RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💼 *TRABAJO PHANTOM PLUS* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n\n💸 *TODO SE FUE A PAGAR TU DEUDA*\n\n🚔 *DEUDA RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
       }
     } else {
       user.coin = (Number(user.coin) || 0) + ganancia
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n⚡ PHANTOM aprueba este trabajo\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💼 *TRABAJO* 💼\n\n${trabajo.texto} *${ganancia} monedas* 🪙\n⚡ PHANTOM PLUS aprueba este trabajo\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
   }
 
   // ROBAR - NO PUEDES CON DEUDA
   if (['robar', 'rob'].includes(command)) {
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ No puedes robar con deuda\n\nUsa ${usedPrefix}pagardeuda o ${usedPrefix}work\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ No puedes robar con deuda\n\nUsa ${usedPrefix}pagardeuda o ${usedPrefix}work\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
 
     let tiempoEspera = Math.floor(Math.random() * 240000) + 60000
     if (cooldowns.robar[m.sender] && Date.now() - cooldowns.robar[m.sender] < tiempoEspera)
-      return m.reply(`❄️ Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.robar[m.sender])) / 60000)} min para robar, PHANTOM está alerta ⚡`)
+      return m.reply(`❄️ Espera ${Math.ceil((tiempoEspera - (Date.now() - cooldowns.robar[m.sender])) / 60000)} min para robar, PHANTOM PLUS está alerta ⚡`)
 
     let who = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
     if (!who) return m.reply(`❄️ Menciona a quien quieres robar ⚡`)
@@ -146,9 +146,9 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       target.coin -= robado
       user.coin = (Number(user.coin) || 0) + robado
       try {
-        await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚨 *¡TE ROBARON!* 🚨\n🦂 @${m.sender.split('@')[0]} te robó *${robado} monedas* 🪙\n\nTu saldo: ${target.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, null, { mentions: [m.sender] })
+        await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚨 *¡TE ROBARON!* 🚨\n🦂 @${m.sender.split('@')[0]} te robó *${robado} monedas* 🪙\n\nTu saldo: ${target.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, null, { mentions: [m.sender] })
       } catch {}
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🦹 *¡ROBO EXITOSO!* 🦹\n💎 Le robaste *${robado} monedas* a @${who.split('@')[0]}\n👻 PHANTOM estaría orgulloso\n\nTu saldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, null, { mentions: [who, m.sender] })
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🦹 *¡ROBO EXITOSO!* 🦹\n💎 Le robaste *${robado} monedas* a @${who.split('@')[0]}\n👻 PHANTOM PLUS estaría orgulloso\n\nTu saldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, null, { mentions: [who, m.sender] })
     } else {
       let multa = Math.floor(Math.random() * 50) + 20
       user.coin = Number(user.coin) || 0
@@ -157,15 +157,15 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
         user.deuda = (Number(user.deuda) || 0) + deudaNueva
         user.coin = 0
         try {
-          await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 *INTENTO DE ROBO* 🚔\n🦂 @${m.sender.split('@')[0]} intentó robarte pero PHANTOM lo atrapó y ahora debe ${deudaNueva} monedas`, null, { mentions: [m.sender] })
+          await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 *INTENTO DE ROBO* 🚔\n🦂 @${m.sender.split('@')[0]} intentó robarte pero PHANTOM PLUS lo atrapó y ahora debe ${deudaNueva} monedas\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, null, { mentions: [m.sender] })
         } catch {}
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 *¡PHANTOM TE ATRAPÓ!* 🚔\n⚡ Multa: ${multa} monedas\n💸 *DEUDA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}pagardeuda o ${usedPrefix}work\n\nSaldo: 0 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 *¡PHANTOM PLUS TE ATRAPÓ!* 🚔\n⚡ Multa: ${multa} monedas\n💸 *DEUDA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}pagardeuda o ${usedPrefix}work\n\nSaldo: 0 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
       } else {
         user.coin -= multa
         try {
-          await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 *INTENTO DE ROBO* 🚔\n🦂 @${m.sender.split('@')[0]} intentó robarte pero falló y pagó ${multa} monedas`, null, { mentions: [m.sender] })
+          await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 *INTENTO DE ROBO* 🚔\n🦂 @${m.sender.split('@')[0]} intentó robarte pero falló y pagó ${multa} monedas\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, null, { mentions: [m.sender] })
         } catch {}
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 *¡TE ATRAPÓ PHANTOM!* 🚔\n⚡ Multa: *${multa} monedas*\n\nTu saldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 *¡TE ATRAPÓ PHANTOM PLUS!* 🚔\n⚡ Multa: *${multa} monedas*\n\nTu saldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
       }
     }
   }
@@ -174,10 +174,10 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
   if (['pagardeuda', 'deuda'].includes(command)) {
     user.coin = Number(user.coin) || 0
     user.deuda = Number(user.deuda) || 0
-    if (user.deuda === 0) return m.reply('❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ No tienes deudas, PHANTOM está orgulloso 👻\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369')
+    if (user.deuda === 0) return m.reply('❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ No tienes deudas, PHANTOM PLUS está orgulloso 👻\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━')
 
     let monto = parseInt(text)
-    if (isNaN(monto) || monto < 1) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💸 *DEUDA*: ${user.deuda} monedas\n⚡ Uso: ${usedPrefix}pagardeuda <monto>\n⛓️ O usa ${usedPrefix}work para pagar\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (isNaN(monto) || monto < 1) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💸 *DEUDA*: ${user.deuda} monedas\n⚡ Uso: ${usedPrefix}pagardeuda <monto>\n⛓️ O usa ${usedPrefix}work para pagar\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     if (user.coin < monto) return m.reply(`❄️ Saldo: ${user.coin} 🪙\n🚔 Deuda: ${user.deuda} 🪙\n\n⚡ Usa ${usedPrefix}work para ganar`)
 
     let aPagar = Math.min(monto, user.deuda)
@@ -185,9 +185,9 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     user.deuda -= aPagar
 
     if (user.deuda === 0) {
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ *¡DEUDA PAGADA!* ✅\n💎 Pagaste ${aPagar} monedas\n👻 PHANTOM: "Por fin, sistema libre"\n\nTu saldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ *¡DEUDA PAGADA!* ✅\n💎 Pagaste ${aPagar} monedas\n👻 PHANTOM PLUS: "Por fin, sistema libre"\n\nTu saldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     } else {
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💸 Pagaste ${aPagar} monedas\n\n🚔 *RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💸 Pagaste ${aPagar} monedas\n\n🚔 *RESTANTE*: ${user.deuda} monedas\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
   }
 }
@@ -201,9 +201,9 @@ handler.before = async (m, { conn }) => {
     let ganancia = Math.floor(Math.random() * 50) + 20
     if (!global.db.data.users[m.sender].deuda || global.db.data.users[m.sender].deuda === 0) {
       global.db.data.users[m.sender].coin = (Number(global.db.data.users[m.sender].coin) || 0) + ganancia
-      await conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ ¡Correcto! PHANTOM te premia con *${ganancia} monedas* 🪙💎\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, m)
+      await conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ ¡Correcto! PHANTOM PLUS te premia con *${ganancia} monedas* 🪙💎\n\nSaldo: ${global.db.data.users[m.sender].coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
     } else {
-      await conn.reply(m.chat, `❄️ ¡Correcto! Pero debes ${global.db.data.users[m.sender].deuda} 🪙\n⛓️ Usa .work para pagar, PHANTOM no perdona deudas`, m)
+      await conn.reply(m.chat, `❄️ ¡Correcto! Pero debes ${global.db.data.users[m.sender].deuda} 🪙\n⛓️ Usa .work para pagar, PHANTOM PLUS no perdona deudas`, m)
     }
     delete global.db.data.trivia[m.sender]
   }
