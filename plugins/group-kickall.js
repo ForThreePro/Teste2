@@ -2,44 +2,19 @@ import moment from 'moment-timezone'
 moment.locale('es')
 
 let handler = async (m, { conn }) => {
-    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-
     // TUS 2 NÚMEROS PROTEGIDOS
     const owners = ['51927174369', '51930858072']
     const ownerJids = owners.map(n => n + '@s.whatsapp.net')
 
-    const react = async (text) => {
-        try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
-    }
-
     // Solo tú con cualquiera de tus 2 números puedes usarlo
+    // Si no eres tú, silencioso total, no responde nada
     const senderNum = m.sender.replace(/[^0-9]/g, '')
     const isOwner = owners.some(n => senderNum.includes(n) || senderNum.endsWith(n.slice(2)))
-    if (!isOwner) {
-        await react('❌')
-        return conn.sendMessage(m.chat, { 
-            text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    if (!isOwner) return
 
-⛓️ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ ACCESO DENEGADO
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`DENEGADO\`\` 🔴 —˙𖦹.꒷
-❄️ Solo mi dueño puede usar esto pe
-
-── *📊 INFO* ╏ ❄️
-🔒 ➛ Comando: *.kickall*
-👑 ➛ Solo: +51 927 174 369 / +51 930 858 072
-
-━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
-🦂 *Contacto:* +51 927 174 369
-━━━━━━━━━━━`, mentions: [m.sender] }, { quoted: m })
-    }
-
-    if (!m.isGroup) return m.reply('❄️ Solo en grupos pe')
+    if (!m.isGroup) return
 
     try {
-        await react('❄️')
         let groupMetadata = await conn.groupMetadata(m.chat)
         let botId = conn.user.jid
         let botLid = conn.user.lid || ''
@@ -69,72 +44,33 @@ let handler = async (m, { conn }) => {
                 return true
             })
 
-        if (!toKick.length) {
-            await react('❌')
-            return m.reply('❄️ No hay nadie para sacar pe, solo estamos tú y yo ❄️')
-        }
+        if (!toKick.length) return
 
-        await conn.sendMessage(m.chat, { 
-            text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let isRapido = toKick.length >= 300
 
-⛓️ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ KICKALL INICIADO
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`PURGA\`\` 🔴 —˙𖦹.꒷
-❄️ Sacando a todos, incluido el creador, menos a ti y a PHANTOM pe
-
-── *📊 INFO* ╏ ❄️
-🔴 ➛ Total: *${toKick.length}*
-👑 ➛ Se quedan: *Tú (2 números) y el bot*
-👻 ➛ Creador: *SÍ se elimina si no eres tú*
-👻 ➛ El bot: *NO se va*
-
-━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
-🦂 *Contacto:* +51 927 174 369
-━━━━━━━━━━━`, mentions: [m.sender] }, { quoted: m })
-
-        let sacados = 0
-        let fallidos = []
-        for (let id of toKick) {
-            try {
-                await conn.groupParticipantsUpdate(m.chat, [id], 'remove')
-                sacados++
-                await new Promise(r => setTimeout(r, 800))
-            } catch (e) {
-                fallidos.push(id)
+        if (isRapido) {
+            // MODO RÁPIDO 300+ : lotes de 10 en paralelo
+            for (let i = 0; i < toKick.length; i += 10) {
+                let lote = toKick.slice(i, i + 10)
+                await Promise.allSettled(lote.map(id => conn.groupParticipantsUpdate(m.chat, [id], 'remove')))
+                if (i + 10 < toKick.length) await new Promise(r => setTimeout(r, 300))
+            }
+        } else {
+            // MODO NORMAL : 1 por 1
+            for (let id of toKick) {
+                try {
+                    await conn.groupParticipantsUpdate(m.chat, [id], 'remove')
+                    await new Promise(r => setTimeout(r, 800))
+                } catch (e) {}
             }
         }
 
-        await react('🔥')
-        await conn.sendMessage(m.chat, { 
-            text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
-
-⛓️ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ COMPLETADO
-꒰ ◞⁺⊹ ．${fecha}
-
-.⃟𖥔 ݁. 𖦹˙— \`\`LIMPIO\`\` 🟢 —˙𖦹.꒷
-❄️ Listo pe, solo quedamos nosotros
-
-── *📊 RESULTADO* ╏ ❄️
-🗑️ ➛ Eliminados: *${sacados}*
-⚠️ ➛ Fallidos: *${fallidos.length}*
-👑 ➛ Quedan: *Tú y yo (bot)*
-
-━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
-🦂 *Contacto:* +51 927 174 369
-━━━━━━━━━━━` 
-        })
-
-    } catch (e) {
-        return m.reply(`❌ ${e.message}\n❄️ El bot debe ser admin pe`)
-    }
+    } catch (e) {}
 }
 
 handler.help = ['kickall']
 handler.tags = ['owner']
-handler.command = ['kickall', 'sacartodos', 'kicktodos']
+handler.command = ['kickall', 'sacartodos', 'kickt​odos']
 handler.group = true
 handler.botAdmin = true
 
