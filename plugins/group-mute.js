@@ -6,22 +6,23 @@ let mutedUsers = new Set()
 let handler = async (m, { conn, command, participants }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
-    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
 
     let mentionedJid = m.mentionedJid[0]? m.mentionedJid[0] : m.quoted? m.quoted.sender : false
-    if (!mentionedJid) { await react('❌'); return m.reply(head+`\n❌ Menciona o responde a un usuario\nEj: *.mute @user*`, m) }
+    if (!mentionedJid) { await react('❌'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ USO ：✿ 。\n\n❌ Menciona o responde a un usuario\nEj: *.mute @user*` + foot, m) }
 
-    if (participants.find(p=>p.id===mentionedJid)?.admin) { await react('❌'); return m.reply(head+`\n❌ No puedes silenciar admins`, m) }
-    if (mentionedJid===conn.user.jid) { await react('❌'); return m.reply(head+`\n❌ No puedo silenciarme`, m) }
+    if (participants.find(p=>p.id===mentionedJid)?.admin) { await react('❌'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ERROR ：✿ 。\n\n❌ No puedes silenciar admins` + foot, m) }
+    if (mentionedJid===conn.user.jid) { await react('❌'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ERROR ：✿ 。\n\n❌ No puedo silenciarme` + foot, m) }
 
     if (command==="mute") {
-        if (mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⚠️ Ya está silenciado`, m) }
+        if (mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ MUTE ：✿ 。\n\n⚠️ Ya está silenciado` + foot, m) }
         mutedUsers.add(mentionedJid); await react('🔇')
-        return conn.sendMessage(m.chat, { text: head+`\n🔇 Silenciado en el sistema: @${mentionedJid.split('@')[0]} 👻`, mentions:[mentionedJid] }, { quoted:m })
+        return conn.sendMessage(m.chat, { text: head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ MUTE ：✿ 。\n\n🔇 Silenciado en el sistema: @${mentionedJid.split('@')[0]} 👻` + foot, mentions:[mentionedJid] }, { quoted:m })
     } else {
-        if (!mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⚠️ No está silenciado`, m) }
+        if (!mutedUsers.has(mentionedJid)) { await react('⚠️'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ MUTE ：✿ 。\n\n⚠️ No está silenciado` + foot, m) }
         mutedUsers.delete(mentionedJid); await react('🔊')
-        return conn.sendMessage(m.chat, { text: head+`\n🔊 Liberado del silencio: @${mentionedJid.split('@')[0]} ❄️`, mentions:[mentionedJid] }, { quoted:m })
+        return conn.sendMessage(m.chat, { text: head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ UNMUTE ：✿ 。\n\n🔊 Liberado del silencio: @${mentionedJid.split('@')[0]} ❄️` + foot, mentions:[mentionedJid] }, { quoted:m })
     }
 }
 
