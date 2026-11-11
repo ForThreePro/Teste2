@@ -11,21 +11,21 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
     if (!text) {
-        let menuUso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let menuUso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐈𝐀 𝐕𝐎𝐙 ﹒ ${command.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 🤖 ࣪ ꕀ.${command} ˚. ᵎᵎ
-> *"Hablando con el sistema PHANTOM"*
+> *"Hablando con el sistema PHANTOM PLUS"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`IA PHANTOM\`\` 🤖 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`IA PHANTOM PLUS\`\` 🤖 —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ ❄️
 🤖 ➛ Responde con IA usando Gemini
 🔊 ➛ Convierte la respuesta a audio PTT
-👻 ➛ Voz PHANTOM seria
+👻 ➛ Voz PHANTOM PLUS seria
 
 ── *📖 USO* ╏ ⛓️
 ➛.${command} <tu pregunta>
@@ -34,11 +34,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 ── *⚙️ NOTAS* ╏ ❄️
 📏 ➛ Máx 2 líneas de respuesta
 🗣️ ➛ Voz en español latino
-⚡ ➛ PHANTOM responde corto y al grano
+⚡ ➛ PHANTOM PLUS responde corto y al grano
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
@@ -46,7 +47,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     await m.react('❄️')
-    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ ${command.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -55,13 +56,14 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📊 ESTADO* ╏ ❄️
 🧠 ➛ Consultando a Gemini...
-🗣️ ➛ Generando voz PHANTOM...
+🗣️ ➛ Generando voz PHANTOM PLUS...
 📤 ➛ Enviando audio...
-👻 ➛ PHANTOM despertando...
+👻 ➛ PHANTOM PLUS despertando...
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
 
     try {
@@ -69,7 +71,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         let aiRes = await fetch(aiUrl)
         let aiJson = await aiRes.json()
 
-        let respuesta = aiJson.result || aiJson.data || aiJson.response || "No te entendí pe causa, PHANTOM está procesando"
+        let respuesta = aiJson.result || aiJson.data || aiJson.response || "No te entendí pe causa, PHANTOM PLUS está procesando"
 
         if(respuesta.length > 200) respuesta = respuesta.substring(0, 200) + "..."
 
@@ -111,7 +113,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         console.log(e)
         await m.react('❌')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-        await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ ${command.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -120,16 +122,17 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ ❄️
 ❌ ➛ ${e.message}
-⚡ ➛ PHANTOM no pudo procesarlo
+⚡ ➛ PHANTOM PLUS no pudo procesarlo
 
 ── *💡 SOLUCIÓN* ╏ ⛓️
 🔧 ➛ Intenta con un texto más corto
 🔧 ➛ Verifica tu conexión
-❄️ ➛ PHANTOM dice: menos texto, más directo
+❄️ ➛ PHANTOM PLUS dice: menos texto, más directo
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
     }
 }
