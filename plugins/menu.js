@@ -20,15 +20,15 @@ rpg: '⚔️', anime: '🎌', internet: '🌐', image: '🖼️'
 const TOP_COMANDOS = ['.play', '.sticker', '.ia', '.menu', '.ytmp4']
 
 const FRASES_FROST = [
-"El frío llegó... y PHANTOM manda",
+"El frío llegó... y PHANTOM PLUS manda",
 "Congelando el chat, un comando a la vez",
-"La noche es fría y PHANTOM está en línea",
+"La noche es fría y PHANTOM PLUS está en línea",
 "Cuidado con el hielo, resbala",
 "Hoy toca congelar hasta amanecer",
 "Si no hay hielo, hay frost",
 "El frío es mi superpoder",
-"PHANTOM IA - Donde el frío manda ❄️",
-"Más frío que el invierno de PHANTOM"
+"PHANTOM PLUS - Donde el frío manda ❄️",
+"Más frío que el invierno de PHANTOM PLUS"
 ]
 
 let handler = async (m, { conn }) => {
@@ -61,7 +61,7 @@ for (const plugin of plugins) {
 }
 
 const userName = m.pushName || 'Usuario'
-const IMG_MENU = 'https://files.evogb.win/luvW09.jpg'
+const IMG_MENU = 'https://files.evogb.win/9BFoEi.jpg'
 const ping = Math.round(performance.now() - start)
 const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 const CANAL_LINK = 'https://whatsapp.com/channel/0029Vb8emrOJuyACodGSbP0z'
@@ -74,9 +74,9 @@ const estadoBot = dias > 0? `En línea • ${dias}d ${horas}h` : `En línea • 
 const EMOJIS_EXTRA = ['❄️','⛓️','⚡','👻','🦂','🧊','💎','🔮','👑','🤖']
 let emojiIndex = 0
 
-let menuTexto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+let menuTexto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
-⛓️ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 3.0 PHANTOM FROST
+⛓️ ┇ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 ﹒ 3.0 PHANTOM PLUS FROST
 ꒰ ◞⁺⊹ ．estado: *${estadoBot}* • Ping: ${ping}ms
 
   ꒱ ׁ. ᘏ 𝗨𝗦𝗨𝗔𝗥𝗜𝗢 ׅ 𝆬 ָ֢ ෆ
@@ -94,9 +94,9 @@ ${TOP_COMANDOS.map((c,i) => `${i+1}. ${c}`).join(' | ')}
 *Usuarios*: ${totalUsers} | *Comandos*: ${pluginsCount}
 *Owner*: @${ownerNum}
 *RAM*: ${ram}mb/${totalram}gb
-*Edición*: PHANTOM IA x FROST
+*Edición*: PHANTOM PLUS x FROST
 
- ׅ 埃斯 : 𝖲𝖨𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
+ ׅ 埃斯 : 𝖲𝖯𝖲𝖳𝖤𝖬𝖠 ﹙ 💻 ﹚
 *${fecha}* ─ ${fecha2} ─ ${hora}
 
 > ❍ Usa. antes de cada comando ❄️
@@ -122,14 +122,15 @@ for (const tag of tagsOrdenados) {
 }
 
 menuTexto += `━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 *Owner*: @${ownerNum}
-*Version*: 3.0 PHANTOM FROST
+*Version*: 3.0 PHANTOM PLUS FROST
 *${CANAL_LINK}*
 
-> "El frío llegó... y PHANTOM manda" ❄️
-> "PHANTOM IA - Donde el frío manda"
+> "El frío llegó... y PHANTOM PLUS manda" ❄️
+> "PHANTOM PLUS - Donde el frío manda"
 ━━━━━━━━━━━`
 
 await conn.sendMessage(m.chat, {
@@ -139,7 +140,7 @@ await conn.sendMessage(m.chat, {
 }, { quoted: m })
 
 } catch (e) {
-await conn.sendMessage(m.chat, { text: `❌ *ERROR PHANTOM*: ${e.message}\n❄️ Se congeló el sistema...` }, { quoted: m })
+await conn.sendMessage(m.chat, { text: `❌ *ERROR PHANTOM PLUS*: ${e.message}\n❄️ Se congeló el sistema...` }, { quoted: m })
 }
 }
 
