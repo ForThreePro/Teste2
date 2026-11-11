@@ -23,7 +23,7 @@ const handler = async (m, { conn, command, text }) => {
 
   if (!query && (!mime || !/audio|video/.test(mime))) {
     return conn.reply(m.chat, 
-`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ 𝐒𝐎𝐍𝐆
 ꒰ ◞⁺⊹ ．${fecha}
@@ -44,13 +44,18 @@ const handler = async (m, { conn, command, text }) => {
 ❄️ ➛.song (respondiendo a video)
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`, m)
   }
 
   try {
     await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
+
+    // ===== MEJORA 2 APLICADA: no duplicar ENCONTRADO + PREVIEW + DESCARGA =====
+    let songDetectado = null
+    let fromDetection = false
 
     if (!query && mime && /audio|video/.test(mime)) {
       let buffer = await q.download()
@@ -65,36 +70,9 @@ const handler = async (m, { conn, command, text }) => {
       let song = await detectarStellar(audioUrl)
       if (!song) throw new Error('Stellar no reconoció la canción')
       query = `${song.title} ${song.artist}`
-
-      let spotify = song.url.find(u => u.includes('spotify')) || ''
-      let deezer = song.url.find(u => u.includes('deezer')) || ''
-      let escuchar = ''
-      if (spotify) escuchar += `> ${spotify}\n`
-      if (deezer) escuchar += `> ${deezer}`
-      if (!escuchar) escuchar = `> No disponible`
-
-      await conn.reply(m.chat,
-`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
-
-⛓️ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG
-
-.⃟𖥔 ݁. 𖦹˙— \`\`¿QUÉ CANCIÓN ES?\`\` 🎵 —˙𖦹.꒷
-
-── *🎵 CANCIÓN* ╏ ❄️
-📌 ➛ *Título:* ${song.title}
-👤 ➛ *Artista:* ${song.artist}
-💿 ➛ *Álbum:* ${song.album}
-🎼 ➛ *Género:* ${song.genres}
-⏱️ ➛ *Duración:* ${song.duration}
-📅 ➛ *Lanzamiento:* ${song.release_date}
-
-── *🔗 ESCUCHAR* ╏ ⛓️
-${escuchar}
-
-━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
-🦂 *Contacto:* +51 927 174 369
-━━━━━━━━━━━`, m)
+      songDetectado = song
+      fromDetection = true
+      // Ya no mandamos ENCONTRADO aquí, se manda junto con la descarga al final
     }
 
     let link = query
@@ -111,11 +89,12 @@ ${escuchar}
     if (!j.status || !j.result) throw new Error('API FAA está caída')
 
     const downloadUrl = j.result.mp3
-    const title = (j.result.title || info?.title || 'phantom').replace(/[^\w\s-]/gi, '').trim()
+    const title = (j.result.title || info?.title || 'phantom-plus').replace(/[^\w\s-]/gi, '').trim()
 
-    if (info) {
+    // Solo mostrar PREVIEW si viene por texto, no si viene de detectar
+    if (info && !fromDetection) {
       const preview = 
-`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐏𝐑𝐄𝐕𝐈𝐄𝐖 ﹒ SONG
 ꒰ ◞⁺⊹ ．${fecha}
@@ -134,8 +113,9 @@ ${escuchar}
 👻 ➛ Espera un momento
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`.trim()
       await conn.reply(m.chat, preview, m)
     }
@@ -144,8 +124,49 @@ ${escuchar}
     const buffer = Buffer.from(res.data)
     const size = (buffer.length / 1024 / 1024).toFixed(2)
 
-    const finalText = 
-`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    // Si viene de detectar, 1 solo mensaje combinado: ENCONTRADO + DESCARGA
+    let finalText
+    if (fromDetection && songDetectado) {
+      let spotify = songDetectado.url.find(u => u.includes('spotify')) || ''
+      let deezer = songDetectado.url.find(u => u.includes('deezer')) || ''
+      let escuchar = ''
+      if (spotify) escuchar += `> ${spotify}\n`
+      if (deezer) escuchar += `> ${deezer}`
+      if (!escuchar) escuchar = `> No disponible`
+
+      finalText = 
+`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
+
+⛓️ ┇ 𝐄𝐍𝐂𝐎𝐍𝐓𝐑𝐀𝐃𝐎 ﹒ SONG
+꒰ ◞⁺⊹ ．${fecha}
+
+.⃟𖥔 ݁. 𖦹˙— \`\`¿QUÉ CANCIÓN ES?\`\` 🎵 —˙𖦹.꒷
+
+── *🎵 CANCIÓN* ╏ ❄️
+📌 ➛ *Título:* ${songDetectado.title}
+👤 ➛ *Artista:* ${songDetectado.artist}
+💿 ➛ *Álbum:* ${songDetectado.album}
+🎼 ➛ *Género:* ${songDetectado.genres}
+⏱️ ➛ *Duración:* ${songDetectado.duration}
+📅 ➛ *Lanzamiento:* ${songDetectado.release_date}
+
+── *🔗 ESCUCHAR* ╏ ⛓️
+${escuchar}
+
+── *📊 DESCARGA* ╏ ❄️
+🎵 ➛ Título: *${title}*
+🔌 ➛ API: *FAA-BOT*
+⚖️ ➛ Peso: *${size} MB*
+✨ ➛ Estado: *Listo*
+
+━━━━━━━━━━━
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
+🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
+━━━━━━━━━━━`.trim()
+    } else {
+      finalText = 
+`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀 ﹒ AUDIO ❄️
 ꒰ ◞⁺⊹ ．${fecha}
@@ -159,16 +180,18 @@ ${escuchar}
 ✨ ➛ Estado: *Listo*
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`.trim()
+    }
 
     await conn.reply(m.chat, finalText, m)
     return conn.sendMessage(m.chat, { audio: buffer, mimetype: 'audio/mpeg', fileName: `${title}.mp3` }, { quoted: m })
 
   } catch (e) {
     console.log(e)
-    return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ Error: ${e.message}\n👻 No se encontró la canción\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`, m)
+    return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ Error: ${e.message}\n👻 No se encontró la canción\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
   }
 }
 
