@@ -8,7 +8,7 @@ let handler = async (m, { conn }) => {
     let groupName = await conn.getName(m.chat)
 
     if (!m.isGroup) {
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ SALIR
 ꒰ ◞⁺⊹ ．${fecha}
@@ -17,18 +17,19 @@ let handler = async (m, { conn }) => {
 
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ Este comando solo funciona en grupos
-👻 ➛ PHANTOM solo sale de grupos
+👻 ➛ PHANTOM PLUS solo sale de grupos
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
     let miNumero = '51927174369@s.whatsapp.net'
     if (user !== miNumero) {
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐂𝐂𝐄𝐒𝐎 𝐃𝐄𝐍𝐄𝐆𝐀𝐃𝐎 ﹒ SALIR
 ꒰ ◞⁺⊹ ．${fecha}
@@ -37,11 +38,12 @@ let handler = async (m, { conn }) => {
 
 ── *📝 AVISO* ╏ ❄️
 🔒 ➛ Este comando es exclusivo del dueño
-👻 ➛ Solo PHANTOM mayor puede irse
+👻 ➛ Solo PHANTOM PLUS mayor puede irse
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -53,7 +55,7 @@ let handler = async (m, { conn }) => {
         pp = 'https://files.evogb.win/YhR5LZ.jpg'
     }
 
-    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐏𝐄𝐃𝐈𝐃𝐀 ﹒ ADIOS
 ꒰ ◞⁺⊹ ．${fecha}
@@ -62,7 +64,7 @@ let handler = async (m, { conn }) => {
 
 ── *📊 INFORMACIÓN* ╏ ❄️
 👋 ➛ *${nombre}* se despide de: *${groupName}*
-👻 ➛ PHANTOM se va por nuevos sistemas
+👻 ➛ PHANTOM PLUS se va por nuevos sistemas
 
 ── *📝 MENSAJE* ╏ ⛓️
 ✨ ➛ Gracias por la confianza depositada
@@ -70,15 +72,16 @@ let handler = async (m, { conn }) => {
 ✨ ➛ Por elegirnos como su Bot #1 de WhatsApp 2026
 ❄️ ➛ Me llevo los mejores recuerdos del sistema
 💌 ➛ Si necesitan volver a contar conmigo, aquí estaré
-⚡ ➛ PHANTOM siempre vuelve
+⚡ ➛ PHANTOM PLUS siempre vuelve
 
 ── *📞 SOPORTE* ╏ ❄️
 📱 ➛ Soporte 24/7: *+51 927 174 369*
-❄️ ➛ Soporte PHANTOM incluido
+❄️ ➛ Soporte PHANTOM PLUS incluido
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
 
     await conn.sendMessage(m.chat, {
@@ -87,7 +90,7 @@ let handler = async (m, { conn }) => {
         mentions: [user]
     })
 
-    await conn.sendMessage(m.chat, { text: `👻 Saliendo en 3... PHANTOM cerrando sistema` })
+    await conn.sendMessage(m.chat, { text: `👻 Saliendo en 3... PHANTOM PLUS cerrando sistema` })
     await new Promise(r => setTimeout(r, 1000))
     await conn.sendMessage(m.chat, { text: `❄️ Saliendo en 2... Guardando sesión` })
     await new Promise(r => setTimeout(r, 1000))
