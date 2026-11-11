@@ -13,7 +13,7 @@ let handler = async (m, { conn, text }) => {
 
     if (!text) {
         await react('❌')
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ BUSCAR
 ꒰ ◞⁺⊹ ．${fecha}
@@ -22,20 +22,21 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ ¿Qué quieres buscar?
-👻 ➛ PHANTOM: dime que buscar pe
+👻 ➛ PHANTOM PLUS: dime que buscar pe
 
 ── *💡 EJEMPLO* ╏ ⛓️
 ➛.google phantom frost
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
     await react('❄️')
-    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ YOUTUBE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -45,11 +46,12 @@ let handler = async (m, { conn, text }) => {
 ── *📊 ESTADO* ╏ ❄️
 🔍 ➛ Buscando: *${text}*
 ⏳ ➛ Conectando al sistema...
-👻 ➛ PHANTOM buscando
+👻 ➛ PHANTOM PLUS buscando
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
 
     try {
@@ -58,7 +60,7 @@ let handler = async (m, { conn, text }) => {
 
         if (!results.length) {
             await react('❌')
-            let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+            let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐒𝐈𝐍 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ BUSCAR
 ꒰ ◞⁺⊹ ．${fecha}
@@ -67,16 +69,17 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ ❄️
 📭 ➛ No encontré resultados para: *${text}*
-❄️ ➛ PHANTOM: sin resultados
+❄️ ➛ PHANTOM PLUS: sin resultados
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
         }
 
-        let txt = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let txt = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ YOUTUBE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -99,15 +102,16 @@ ${results.map((v, i) => {
 ── *📋 INFORMACIÓN* ╏ ⛓️
 👤 ➛ Solicitado por: ${user}
 👥 ➛ Grupo: *${groupName}*
-👻 ➛ Buscado por PHANTOM
+👻 ➛ Buscado por PHANTOM PLUS
 
 ── *💡 TIP* ╏ ❄️
 ➛.ytmp4 + link
 ➛.ytmp3 + link
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: txt, mentions: [m.sender] }, { quoted: m })
@@ -116,7 +120,7 @@ ${results.map((v, i) => {
     } catch (e) {
         console.error(e)
         await react('❌')
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ BUSCAR
 ꒰ ◞⁺⊹ ．${fecha}
@@ -126,11 +130,12 @@ ${results.map((v, i) => {
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ No se pudo realizar la búsqueda
 🔧 ➛ Intenta más tarde
-❄️ ➛ PHANTOM falló buscando
+❄️ ➛ PHANTOM PLUS falló buscando
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
