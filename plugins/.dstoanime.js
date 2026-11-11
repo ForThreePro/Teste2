@@ -38,7 +38,7 @@ let handler = async (m, { conn, text, command }) => {
   let mime = (q.msg || q).mimetype || ''
 
   if (!/image/.test(mime) &&!link) {
-    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐈 ﹒ TOANIME
 ꒰ ◞⁺⊹ ．FROST MODE
@@ -50,8 +50,9 @@ let handler = async (m, { conn, text, command }) => {
 🦂 ➛ O manda *.${command} + link de imagen*
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━` }, { quoted: m })
   }
 
@@ -63,7 +64,7 @@ let handler = async (m, { conn, text, command }) => {
       link = await myCloud(media)
     }
 
-    await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐈 ﹒ CONVIRTIENDO
 
@@ -72,13 +73,14 @@ let handler = async (m, { conn, text, command }) => {
 👻 ➛ Espera un momento
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━` }, { quoted: m })
 
     const buf = await faaBuffer(`https://api-faa.my.id/faa/toanime?url=${encodeURIComponent(link)}`)
 
-    await conn.sendMessage(m.chat, { image: buf, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    await conn.sendMessage(m.chat, { image: buf, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐈 ﹒ ANIME LISTO
 
@@ -87,12 +89,13 @@ let handler = async (m, { conn, text, command }) => {
 💎 ➛ Peso: ${(buf.length/1024).toFixed(0)} KB
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━` }, { quoted: m })
 
   } catch (e) {
-    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐈 ﹒ ERROR
 
@@ -100,8 +103,9 @@ let handler = async (m, { conn, text, command }) => {
 ❌ ➛ ${e.message}
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━` }, { quoted: m })
   }
 }
