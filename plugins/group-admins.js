@@ -9,7 +9,7 @@ const handler = async (m, { conn, command }) => {
 
   if (!m.mentionedJid[0] &&!m.quoted) {
     await react('❌')
-    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐃𝐌𝐈𝐍𝐈𝐒𝐓𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ PROMOTE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -19,7 +19,7 @@ const handler = async (m, { conn, command }) => {
 ── *📖 USO* ╏ ❄️
 ➛ Menciona a un usuario
 ➛ Responde al mensaje del usuario
-👻 ➛ PHANTOM: menciona pe
+👻 ➛ PHANTOM PLUS: menciona pe
 
 ── *💡 EJEMPLOS* ╏ ⛓️
 ➛.promote @user
@@ -30,8 +30,9 @@ const handler = async (m, { conn, command }) => {
 👻 ➛ Solo los del sistema
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
   }
@@ -45,7 +46,7 @@ const handler = async (m, { conn, command }) => {
     await conn.groupParticipantsUpdate(m.chat, [user], action)
   } catch {
     await react('❌')
-    let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ ADMIN
 ꒰ ◞⁺⊹ ．${fecha}
@@ -55,17 +56,18 @@ const handler = async (m, { conn, command }) => {
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ No se pudo completar la acción
 🔒 ➛ Verifica permisos del bot
-👻 ➛ PHANTOM dice: el bot no es admin pe
+👻 ➛ PHANTOM PLUS dice: el bot no es admin pe
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: error }, { quoted: m })
   }
 
   let msgAccion = action === 'promote'
-? `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+? `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐏𝐑𝐎𝐌𝐎𝐕𝐈𝐃𝐎 ﹒ NUEVO ADMIN
 ꒰ ◞⁺⊹ ．${fecha}
@@ -75,13 +77,14 @@ const handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ ❄️
 ❄️ ➛ Nuevo Admin: @${user.split('@')[0]}
 👤 ➛ Por: @${m.sender.split('@')[0]}
-👻 ➛ PHANTOM aprobó al nuevo admin
+👻 ➛ PHANTOM PLUS aprobó al nuevo admin
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
-    : `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    : `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐆𝐑𝐀𝐃𝐀𝐃𝐎 ﹒ QUITAR ADMIN
 ꒰ ◞⁺⊹ ．${fecha}
@@ -91,11 +94,12 @@ const handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ ❄️
 🔴 ➛ Ya no es Admin: @${user.split('@')[0]}
 👤 ➛ Por: @${m.sender.split('@')[0]}
-👻 ➛ PHANTOM le quitó el poder
+👻 ➛ PHANTOM PLUS le quitó el poder
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
 
   await conn.sendMessage(m.chat, { text: msgAccion, mentions: [user, m.sender] }, { quoted: m })
