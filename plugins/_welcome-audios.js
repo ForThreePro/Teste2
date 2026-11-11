@@ -25,7 +25,7 @@ let handler = async (m, { conn, command }) => {
     await react('❄️')
 
     if (!m.quoted) {
-      let uso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+      let uso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐔𝐃𝐈𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -34,7 +34,7 @@ let handler = async (m, { conn, command }) => {
 
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ Debes responder a un audio
-👻 ➛ PHANTOM dice: responde al audio pe
+👻 ➛ PHANTOM PLUS dice: responde al audio pe
 
 ── *📖 USO* ╏ ⛓️
 ➛ Envía o reenvía un audio
@@ -44,21 +44,22 @@ let handler = async (m, { conn, command }) => {
 ➛ Manda un audio → responde → .${command}
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
     }
 
     if (!mime ||!/audio/.test(mime)) {
       await react('❌')
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Responde a un audio válido pe - PHANTOM quiere escuchar`, { quoted: m })
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Responde a un audio válido pe - PHANTOM PLUS quiere escuchar\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, { quoted: m })
     }
 
     let buffer = await q.download()
     chat[`audio${type}`] = buffer.toString('base64')
 
-    let ok = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let ok = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐆𝐔𝐀𝐑𝐃𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -68,11 +69,12 @@ let handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ ❄️
 ✅ ➛ Audio de *${type}* guardado
 🔊 ➛ Se reproducirá cuando alguien ${type === 'welcome'? 'entre' : type === 'bye'? 'salga' : 'sea kickeado'}
-👻 ➛ PHANTOM aprobó el audio
+👻 ➛ PHANTOM PLUS aprobó el audio
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   }
@@ -80,7 +82,7 @@ let handler = async (m, { conn, command }) => {
   if (command.startsWith('delaudio')) {
     await react('🗑️')
     if (!chat[`audio${type}`]) {
-      let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+      let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐍𝐎 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -89,17 +91,18 @@ let handler = async (m, { conn, command }) => {
 
 ── *📝 AVISO* ╏ ❄️
 📭 ➛ No hay un audio de *${type}* configurado
-❄️ ➛ PHANTOM dice: no hay nada que borrar
+❄️ ➛ PHANTOM PLUS dice: no hay nada que borrar
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
     }
 
     delete chat[`audio${type}`]
-    let del = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let del = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -109,11 +112,12 @@ let handler = async (m, { conn, command }) => {
 ── *📊 INFORMACIÓN* ╏ ❄️
 🗑️ ➛ Audio de *${type}* eliminado
 ✅ ➛ Ya no se reproducirá
-👻 ➛ PHANTOM lo borró
+👻 ➛ PHANTOM PLUS lo borró
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: del }, { quoted: m })
   }
