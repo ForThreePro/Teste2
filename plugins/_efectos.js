@@ -11,7 +11,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     let mime = (q.msg || q).mimetype || ''
 
     if (!q.msg?.audioMessage && !q.msg?.pttMessage && !/audio/.test(mime)) {
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐔𝐃𝐈𝐎 ﹒ EFECTOS
 ꒰ ◞⁺⊹ ．${fecha}
@@ -29,8 +29,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 🎧 ➛ agudo, vibrato
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
     }
 
@@ -57,7 +58,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
         let audio = await q.download()
-        if (!audio) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Audio no disponible, reenvíalo pe\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`)
+        if (!audio) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Audio no disponible, reenvíalo pe\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
 
         let tmp = tmpdir()
         let name = Date.now()
@@ -87,7 +88,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     } catch (e) {
         console.log(e)
-        m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Error PHANTOM: ${e.message.slice(0,400)}\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`)
+        m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Error PHANTOM PLUS: ${e.message.slice(0,400)}\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
 }
 
