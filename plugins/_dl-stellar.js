@@ -22,21 +22,21 @@ let handler = async (m, { conn, command }) => {
     text = text.replace(`.${command}`, '').trim()
 
     if (!text) {
-        return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ DESCARGAS
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢𝗦 ׅ 𝆬 ָ֢ ෆ
 📥 ࣪ ꕀ.descargas ˚. ᵎᵎ
-> *"Descargando con el sistema PHANTOM"*
+> *"Descargando con el sistema PHANTOM PLUS"*
 
-.⃟𖥔 ݁. 𖦹˙— \`\`USO PHANTOM\`\` 📥 —˙𖦹.꒷
+.⃟𖥔 ݁. 𖦹˙— \`\`USO PHANTOM PLUS\`\` 📥 —˙𖦹.꒷
 
 ── *📝 COMANDOS* ╏ ❄️
 1️⃣ ➛.*play1* <nombre de canción>
    🎵 ➛ Descarga audio de YouTube MP3
-   👻 ➛ PHANTOM pone la música
+   👻 ➛ PHANTOM PLUS pone la música
 
 2️⃣ ➛.*ttmp3* <link de tiktok>
    🎵 ➛ Descarga audio de TikTok MP3
@@ -44,7 +44,7 @@ let handler = async (m, { conn, command }) => {
 
 3️⃣ ➛.*fb* <link de facebook>
    📹 ➛ Descarga video de Facebook
-   ❄️ ➛ Descarga rápida PHANTOM
+   ❄️ ➛ Descarga rápida PHANTOM PLUS
 
 ── *💡 EJEMPLOS* ╏ ⛓️
 ➛.*play1* despacito
@@ -52,8 +52,9 @@ let handler = async (m, { conn, command }) => {
 ➛.*fb* https://facebook.com/watch?v=xxx
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`, mentions: [ownerNum + '@s.whatsapp.net'] }, { quoted: m })
@@ -62,7 +63,7 @@ let handler = async (m, { conn, command }) => {
     await react(conn, m, '❄️')
     try {
         if (command === 'play1') {
-            await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+            await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐍𝐃𝐎 ﹒ PLAY1
 ꒰ ◞⁺⊹ ．${fecha}
@@ -72,22 +73,32 @@ let handler = async (m, { conn, command }) => {
 ── *📊 ESTADO* ╏ ❄️
 🔍 ➛ Buscando canción...
 ⬇️ ➛ Descargando audio MP3...
-👻 ➛ PHANTOM eligiendo tema...
+👻 ➛ PHANTOM PLUS eligiendo tema...
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
             const searchResult = await ytsearch(text)
             if (!searchResult.videos.length) throw new Error("No se encontró la canción.")
             const video = searchResult.videos[0]
 
             const apiUrl = `${api.url}/dl/ytmp3?url=${encodeURIComponent(video.url)}&key=${api.key}`
-            const resDl = await fetch(apiUrl).then(r => r.json())
-            const dl = resDl?.data?.dl || resDl?.data?.download
-            if (!dl) throw new Error('No se pudo descargar el audio de YT')
+            // FIX: la API a veces devuelve JSON, a veces el MP3 directo
+            const resDl = await fetch(apiUrl)
+            const ctDl = resDl.headers.get('content-type') || ''
+            let audioBuffer
+            if (ctDl.includes('application/json')) {
+                const j = await resDl.json()
+                const dl = j?.data?.dl || j?.data?.download || j?.result?.dl || j?.result?.url || j?.dl || j?.url
+                if (!dl) throw new Error('No se pudo descargar el audio de YT')
+                audioBuffer = await getBuffer(dl)
+            } else {
+                audioBuffer = Buffer.from(await resDl.arrayBuffer())
+            }
+            if (!audioBuffer || audioBuffer.length < 1000) throw new Error('Audio vacío de la API')
 
-            const audioBuffer = await getBuffer(dl)
             await react(conn, m, '⚡')
             await conn.sendMessage(m.chat, {
                 audio: audioBuffer,
@@ -97,7 +108,7 @@ let handler = async (m, { conn, command }) => {
         }
 
         if (command === 'ttmp3') {
-            await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+            await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐍𝐃𝐎 ﹒ TTMP3
 ꒰ ◞⁺⊹ ．${fecha}
@@ -109,8 +120,9 @@ let handler = async (m, { conn, command }) => {
 ⚡ ➛ Extrayendo audio...
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
             const apiUrl = `${api.url}/dl/tiktokmp3?url=${encodeURIComponent(text)}&key=${api.key}`
             const res = await fetch(apiUrl).then(r => r.json())
@@ -129,7 +141,7 @@ let handler = async (m, { conn, command }) => {
         }
 
         if (command === 'fb' || command === 'facebook') {
-            await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+            await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐍𝐃𝐎 ﹒ FACEBOOK
 ꒰ ◞⁺⊹ ．${fecha}
@@ -138,11 +150,12 @@ let handler = async (m, { conn, command }) => {
 
 ── *📊 ESTADO* ╏ ❄️
 ⬇️ ➛ Descargando video de Facebook...
-👻 ➛ PHANTOM procesando video
+👻 ➛ PHANTOM PLUS procesando video
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
             const apiUrl = `${api.url}/dl/facebook?url=${encodeURIComponent(text)}&key=${api.key}`
             const res = await fetch(apiUrl)
@@ -160,7 +173,7 @@ let handler = async (m, { conn, command }) => {
             await react(conn, m, '⚡')
             await conn.sendMessage(m.chat, {
                 video: videoBuffer,
-                caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+                caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ FACEBOOK
 
@@ -169,11 +182,12 @@ let handler = async (m, { conn, command }) => {
 ── *📊 RESULTADO* ╏ ❄️
 ✅ ➛ Video descargado correctamente
 📥 ➛ Disfrútalo
-👻 ➛ PHANTOM lo aprueba
+👻 ➛ PHANTOM PLUS lo aprueba
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
             }, { quoted: m })
         }
@@ -183,7 +197,7 @@ let handler = async (m, { conn, command }) => {
         await react(conn, m, '❌')
         const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
         console.log("ERROR:", e)
-        return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ ${command.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -192,7 +206,7 @@ let handler = async (m, { conn, command }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ ❄️
 ❌ ➛ ${e.message}
-⚡ ➛ PHANTOM no pudo completar la descarga
+⚡ ➛ PHANTOM PLUS no pudo completar la descarga
 
 ── *💡 SOLUCIÓN* ╏ ⛓️
 🔧 ➛ Verifica que el link sea válido
@@ -200,8 +214,9 @@ let handler = async (m, { conn, command }) => {
 ❄️ ➛ Intenta de nuevo
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━` }, { quoted: m })
     }
 }
