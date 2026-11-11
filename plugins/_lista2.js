@@ -25,7 +25,7 @@ let handler = async (m, { conn }) => {
 
     if (total === 0) {
         await react('📭')
-        let vacia = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let vacia = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐁𝐎𝐑𝐑𝐀𝐑 𝐋𝐈𝐒𝐓𝐀 ﹒ LISTA
 ꒰ ◞⁺⊹ ．${fecha}
@@ -35,11 +35,12 @@ let handler = async (m, { conn }) => {
 ── *📝 AVISO* ╏ ❄️
 📭 ➛ La lista de este grupo ya está vacía
 📭 ➛ No hay registros para borrar
-❄️ ➛ PHANTOM: "No hay registros para borrar"
+❄️ ➛ PHANTOM PLUS: "No hay registros para borrar"
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: vacia }, { quoted: m })
     }
@@ -47,7 +48,7 @@ let handler = async (m, { conn }) => {
     await react('🗑️')
     fs.writeFileSync(db, JSON.stringify([]))
 
-    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐁𝐎𝐑𝐑𝐀𝐃𝐎 ﹒ LISTA
 ꒰ ◞⁺⊹ ．${fecha} ${hora}
@@ -58,17 +59,18 @@ let handler = async (m, { conn }) => {
 🗑️ ➛ Se eliminaron: *${total}* registro${total > 1 ? 's' : ''}
 📅 ➛ Rango: *Lunes a Sábado*
 ⏰ ➛ Hora: *${hora}*
-👻 ➛ PHANTOM eliminó la lista
+👻 ➛ PHANTOM PLUS eliminó la lista
 
 ── *📦 ESTADO* ╏ ⛓️
 ✅ ➛ Lista de este grupo reiniciada
 ❄️ ➛ Lista limpia como sistema nuevo
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━
-*Admin*: Comando ejecutado por PHANTOM
+*Admin*: Comando ejecutado por PHANTOM PLUS
 ━━━━━━━━━━━`
 
     return conn.sendMessage(m.chat, { text: texto }, { quoted: m })
