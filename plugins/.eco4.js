@@ -11,16 +11,16 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
   //.PRESTAMO - INTERÉS FIJO 25% UNA SOLA VEZ
   if (command === 'prestamo') {
-    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ Paga primero, PHANTOM no presta con deuda\n\n${usedPrefix}work o ${usedPrefix}pagardeuda\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
-    if (user.prestamo > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 Ya tienes préstamo activo\n💰 Capital: ${user.prestamo - user.interes} monedas\n📈 Interés: ${user.interes} monedas\n💵 *Total: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto>\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ Paga primero, PHANTOM PLUS no presta con deuda\n\n${usedPrefix}work o ${usedPrefix}pagardeuda\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
+    if (user.prestamo > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 Ya tienes préstamo activo\n💰 Capital: ${user.prestamo - user.interes} monedas\n📈 Interés: ${user.interes} monedas\n💵 *Total: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto>\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
 
     let monto = parseInt(text)
-    if (isNaN(monto) || monto < 100) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n⤷ ┇ 𝐁𝐀𝐍𝐂𝐎 ﹒ 𝐏𝐑𝐄𝐒𝐓𝐀𝐌𝐎\n\n🏦 *PRÉSTAMO BANCARIO PHANTOM* 🏦\n> *"Te presto pero el sistema cobra"*\n\nMínimo: 100 monedas\nMáximo: 10,000 monedas\nInterés: 25% fijo\n\nEj:\n100 → Pagas 125\n200 → Pagas 250\n500 → Pagas 625\n1000 → Pagas 1250\n\nUso: ${usedPrefix}prestamo <monto>\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
-    if (monto > 10000) return m.reply('❄️ Máximo 10,000 monedas, ni PHANTOM presta más ⚡')
+    if (isNaN(monto) || monto < 100) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n⤷ ┇ 𝐁𝐀𝐍𝐂𝐎 ﹒ 𝐏𝐑𝐄𝐒𝐓𝐀𝐌𝐎\n\n🏦 *PRÉSTAMO BANCARIO PHANTOM PLUS* 🏦\n> *"Te presto pero el sistema cobra"*\n\nMínimo: 100 monedas\nMáximo: 10,000 monedas\nInterés: 25% fijo\n\nEj:\n100 → Pagas 125\n200 → Pagas 250\n500 → Pagas 625\n1000 → Pagas 1250\n\nUso: ${usedPrefix}prestamo <monto>\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
+    if (monto > 10000) return m.reply('❄️ Máximo 10,000 monedas, ni PHANTOM PLUS presta más ⚡')
 
     let totalRiqueza = user.coin + user.bank
     let limitePrestamo = Math.max(100, totalRiqueza * 2)
-    if (monto > limitePrestamo) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 Solo te presto hasta *${limitePrestamo} monedas* según tu riqueza\n💎 Total: ${totalRiqueza} 🪙\n⛓️ PHANTOM no se fía mucho\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (monto > limitePrestamo) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 Solo te presto hasta *${limitePrestamo} monedas* según tu riqueza\n💎 Total: ${totalRiqueza} 🪙\n⛓️ PHANTOM PLUS no se fía mucho\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
 
     let interesFijo = Math.floor(monto * 0.25)
     let totalPagar = monto + interesFijo
@@ -28,35 +28,35 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     user.interes = interesFijo
     user.bank += monto
 
-    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 *¡PRÉSTAMO APROBADO!* 🏦\n👻 PHANTOM liberó los fondos\n\n💰 Recibiste: *${monto} monedas* en tu banco\n📈 Interés: ${interesFijo} monedas (25%)\n💵 *Total a pagar: ${totalPagar} monedas*\n\n⚠️ Paga con ${usedPrefix}pagarprestamo <monto>\n\nBanco: ${user.bank} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 *¡PRÉSTAMO APROBADO!* 🏦\n👻 PHANTOM PLUS liberó los fondos\n\n💰 Recibiste: *${monto} monedas* en tu banco\n📈 Interés: ${interesFijo} monedas (25%)\n💵 *Total a pagar: ${totalPagar} monedas*\n\n⚠️ Paga con ${usedPrefix}pagarprestamo <monto>\n\nBanco: ${user.bank} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
   }
 
   //.PAGARPRESTAMO
   if (['pagarprestamo', 'pp'].includes(command)) {
-    if (user.prestamo === 0) return m.reply('❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ Sin préstamos, PHANTOM orgulloso 👻\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369')
+    if (user.prestamo === 0) return m.reply('❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ Sin préstamos, PHANTOM PLUS orgulloso 👻\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━')
     let monto = parseInt(text)
-    if (isNaN(monto) || monto < 1) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 *TU PRÉSTAMO*\n💰 Capital: ${user.prestamo - user.interes}\n📈 Interés: ${user.interes}\n💵 *Total: ${user.prestamo}*\n\nUso: ${usedPrefix}pagarprestamo <monto>\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (isNaN(monto) || monto < 1) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 *TU PRÉSTAMO*\n💰 Capital: ${user.prestamo - user.interes}\n📈 Interés: ${user.interes}\n💵 *Total: ${user.prestamo}*\n\nUso: ${usedPrefix}pagarprestamo <monto>\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     if (user.coin < monto) return m.reply(`❄️ Billetera: ${user.coin} 🪙\n💵 Deuda: ${user.prestamo} 🪙\n⛓️ No alcanza`)
     let aPagar = Math.min(monto, user.prestamo)
     user.coin -= aPagar
     user.prestamo -= aPagar
     if (user.prestamo === 0) {
       user.interes = 0
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ *¡PRÉSTAMO PAGADO!* ✅\n💎 Pagaste ${aPagar} monedas\n👻 PHANTOM: "Por fin, sistema libre"\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ *¡PRÉSTAMO PAGADO!* ✅\n💎 Pagaste ${aPagar} monedas\n👻 PHANTOM PLUS: "Por fin, sistema libre"\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     } else {
       let capitalOriginal = user.prestamo + aPagar - user.interes
       let interesOriginal = user.interes
       let porcentajePagado = aPagar / (capitalOriginal + interesOriginal)
       user.interes = Math.max(0, Math.floor(interesOriginal * (1 - porcentajePagado)))
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💸 Pagaste ${aPagar} monedas\n\n🏦 *RESTANTE*\n💰 Capital: ${user.prestamo - user.interes}\n📈 Interés: ${user.interes}\n💵 *Total: ${user.prestamo}*\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💸 Pagaste ${aPagar} monedas\n\n🏦 *RESTANTE*\n💰 Capital: ${user.prestamo - user.interes}\n📈 Interés: ${user.interes}\n💵 *Total: ${user.prestamo}*\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
   }
 
   //.VER PRESTAMO
   if (['verprestamo', 'miprestamo'].includes(command)) {
-    if (user.prestamo === 0) return m.reply('❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ Sin préstamos\n⚡ Usa ' + usedPrefix + 'prestamo <monto> para pedir\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369')
+    if (user.prestamo === 0) return m.reply('❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ Sin préstamos\n⚡ Usa ' + usedPrefix + 'prestamo <monto> para pedir\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━')
     let capital = user.prestamo - user.interes
-    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 *TU PRÉSTAMO PHANTOM* 🏦\n💰 Capital: ${capital} monedas\n📈 Interés: ${user.interes} monedas (25%)\n💵 *TOTAL: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto> ⚡\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 *TU PRÉSTAMO PHANTOM PLUS* 🏦\n💰 Capital: ${capital} monedas\n📈 Interés: ${user.interes} monedas (25%)\n💵 *TOTAL: ${user.prestamo} monedas*\n\nUsa ${usedPrefix}pagarprestamo <monto> ⚡\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
   }
 
   //.INTERES
@@ -68,49 +68,49 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       let falta = tiempoEspera - (ahora - ultimoInteres)
       let horas = Math.floor(falta / 3600000)
       let minutos = Math.floor((falta % 3600000) / 60000)
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⏰ Ya cobraste hoy, PHANTOM en reposo\n⏳ Vuelve en: ${horas}h ${minutos}m ❄️\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⏰ Ya cobraste hoy, PHANTOM PLUS en reposo\n⏳ Vuelve en: ${horas}h ${minutos}m ❄️\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
     if (user.bank === 0) return m.reply('❄️ Sin monedas en el banco... ¡Bóveda vacía! 💎\nUsa ' + usedPrefix + 'dall para depositar')
     let interesGanado = Math.floor(user.bank * 0.02)
     if (interesGanado < 1) interesGanado = 1
     user.bank += interesGanado
     user.ultimoInteres = ahora
-    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 *INTERÉS PHANTOM* 🏦\n👻 Ganaste: *${interesGanado} monedas* (2%)\n💎 Tu banco genera solo\n\nBanco: ${user.bank} 🪙\n\nVuelve mañana 💰\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 *INTERÉS PHANTOM PLUS* 🏦\n👻 Ganaste: *${interesGanado} monedas* (2%)\n💎 Tu banco genera solo\n\nBanco: ${user.bank} 🪙\n\nVuelve mañana 💰\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
   }
 
   //.CRIMEN
   if (command === 'crimen') {
-    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ Paga primero, no puedes hacer crimen con deuda\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+    if (user.deuda > 0) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 Deuda de ${user.deuda} 🪙\n⛓️ Paga primero, no puedes hacer crimen con deuda\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     let ahora = Date.now()
     let tiempoEspera = 600000
     if (ahora - user.ultimoCrimen < tiempoEspera) {
       let falta = tiempoEspera - (ahora - user.ultimoCrimen)
       let minutos = Math.ceil(falta / 60000)
-      return m.reply(`🚨 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n👮 El sistema te vigila\n⏳ Espera ${minutos} min para otro crimen ❄️`)
+      return m.reply(`🚨 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n👮 El sistema te vigila\n⏳ Espera ${minutos} min para otro crimen ❄️\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     }
     user.ultimoCrimen = ahora
     let exito = Math.random() < 0.35
     if (exito) {
       let robado = Math.floor(Math.random() * 500) + 100
       user.coin += robado
-      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🦹 *¡CRIMEN EXITOSO!* 🦹\n💎 Robaste *${robado} monedas* del banco central\n👀 Nadie vio nada, PHANTOM te cubrió\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+      return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🦹 *¡CRIMEN EXITOSO!* 🦹\n💎 Robaste *${robado} monedas* del banco central\n👀 Nadie vio nada, PHANTOM PLUS te cubrió\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
     } else {
       let multa = Math.floor(Math.random() * 200) + 100
       if (user.coin < multa) {
         let deudaNueva = multa - user.coin
         user.deuda += deudaNueva
         user.coin = 0
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 *¡TE ATRAPARON!* 🚔\n💀 Intentaste robar el banco pero fallaste\n\n💸 Multa: ${multa} monedas\n💔 *DEUDA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}work para pagar\n\nSaldo: 0 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 *¡TE ATRAPARON!* 🚔\n💀 Intentaste robar el banco pero fallaste\n\n💸 Multa: ${multa} monedas\n💔 *DEUDA*: ${user.deuda} monedas\n\nUsa ${usedPrefix}work para pagar\n\nSaldo: 0 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
       } else {
         user.coin -= multa
-        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚔 *¡TE ATRAPARON!* 🚔\n🔔 La alarma sonó\n\n💸 Multa: *${multa} monedas*\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`)
+        return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚔 *¡TE ATRAPARON!* 🚔\n🔔 La alarma sonó\n\n💸 Multa: *${multa} monedas*\n\nSaldo: ${user.coin} 🪙\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`)
       }
     }
   }
 
   //.BANCO
   if (command === 'banco') {
-    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n⤷ ┇ 𝐁𝐀𝐍𝐂𝐎 ﹒ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋\n꒰ ◞⁺⊹ ．FROST MODE\n> *"La bóveda central PHANTOM"*\n\n`
+    let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n⤷ ┇ 𝐁𝐀𝐍𝐂𝐎 ﹒ 𝐂𝐄𝐍𝐓𝐑𝐀𝐋\n꒰ ◞⁺⊹ ．FROST MODE\n> *"La bóveda central PHANTOM PLUS"*\n\n`
     texto += `💰 Banco: ${user.bank} monedas\n`
     texto += `💵 Billetera: ${user.coin} monedas\n`
     texto += `🚔 Deuda: ${user.deuda} monedas\n\n`
@@ -118,15 +118,15 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       let capital = user.prestamo - user.interes
       texto += `📊 *TU PRÉSTAMO* ⚡\n💰 Capital: ${capital}\n📈 Interés: ${user.interes}\n💵 Total: ${user.prestamo}\n\n`
     } else {
-      texto += `✅ Sin préstamos - PHANTOM tranquilo 👻\n\n`
+      texto += `✅ Sin préstamos - PHANTOM PLUS tranquilo 👻\n\n`
     }
-    texto += `📈 *SERVICIOS PHANTOM* ╏ ❄️\n`
+    texto += `📈 *SERVICIOS PHANTOM PLUS* ╏ ❄️\n`
     texto += `• ${usedPrefix}interes - Cobra 2% diario 💎\n`
     texto += `• ${usedPrefix}prestamo <monto> - Préstamo 25% 🏦\n`
     texto += `• ${usedPrefix}pagarprestamo <monto> - Paga deuda 💸\n`
     texto += `• ${usedPrefix}crimen - Roba el banco (35%) 🦹\n\n`
     texto += `💡 Tip: ${usedPrefix}dall para ganar interés\n\n`
-    texto += `━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`
+    texto += `━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
     return m.reply(texto)
   }
 
@@ -138,7 +138,7 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
       let groupMetadata = await conn.groupMetadata(m.chat)
       isAdmin = groupMetadata.participants.find(p => p.id === m.sender)?.admin
     } catch {}
-    if (!isOwner &&!isAdmin) return m.reply('❌ Solo admins, ni PHANTOM puede perdonar sin permiso ❄️')
+    if (!isOwner &&!isAdmin) return m.reply('❌ Solo admins, ni PHANTOM PLUS puede perdonar sin permiso ❄️')
     let who = m.mentionedJid[0]
     if (!who) return m.reply(`❄️ Uso: ${usedPrefix}perdonarprestamo @user ⚡`)
     who = who.replace(/@lid$/, '@s.whatsapp.net')
@@ -150,9 +150,9 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
     userTarget.prestamo = 0
     userTarget.interes = 0
     try {
-      await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🏦 *¡PRÉSTAMO PERDONADO!* 🏦\n👻 Un admin te perdonó *${deudaPerdonada} monedas*\n💎 PHANTOM: "Hoy es tu día de suerte"\n\nYa no debes nada ✅\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, null, { mentions: [m.sender] })
+      await conn.reply(who, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🏦 *¡PRÉSTAMO PERDONADO!* 🏦\n👻 Un admin te perdonó *${deudaPerdonada} monedas*\n💎 PHANTOM PLUS: "Hoy es tu día de suerte"\n\nYa no debes nada ✅\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, null, { mentions: [m.sender] })
     } catch {}
-    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n✅ *¡PRÉSTAMO PERDONADO!* ✅\n💎 Le perdonaste *${deudaPerdonada} monedas* a @${who.split('@')[0]}\n\nYa no tiene deuda 👻\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, null, { mentions: [who] })
+    return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n✅ *¡PRÉSTAMO PERDONADO!* ✅\n💎 Le perdonaste *${deudaPerdonada} monedas* a @${who.split('@')[0]}\n\nYa no tiene deuda 👻\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, null, { mentions: [who] })
   }
 }
 
