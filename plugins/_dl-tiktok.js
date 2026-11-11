@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import { generateWAMessageFromContent, generateWAMessageContent, proto } from '@whiskeysockets/baileys'
 import moment from 'moment-timezone'
 moment.locale('es')
 
@@ -12,21 +11,21 @@ var handler = async (m, { conn, args }) => {
   const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
   if (!args[0]) {
-    let menuUso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let menuUso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 ﹒ TIKTOK
 ꒰ ◞⁺⊹ ．${fecha}
 
   ꒱ ׁ. ᘏ 𝗖𝗢𝗠𝗔𝗡𝗗𝗢 ׅ 𝆬 ָ֢ ෆ
 📱 ࣪ ꕀ.tiktok ˚. ᵎᵎ
-> *"Bajando videos con el sistema PHANTOM"*
+> *"Bajando videos con el sistema PHANTOM PLUS"*
 
 .⃟𖥔 ݁. 𖦹˙— \`\`DESCARGAS\`\` 📥 —˙𖦹.꒷
 
 ── *📝 DESCRIPCIÓN* ╏ ❄️
 📱 ➛ Descarga videos de TikTok sin marca de agua
 📱 ➛ Con botones interactivos
-👻 ➛ PHANTOM procesando TikTok
+👻 ➛ PHANTOM PLUS procesando TikTok
 
 ── *📖 USO* ╏ ⛓️
 ➛.*tiktok* <link de tiktok>
@@ -41,8 +40,9 @@ var handler = async (m, { conn, args }) => {
 📱 ➛ www.tiktok.com
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
@@ -52,7 +52,7 @@ var handler = async (m, { conn, args }) => {
   const url = args[0]
   if (!url.match(/(https?:\/\/)?(www\.)?(vm\.|vt\.|www\.)?tiktok\.com\//)) {
     await react(conn, m, '❌')
-    let menuError = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let menuError = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK
 ꒰ ◞⁺⊹ ．${fecha}
@@ -61,21 +61,22 @@ var handler = async (m, { conn, args }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ ❄️
 ❌ ➛ El enlace no es válido
-👻 ➛ PHANTOM: "Eso no es TikTok"
+👻 ➛ PHANTOM PLUS: "Eso no es TikTok"
 
 ── *📖 USO* ╏ ⛓️
 ➛ Solo links de: *tiktok.com*
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuError }, { quoted: m })
   }
 
   try {
     await react(conn, m, "❄️")
-    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐏𝐑𝐎𝐂𝐄𝐒𝐀𝐍𝐃𝐎 ﹒ TIKTOK
 ꒰ ◞⁺⊹ ．${fecha}
@@ -86,11 +87,12 @@ var handler = async (m, { conn, args }) => {
 🔍 ➛ Analizando link...
 📥 ➛ Obteniendo video HD...
 ⬇️ ➛ Preparando descarga sin marca...
-👻 ➛ PHANTOM buscando el video...
+👻 ➛ PHANTOM PLUS buscando el video...
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
 
     const tiktokData = await tiktokdl(url)
@@ -102,24 +104,8 @@ var handler = async (m, { conn, args }) => {
     const likes = formatNum(tiktokData.data.digg_count)
     const comments = formatNum(tiktokData.data.comment_count)
 
-    const businessHeader = {
-      key: { remoteJid: m.chat, participant: '0@s.whatsapp.net', fromMe: false },
-      message: {
-        locationMessage: {
-          name: `❄️ PHANTOM IA - FROST MODE ⚡`,
-          jpegThumbnail: Buffer.from(await (await fetch('https://files.catbox.moe/dsgmid.jpg')).arrayBuffer())
-        }
-      }
-    }
-
-    const media = await generateWAMessageContent({ video: { url: videoURL } }, { upload: conn.waUploadToServer, jid: m.chat })
-
-    const msg = generateWAMessageFromContent(m.chat, {
-      viewOnceMessage: {
-        message: {
-          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-            body: {
-              text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    // FIX: video normal, sin viewOnce ni interactive, así WhatsApp sí lo muestra
+    let caption = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐂𝐎𝐌𝐏𝐋𝐄𝐓𝐀𝐃𝐎 ﹒ TIKTOK
 ꒰ ◞⁺⊹ ．${fecha}
@@ -131,32 +117,32 @@ var handler = async (m, { conn, args }) => {
 👤 ➛ Autor: *@${author}*
 ❤️ ➛ Likes: *${likes}*
 💬 ➛ Comentarios: *${comments}*
-👻 ➛ PHANTOM le dio like
+👻 ➛ PHANTOM PLUS le dio like
 
 ── *📥 DESCARGA* ╏ ⛓️
 ⬇️ ➛ Video sin marca de agua
-❄️ ➛ Listo para ver`
-            },
-            footer: { text: 'Sin marca de agua ✨ | PHANTOM IA - FROST MODE ❄️' },
-            header: { hasMediaAttachment: true, videoMessage: media.videoMessage },
-            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-              buttons: [
-                { name: 'cta_copy', buttonParamsJson: JSON.stringify({ display_text: '📋 Copiar texto', copy_code: title }) },
-                { name: 'cta_url', buttonParamsJson: JSON.stringify({ display_text: '📱 Ver en TikTok', url: url }) }
-              ]
-            })
-          })
-        }
-      }
-    }, { quoted: businessHeader })
+❄️ ➛ Listo para ver
 
-    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+━━━━━━━━━━━
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
+🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
+━━━━━━━━━━━
+🔗 ${url}`
+
+    await conn.sendMessage(m.chat, {
+      video: { url: videoURL },
+      caption: caption,
+      mimetype: 'video/mp4',
+      fileName: 'PHANTOM_PLUS_TIKTOK.mp4'
+    }, { quoted: m })
+
     await react(conn, m, "❄️")
 
   } catch (error) {
     await react(conn, m, "❌")
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    let menuErr = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let menuErr = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ TIKTOK
 ꒰ ◞⁺⊹ ．${fecha}
@@ -165,16 +151,17 @@ var handler = async (m, { conn, args }) => {
 
 ── *📝 DESCRIPCIÓN* ╏ ❄️
 ❌ ➛ ${error.message}
-⚡ ➛ PHANTOM no pudo procesarlo
+⚡ ➛ PHANTOM PLUS no pudo procesarlo
 
 ── *💡 SOLUCIÓN* ╏ ⛓️
 🔧 ➛ Verifica que el video sea público
 🔧 ➛ Intenta con otro link
-❄️ ➛ PHANTOM dice: prueba otra vez
+❄️ ➛ PHANTOM PLUS dice: prueba otra vez
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: menuErr }, { quoted: m })
   }
