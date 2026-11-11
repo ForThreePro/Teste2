@@ -57,27 +57,27 @@ let handler = async (m, { conn, participants }) => {
         let apiUrl = `https://api.stellarwa.xyz/generate/horny?avatar=${encodeURIComponent(pp)}&key=${key}`
         try {
             await react('❄️')
-            await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ ┇ 𝐇𝐎𝐑𝐍𝐘 ﹒ HORNY\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` 😏 —˙𖦹.꒷\n\n👻 ➛ Generando... PHANTOM mirando 👀`, mentions: [who] })
+            await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ ┇ 𝐇𝐎𝐑𝐍𝐘 ﹒ HORNY\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` 😏 —˙𖦹.꒷\n\n👻 ➛ Generando... PHANTOM PLUS mirando 👀`, mentions: [who] })
             let res = await stellarFetch(apiUrl)
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🔥 @${getMention(who)}\n\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🔥 @${getMention(who)}\n\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Error 500: La API falló. Intenta de nuevo`)
+            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Error 500: La API falló. Intenta de nuevo`)
         }
     }
 
     // ===== SHIP =====
     if (m.text?.includes('ship')) {
-        if (!m.isGroup) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Solo grupos pe, como PHANTOM solo en grupo`)
+        if (!m.isGroup) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Solo grupos pe, como PHANTOM PLUS solo en grupo`)
         let members = participants.map(u => toJid(u.id))
         let user1, user2
         if (m.mentionedJid.length >= 2) { user1 = toJid(m.mentionedJid[0]); user2 = toJid(m.mentionedJid[1]) }
         else { user1 = members[Math.floor(Math.random() * members.length)]; user2 = members[Math.floor(Math.random() * members.length)]; while(user1 === user2) user2 = members[Math.floor(Math.random() * members.length)] }
 
         await react('💘')
-        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ ┇ 𝐒𝐇𝐈𝐏 ﹒ SHIP\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` 💘 —˙𖦹.꒷\n\n👻 ➛ Calculando amor... PHANTOM shippea ❄️`, mentions: [user1, user2] })
+        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ ┇ 𝐒𝐇𝐈𝐏 ﹒ SHIP\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`CALCULANDO\`\` 💘 —˙𖦹.꒷\n\n👻 ➛ Calculando amor... PHANTOM PLUS shippea ❄️`, mentions: [user1, user2] })
         try {
             let avatar1 = await getAvatar(user1); let avatar2 = await getAvatar(user2)
             let apiUrl = `https://api.stellarwa.xyz/generate/ship?avatar1=${encodeURIComponent(avatar1)}&avatar2=${encodeURIComponent(avatar2)}&background=${encodeURIComponent(defaultBg)}&key=${key}`
@@ -85,10 +85,10 @@ let handler = async (m, { conn, participants }) => {
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
             let porcentaje = Math.floor(Math.random() * 101)
-            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n💘 ${porcentaje}% - PHANTOM dice: ${porcentaje > 70? 'almas gemelas PHANTOM' : 'mejor amigos FROST'}\n\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, mentions: [user1, user2] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n💘 ${porcentaje}% - PHANTOM PLUS dice: ${porcentaje > 70? 'almas gemelas PHANTOM PLUS' : 'mejor amigos FROST'}\n\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico`, mentions: [user1, user2] })
         } catch (e) {
             await react('❌')
-            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Error 500: La API falló`)
+            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Error 500: La API falló`)
         }
     }
 
@@ -100,15 +100,15 @@ let handler = async (m, { conn, participants }) => {
         let apiUrl = `https://api.stellarwa.xyz/generate/security?avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&createdTimestamp=${createdTimestamp}&key=${key}`
 
         await react('🔍')
-        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ ┇ 𝐒𝐄 𝐁𝐔𝐒𝐂𝐀 ﹒ SECURITY\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` 🚨 —˙𖦹.꒷\n\n👻 ➛ Generando... Se robó el sistema 🚨`, mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ ┇ 𝐒𝐄 𝐁𝐔𝐒𝐂𝐀 ﹒ SECURITY\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`BUSCANDO\`\` 🚨 —˙𖦹.꒷\n\n👻 ➛ Generando... Se robó el sistema 🚨`, mentions: [who] })
         try {
             let res = await stellarFetch(apiUrl)
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n🚨 @${getMention(who)} - Buscado por hackear el sistema PHANTOM\n\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n🚨 @${getMention(who)} - Buscado por hackear el sistema PHANTOM PLUS\n\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Error 500: ${e.message}`)
+            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Error 500: ${e.message}`)
         }
     }
 
@@ -124,15 +124,15 @@ let handler = async (m, { conn, participants }) => {
         let apiUrl = `https://api.stellarwa.xyz/generate/rank2?username=${encodeURIComponent(name)}&avatar=${encodeURIComponent(pp)}&background=${encodeURIComponent(defaultBg)}&level=${level}&rank=${rank}&currxp=${currxp}&needxp=${needxp}&key=${key}`
 
         await react('📊')
-        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ ┇ 𝐑𝐀𝐍𝐊 ﹒ TARJETA\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` 📊 —˙𖦹.꒷\n\n👻 ➛ Generando nivel... Nivel PHANTOM ❄️`, mentions: [who] })
+        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ ┇ 𝐑𝐀𝐍𝐊 ﹒ TARJETA\n꒰ ◞⁺⊹ ．${fecha}\n\n.⃟𖥔 ݁. 𖦹˙— \`\`GENERANDO\`\` 📊 —˙𖦹.꒷\n\n👻 ➛ Generando nivel... Nivel PHANTOM PLUS ❄️`, mentions: [who] })
         try {
             let res = await stellarFetch(apiUrl)
             if(!res.ok) throw new Error("Status: " + res.status)
             let buffer = await res.buffer()
-            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆆 ⚡\n\n📊 Nivel: ${level} - Nivel PHANTOM: Pro en el sistema\n\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369`, mentions: [who] })
+            await conn.sendMessage(m.chat, { image: buffer, caption: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n📊 Nivel: ${level} - Nivel PHANTOM PLUS: Pro en el sistema\n\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico`, mentions: [who] })
         } catch (e) {
             await react('❌')
-            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ Error 500: ${e.message}`)
+            m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ Error 500: ${e.message}`)
         }
     }
 }
