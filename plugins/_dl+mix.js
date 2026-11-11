@@ -39,9 +39,7 @@ async function stellarUpscale(buffer, scale) {
   return Buffer.from(data)
 }
 
-// ===== REMOVEBG STELLAR - POR ARCHIVO, NO POR URL =====
 async function stellarRemovebg(buffer) {
-  // Intento 1: POST con archivo method=local (el correcto para Stellar)
   try {
     let form = new FormDataNode()
     form.append('file', buffer, { filename: `removebg.jpg`, contentType: 'image/jpeg' })
@@ -54,8 +52,6 @@ async function stellarRemovebg(buffer) {
   } catch (e1) {
     console.log('Removebg POST falló, intentando GET url:', e1.message)
   }
-
-  // Intento 2: Fallback GET con url (por si Stellar lo soporta con method=url)
   let linkTmp = await myCloud(buffer)
   const apiUrl = `https://api.stellarwa.xyz/tools/removebg?method=url&url=${encodeURIComponent(linkTmp)}&key=${STELLAR_KEY}`
   const { data } = await axios.get(apiUrl, { responseType: 'arraybuffer', timeout: 120000, headers: { 'User-Agent': 'Mozilla/5.0' } })
@@ -64,16 +60,13 @@ async function stellarRemovebg(buffer) {
 
 async function parseStellarResult(data, headers = {}) {
   const ct = headers['content-type'] || ''
-  // Si es imagen directa
   if (ct.includes('image') || !Buffer.from(data).toString('utf8').slice(0, 200).trim().startsWith('{')) {
-    // Verificar que no sea JSON disfrazado
     try {
       const txt = Buffer.from(data).toString('utf8')
       if (txt.trim().startsWith('{')) throw new Error('es json')
       return Buffer.from(data)
     } catch {}
   }
-  // Si es JSON
   const j = JSON.parse(Buffer.from(data).toString())
   let resultData = j.result?.url || j.result?.image || j.result?.data || j.result || j.url || j.data || j.image
   if (typeof resultData === 'object') resultData = resultData.url || resultData.image || resultData.data
@@ -107,29 +100,45 @@ let handler = async (m, { conn, text }) => {
 
   if (!media && !link) {
     await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n꒰❄️꒱ Responde a una imagen o manda link\n\n❄️ Ejemplo: *.removebg*\n❄️ Ejemplo: *.removebg https://link.jpg*\n\nPasos: 1️⃣ Sube a Evogb → 2️⃣ HD x2 → x4 → 3️⃣ Quita fondo` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰❄️꒱ Responde a una imagen o manda link\n\n❄️ Ejemplo: *.removebg*\n❄️ Ejemplo: *.removebg https://link.jpg*\n\nPasos: 1️⃣ Sube a Evogb → 2️⃣ HD x2 → x4 → 3️⃣ Quita fondo\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━` }, { quoted: m })
+  }
+
+  // ===== MEJORA 8 APLICADA: 1 solo mensaje editable, no 4 mensajes =====
+  let procMsg = null
+  const sendProc = async (pasoTexto) => {
+    const txt = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n${pasoTexto}\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
+    try {
+      if (!procMsg) {
+        procMsg = await conn.sendMessage(m.chat, { text: txt }, { quoted: m })
+      } else {
+        await conn.sendMessage(m.chat, { text: txt, edit: procMsg.key })
+      }
+    } catch {}
+  }
+  const deleteProc = async () => {
+    if (!procMsg) return
+    try { await conn.sendMessage(m.chat, { delete: procMsg.key }) } catch {}
   }
 
   try {
     await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
-    await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n1️⃣ *PASO 1/3:* Subiendo original a Evogb...` }, { quoted: m })
+    await sendProc(`⏳ *PROCESANDO...*\n\n1️⃣ *PASO 1/3:* Subiendo original a Evogb...`)
     let linkOriginal = link
     if (!linkOriginal) linkOriginal = await myCloud(media)
     if (!linkOriginal) throw new Error('No se pudo subir original a Evogb')
 
-    await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n2️⃣ *PASO 2/3:* Mejorando HD x2...` }, { quoted: m })
+    await sendProc(`⏳ *PROCESANDO...*\n\n2️⃣ *PASO 2/3:* Mejorando HD x2...`)
     let hdX2 = await stellarUpscale(media, 2)
-    await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n2️⃣ *PASO 2/3:* Mejorando HD x4 automático...` }, { quoted: m })
+    await sendProc(`⏳ *PROCESANDO...*\n\n2️⃣ *PASO 2/3:* Mejorando HD x4 automático...`)
     let hdX4 = await stellarUpscale(hdX2, 2)
     let linkHD = await myCloud(hdX4)
 
-    await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n3️⃣ *PASO 3/3:* Quitando fondo (POST archivo)...` }, { quoted: m })
-    // CAMBIO CLAVE: le pasamos el BUFFER, no la URL
+    await sendProc(`⏳ *PROCESANDO...*\n\n3️⃣ *PASO 3/3:* Quitando fondo (POST archivo)...`)
     let finalBuffer = await stellarRemovebg(hdX4)
 
     let linkFinal = await myCloud(finalBuffer).catch(() => null)
 
-    const caption = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    const caption = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ╭───INFO ꒰❄️꒱────╮
 ❄️ Tipo: Removebg + HD x4
@@ -141,16 +150,24 @@ let handler = async (m, { conn, text }) => {
 🔗 *HD x4:* ${linkHD || 'No se pudo subir'}
 🔗 *Sin fondo:* ${linkFinal || 'No se pudo subir'}
 
-꒰❄️꒱ Fondo eliminado - listo`
+꒰❄️꒱ Fondo eliminado - listo
 
+━━━━━━━━━━━
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
+🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
+━━━━━━━━━━━`
+
+    await deleteProc()
     await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
     await conn.sendMessage(m.chat, { image: finalBuffer, caption }, { quoted: m })
-    await conn.sendMessage(m.chat, { document: finalBuffer, mimetype: 'image/png', fileName: `removebg-hd-phantom-frost.png` }, { quoted: m })
+    await conn.sendMessage(m.chat, { document: finalBuffer, mimetype: 'image/png', fileName: `removebg-hd-phantom-plus-frost.png` }, { quoted: m })
 
   } catch (e) {
     console.error(e)
+    await deleteProc()
     await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n꒰❌꒱ Error: ${e.message}` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰❌꒱ Error: ${e.message}\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━` }, { quoted: m })
   }
 }
 
