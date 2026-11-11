@@ -4,15 +4,15 @@ let handler = async (m, { conn }) => {
     let botNumber = conn.user.jid
 
     let candidates = participants.filter(p => !p.admin && p.id !== botNumber)
-    if (!candidates.length) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ No hay víctimas, todos son admins... se salvaron del sistema 👻`)
+    if (!candidates.length) return m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ No hay víctimas, todos son admins... se salvaron del sistema 👻`)
 
     let victim = candidates[Math.floor(Math.random() * candidates.length)]
 
     await conn.sendMessage(m.chat, { 
         text: 
-`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 *𝐑 𝐔 𝐋 𝐄 𝐓 𝐀  𝐁 𝐀 𝐍*
-*PHANTOM FROST*
+*PHANTOM PLUS FROST*
 
 ╭─── GIRANDO ❄️ ───╮
 ⛓️ Escaneando sistema...
@@ -21,11 +21,12 @@ let handler = async (m, { conn }) => {
 
 🦂 El sistema eligió a @${victim.id.split('@')[0]} 💥
 
-*¡PHANTOM SE LO LLEVÓ!* ⚡❄️
+*¡PHANTOM PLUS SE LO LLEVÓ!* ⚡❄️
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`,
         mentions: [victim.id]
     })
@@ -34,10 +35,10 @@ let handler = async (m, { conn }) => {
 
     try {
         await conn.groupParticipantsUpdate(m.chat, [victim.id], 'remove')
-        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ @${victim.id.split('@')[0]} fue eliminado del grupo\n⚡ Sistema PHANTOM ejecutado\n\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`, mentions: [victim.id] })
+        await conn.sendMessage(m.chat, { text: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ @${victim.id.split('@')[0]} fue eliminado del grupo\n⚡ Sistema PHANTOM PLUS ejecutado\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, mentions: [victim.id] })
         await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
     } catch (e) {
-        m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ No pude eliminar a @${victim.id.split('@')[0]} - tiene protección del sistema`, null, { mentions: [victim.id] })
+        m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ No pude eliminar a @${victim.id.split('@')[0]} - tiene protección del sistema`, null, { mentions: [victim.id] })
     }
 }
 
