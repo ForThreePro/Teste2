@@ -24,7 +24,7 @@ let handler = async (m, { conn, args, command }) => {
   if (command.startsWith('set')) {
     await react('❄️')
     if (!text) {
-      let uso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+      let uso = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐌𝐄𝐍𝐒𝐀𝐉𝐄 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -38,7 +38,7 @@ let handler = async (m, { conn, args, command }) => {
 👤 ➛ @user = Menciona al usuario
 👥 ➛ @group = Nombre del grupo
 📄 ➛ @desc = Descripción del grupo
-👻 ➛ @ghost = Frase PHANTOM random
+👻 ➛ @ghost = Frase PHANTOM PLUS random
 
 ── *💡 EJEMPLOS* ╏ ❄️
 ➛.setwelcome Bienvenido @user a @group
@@ -46,14 +46,15 @@ let handler = async (m, { conn, args, command }) => {
 ➛.setkick @user fue kickeado de @group
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: uso }, { quoted: m })
     }
 
     chat[key] = text
-    let ok = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let ok = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐆𝐔𝐀𝐑𝐃𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -62,14 +63,15 @@ let handler = async (m, { conn, args, command }) => {
 
 ── *📊 INFORMACIÓN* ╏ ❄️
 ✅ ➛ Mensaje de *${type}* guardado
-👻 ➛ PHANTOM aprobó el texto
+👻 ➛ PHANTOM PLUS aprobó el texto
 
 ── *📝 VISTA PREVIA* ╏ ⛓️
 💬 ➛ ${text}
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: ok }, { quoted: m })
   }
@@ -77,7 +79,7 @@ let handler = async (m, { conn, args, command }) => {
   if (command.startsWith('del')) {
     await react('🗑️')
     if (!chat[key]) {
-      let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+      let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐍𝐎 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -86,17 +88,18 @@ let handler = async (m, { conn, args, command }) => {
 
 ── *📝 AVISO* ╏ ❄️
 📭 ➛ No hay un mensaje de *${type}* personalizado
-❄️ ➛ PHANTOM dice: no hay nada configurado
+❄️ ➛ PHANTOM PLUS dice: no hay nada configurado
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
       return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
     }
 
     delete chat[key]
-    let del = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let del = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -106,11 +109,12 @@ let handler = async (m, { conn, args, command }) => {
 ── *📊 INFORMACIÓN* ╏ ❄️
 🗑️ ➛ Mensaje de *${type}* eliminado
 ✅ ➛ Volverá al mensaje por defecto
-👻 ➛ PHANTOM borró el texto
+👻 ➛ PHANTOM PLUS borró el texto
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
     return conn.sendMessage(m.chat, { text: del }, { quoted: m })
   }
