@@ -155,6 +155,6 @@ let handler = async (m, { conn, usedPrefix, text, command }) => {
 
 handler.help = ['saldo', 'dall', 'rall', 'd', 'r', 'pay', 'lb']
 handler.tags = ['economy']
-handler.command = ['saldo', 'bal', 'balance', 'dall', 'rall', 'd', 'r', 'pay', 'pagar', 'leaderboard', 'lb', 'top']
+handler.command = ['saldo', 'bal', 'balance', 'dall', 'rall', 'd', 'r', 'pay', 'pagar', 'leaderboard', 'lb']
 handler.group = true
 export default handler
