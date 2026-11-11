@@ -14,7 +14,7 @@ let handler = async (m, { conn, text }) => {
 
     if (!text) {
         await react('❌')
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ YOUTUBE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -23,20 +23,21 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ ¿Qué deseas buscar en YouTube?
-👻 ➛ PHANTOM dice: escribe algo pe
+👻 ➛ PHANTOM PLUS dice: escribe algo pe
 
 ── *💡 EJEMPLO* ╏ ⛓️
 ➛.ytsearch Phantom Frost
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         return conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
 
     await react('❄️')
-    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐁𝐔𝐒𝐂𝐀𝐍𝐃𝐎 ﹒ YOUTUBE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -46,11 +47,12 @@ let handler = async (m, { conn, text }) => {
 ── *📊 ESTADO* ╏ ❄️
 🔍 ➛ Buscando: *${text}*
 ⏳ ➛ Conectando a StellarWA...
-👻 ➛ PHANTOM buscando
+👻 ➛ PHANTOM PLUS buscando
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`)
 
     try {
@@ -58,7 +60,7 @@ let handler = async (m, { conn, text }) => {
 
         if (!data.status ||!data.result || data.result.length === 0) {
             await react('❌')
-            let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+            let vacio = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐒𝐈𝐍 𝐑𝐄𝐒𝐔𝐋𝐓𝐀𝐃𝐎𝐒 ﹒ YOUTUBE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -67,11 +69,12 @@ let handler = async (m, { conn, text }) => {
 
 ── *📝 AVISO* ╏ ❄️
 📭 ➛ No se encontraron resultados para: *${text}*
-❄️ ➛ PHANTOM no encontró nada
+❄️ ➛ PHANTOM PLUS no encontró nada
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
             return conn.sendMessage(m.chat, { text: vacio }, { quoted: m })
         }
@@ -84,7 +87,7 @@ let handler = async (m, { conn, text }) => {
 👤 ➛ Canal: *${v.author}*
 🔗 ➛ ${v.url}`).join('\n\n')
 
-        let caption = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let caption = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐓𝐎𝐏 𝟓 ﹒ RESULTADOS
 ꒰ ◞⁺⊹ ．${fecha}
@@ -100,15 +103,16 @@ ${res}
 ── *📋 INFORMACIÓN* ╏ ⛓️
 👤 ➛ Solicitado por: ${user}
 👥 ➛ Grupo: *${groupName}*
-👻 ➛ Buscado por PHANTOM
+👻 ➛ Buscado por PHANTOM PLUS
 
 ── *💡 TIP* ╏ ❄️
 ➛.ytmp4 + link
 ➛.ytmp3 + link
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: caption, mentions: [m.sender] }, { quoted: m })
@@ -116,7 +120,7 @@ ${res}
     } catch (e) { 
         console.error(e)
         await react('❌')
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ YOUTUBE
 ꒰ ◞⁺⊹ ．${fecha}
@@ -126,11 +130,12 @@ ${res}
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ Error al conectar con StellarWA
 🔧 ➛ Intenta más tarde
-👻 ➛ PHANTOM dice: el api se cayó
+👻 ➛ PHANTOM PLUS dice: el api se cayó
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
