@@ -12,7 +12,7 @@ let handler = async (m, { conn }) => {
         let link = await conn.groupInviteCode(m.chat)
         let groupMetadata = await conn.groupMetadata(m.chat)
 
-        let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let texto = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐋𝐈𝐍𝐊 ﹒ DEL GRUPO
 ꒰ ◞⁺⊹ ．${fecha}
@@ -21,7 +21,7 @@ let handler = async (m, { conn }) => {
 
 ── *📊 INFORMACIÓN* ╏ ❄️
 👥 ➛ Grupo: *${groupMetadata.subject}*
-👻 ➛ PHANTOM te pasa el link
+👻 ➛ PHANTOM PLUS te pasa el link
 
 ── *🔗 ENLACE* ╏ ⛓️
 https://chat.whatsapp.com/${link}
@@ -29,17 +29,18 @@ https://chat.whatsapp.com/${link}
 ── *📝 NOTAS* ╏ ❄️
 🔒 ➛ Solo admins pueden resetear el link
 ⚠️ ➛ No lo compartas con desconocidos
-❄️ ➛ PHANTOM lo aprueba
+❄️ ➛ PHANTOM PLUS lo aprueba
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
 
         await conn.sendMessage(m.chat, { text: texto }, { quoted: m })
     } catch (e) {
         await react('❌')
-        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+        let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ LINK
 ꒰ ◞⁺⊹ ．${fecha}
@@ -49,11 +50,12 @@ https://chat.whatsapp.com/${link}
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ No pude obtener el link
 🔒 ➛ ¿Soy admin del grupo?
-👻 ➛ PHANTOM dice: hazme admin pe
+👻 ➛ PHANTOM PLUS dice: hazme admin pe
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
         conn.sendMessage(m.chat, { text: error }, { quoted: m })
     }
@@ -63,6 +65,6 @@ handler.help = ['link']
 handler.tags = ['grupo']
 handler.command = ['link', 'linkgroup', 'grouplink']
 handler.group = true
-handler.admin = true
+handler.botAdmin = true
 
 export default handler
