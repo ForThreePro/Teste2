@@ -1,6 +1,9 @@
 import moment from 'moment-timezone'
 moment.locale('es')
 
+// ✅ FOTO DE MENÚ PHANTOM PLUS
+const menuImg = 'https://files.evogb.win/9BFoEi.jpg'
+
 let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => {
   const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
   let isEnable = /true|enable|(turn)?on|1/i.test(args[0])
@@ -12,9 +15,18 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
     try { await conn.sendMessage(m.chat, { react: { text: text, key: m.key } }) } catch {}
   }
 
+  // Enviar con foto de menú + texto + mentions
+  const sendMenu = async (texto) => {
+    try {
+      await conn.sendMessage(m.chat, { image: { url: menuImg }, caption: texto, mentions: [m.sender] }, { quoted: m })
+    } catch {
+      await conn.sendMessage(m.chat, { text: texto, mentions: [m.sender] }, { quoted: m })
+    }
+  }
+
   if (!args[0]) {
     await react('❌')
-    let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ ON/OFF
 ꒰ ◞⁺⊹ ．${fecha}
@@ -23,7 +35,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 
 ── *📝 AVISO* ╏ ❄️
 ❌ ➛ Falta activar o desactivar
-👻 ➛ PHANTOM dice: pon on o off pe
+👻 ➛ PHANTOM PLUS dice: pon on o off pe
 
 ── *💡 USO* ╏ ⛓️
 ➛.welcome on / off
@@ -32,10 +44,11 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 ➛.detect on / off
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
-    return conn.sendMessage(m.chat, { text: error }, { quoted: m })
+    return sendMenu(error)
   }
 
   let fail = false
@@ -88,7 +101,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
   }
 
   if (fail) {
-    let lock = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let lock = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐀𝐂𝐂𝐄𝐒𝐎 𝐃𝐄𝐍𝐄𝐆𝐀𝐃𝐎 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -97,13 +110,14 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 
 ── *📝 AVISO* ╏ ❄️
 🔒 ➛ No tienes permisos para esto
-👻 ➛ PHANTOM: solo admins pueden tocar esto
+👻 ➛ PHANTOM PLUS: solo admins pueden tocar esto
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
-    return conn.sendMessage(m.chat, { text: lock }, { quoted: m })
+    return sendMenu(lock)
   }
 
   await react(isEnable? '❄️' : '🔴')
@@ -111,7 +125,7 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
   let estadoTexto = isEnable? 'Activado' : 'Desactivado'
   let estadoEmoji = isEnable? '❄️' : '🔴'
 
-  let statusTxt = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+  let statusTxt = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐂𝐈𝐎𝐍 ﹒ ${type.toUpperCase()}
 ꒰ ◞⁺⊹ ．${fecha}
@@ -122,17 +136,15 @@ let handler = async (m, { conn, command, args, isOwner, isAdmin, isROwner }) => 
 ⚙️ ➛ Función: *${type}*
 ${estadoEmoji} ➛ Estado: *${estadoTexto}*
 👑 ➛ Por: @${m.sender.split('@')[0]}
-👻 ➛ PHANTOM ${isEnable? 'aprobó ❄️' : 'lo apagó 🔴'}
+👻 ➛ PHANTOM PLUS ${isEnable? 'aprobó ❄️' : 'lo apagó 🔴'}
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
 
-  await conn.sendMessage(m.chat, {
-    text: statusTxt,
-    mentions: [m.sender]
-  }, { quoted: m })
+  await sendMenu(statusTxt)
 }
 
 handler.help = ['welcome','antilink', 'antibot', 'modoadmin', 'subbots', 'nsfw', 'audios', 'antiprivado', 'antispam', 'autoread', 'detect'].map(v => v + ' on/off')
