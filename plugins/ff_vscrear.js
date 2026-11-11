@@ -6,7 +6,7 @@ let vs = global.vsData = global.vsData || {}
 const crear = async (m, { conn, args, usedPrefix, command }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     if (args.length < 2) {
-      let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+      let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ VS
 ꒰ ◞⁺⊹ ．${fecha}
@@ -15,11 +15,12 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 
 ── *📝 USO* ╏ ❄️
 ➛${usedPrefix + command} 14 PE APOS
-👻 ➛ PHANTOM dice: pon hora y país pe
+👻 ➛ PHANTOM PLUS dice: pon hora y país pe
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
       return conn.reply(m.chat, error, m);
     }
@@ -31,7 +32,7 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
     const pais = args[1].toUpperCase();
     const diferenciasHorarias = { CL: 2, AR: 2, PE: 0, BO: 2 };
     if (!(pais in diferenciasHorarias)) {
-      let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+      let error = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐄𝐑𝐑𝐎𝐑 ﹒ PAIS
 ꒰ ◞⁺⊹ ．${fecha}
@@ -40,11 +41,12 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 
 ── *📝 AVISO* ╏ ❄️
 ⚠️ ➛ Usa PE, CL, AR o BO
-❄️ ➛ PHANTOM solo conoce esos países
+❄️ ➛ PHANTOM PLUS solo conoce esos países
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`
       return conn.reply(m.chat, error, m);
     }
@@ -70,13 +72,13 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 
     let diseño = {}
     if(tipo === 'FEM'){
-        diseño = { header: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n👻⃟💜 ${groupName} 💜⃟👻\nㅤ ˗ˏˋ ꒰ ❄️ ꒱ ˎˊ˗`, icon: '❄️', suplente: '⛓️' }
+        diseño = { header: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n👻⃟💜 ${groupName} 💜⃟👻\nㅤ ˗ˏˋ ꒰ ❄️ ꒱ ˎˊ˗`, icon: '❄️', suplente: '⛓️' }
     }
     if(tipo === 'MASC'){
-        diseño = { header: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⚡˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗⚡\n✧･ﾟ: *✧･ﾟ:* ❄️ *:･ﾟ✧*:･ﾟ✧`, icon: '❄️', suplente: '👻' }
+        diseño = { header: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⚡˗ˏˋ ꒰ ${groupName} ꒱ ˎˊ˗⚡\n✧･ﾟ: *✧･ﾟ:* ❄️ *:･ﾟ✧*:･ﾟ✧`, icon: '❄️', suplente: '👻' }
     }
     if(tipo === 'MIXTO'){
-        diseño = { header: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️⃟✨ ${groupName} ✨⃟⛓️\n　★彡.　☆`, icon: '⛓️', suplente: '❄️' }
+        diseño = { header: `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️⃟✨ ${groupName} ✨⃟⛓️\n　★彡.　☆`, icon: '⛓️', suplente: '❄️' }
     }
 
     vs[m.chat] = vs[m.chat] || { salas: [], tipo, diseño, groupName }
@@ -99,17 +101,17 @@ const crear = async (m, { conn, args, usedPrefix, command }) => {
 const anotar = async (m, { conn, args, usedPrefix, command }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     if (!vs[m.chat] ||!vs[m.chat].salas.length) {
-      return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ ➛ No hay VS activa\n👻 ➛ PHANTOM dice: crea una primero\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`, m)
+      return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ ➛ No hay VS activa\n👻 ➛ PHANTOM PLUS dice: crea una primero\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
     }
     let salaNum = parseInt(args[0]) - 1
     if(isNaN(salaNum)) salaNum = 0
 
     let sala = vs[m.chat].salas[salaNum]
-    if(!sala) return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ ➛ Sala ${args[0]} no existe\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`, m)
+    if(!sala) return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ ➛ Sala ${args[0]} no existe\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
 
     let users = m.mentionedJid || []
     if(users.length === 0) {
-      return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n❌ ➛ Menciona a alguien\nEj:.anotar 1 @pepito @juana\n━━━━━━━━━━━\n⛓️ *PHANTOM IA - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n━━━━━━━━━━━`, m)
+      return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n❌ ➛ Menciona a alguien\nEj:.anotar 1 @pepito @juana\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
     }
 
     for(let user of users){
@@ -117,15 +119,15 @@ const anotar = async (m, { conn, args, usedPrefix, command }) => {
         sala.suplentes = sala.suplentes.filter(v => v!== user)
 
         if (command === 'anotar') {
-            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⚠️ ➛ Sala ${salaNum+1} llena\n❄️ PHANTOM: ya no entra nadie más\n━━━━━━━━━━━`, m)
+            if (sala.jugadores.length >= sala.cantidad) return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⚠️ ➛ Sala ${salaNum+1} llena\n❄️ PHANTOM PLUS: ya no entra nadie más\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
             sala.jugadores.push(user)
         }
         if (command === 'suplente') {
-            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⚠️ ➛ Suplentes sala ${salaNum+1} llenos\n━━━━━━━━━━━`, m)
+            if (sala.suplentes.length >= 2) return conn.reply(m.chat, `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⚠️ ➛ Suplentes sala ${salaNum+1} llenos\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`, m)
             sala.suplentes.push(user)
         }
         if (command === 'salir') {
-            await conn.reply(m.chat, `👻 ➛ @${user.split('@')[0]} salió de la sala ${salaNum+1} - PHANTOM lo sacó`, m, { mentions: [user] })
+            await conn.reply(m.chat, `👻 ➛ @${user.split('@')[0]} salió de la sala ${salaNum+1} - PHANTOM PLUS lo sacó`, m, { mentions: [user] })
         }
     }
     await actualizarLista(m.chat, conn, usedPrefix)
@@ -164,8 +166,9 @@ ${todasSalas}
 │ ${d.icon} = Quiero JUGAR
 │ ${d.suplente} = Quiero SUPLENTE
 ╰───────────────────
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 ━━━━━━━━━━━`;
 
     let mentions = []
