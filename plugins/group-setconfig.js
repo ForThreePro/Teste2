@@ -7,10 +7,19 @@ let handler = async (m, { conn, command }) => {
     let chat = global.db.data.chats[m.chat]
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const react = async (t) => { try { await conn.sendMessage(m.chat, { react: { text: t, key: m.key } }) } catch {} }
-    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
+
+    // 3 - Ver qué stickers están guardados
+    if (['verstickers','versticker','verabrir','vercerrar'].includes(command)) {
+        let abrir = chat.stickerAbrir ? '✅ Guardado' : '❌ No guardado'
+        let cerrar = chat.stickerCerrar ? '✅ Guardado' : '❌ No guardado'
+        await react('❄️')
+        return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ STICKERS ：✿ 。\n\n🟢 *ABRIR:* ${abrir}\n🔴 *CERRAR:* ${cerrar}\n\n💡 Para guardar responde a un sticker con *.setabrir* o *.setcerrar*` + foot)
+    }
 
     if (command==='setabrir' || command==='setcerrar') {
-        if (!m.quoted) { await react('❌'); return m.reply(head+`\n❌ Responde a un sticker con *.${command}*`) }
+        if (!m.quoted) { await react('❌'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ USO ：✿ 。\n\n❌ Responde a un sticker con *.${command}*` + foot) }
         try {
             let q = m.quoted
             let fileSha256 = q.msg?.fileSha256 || q.message?.stickerMessage?.fileSha256
@@ -18,16 +27,16 @@ let handler = async (m, { conn, command }) => {
             let hash = Buffer.from(fileSha256).toString('base64')
             if (command==='setabrir') chat.stickerAbrir = hash; else chat.stickerCerrar = hash
             await react('❄️')
-            return m.reply(head+`\n❄️ Sticker *${command==='setabrir'?'ABRIR 🟢':'CERRAR 🔴'}* guardado en el sistema`)
-        } catch { await react('❌'); return m.reply(head+`\n❌ Error en el sistema`) }
+            return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ STICKER ：✿ 。\n\n❄️ Sticker *${command==='setabrir'?'ABRIR 🟢':'CERRAR 🔴'}* guardado en el sistema` + foot)
+        } catch { await react('❌'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ERROR ：✿ 。\n\n❌ Error en el sistema` + foot) }
     }
 
     if (['resetsticker','delsticker','clearsticker','delabrir','delcerrar'].includes(command)) {
         let b=[]
         if (['resetsticker','delsticker','clearsticker','delabrir'].includes(command) && chat.stickerAbrir) { delete chat.stickerAbrir; b.push('ABRIR') }
         if (['resetsticker','delsticker','clearsticker','delcerrar'].includes(command) && chat.stickerCerrar) { delete chat.stickerCerrar; b.push('CERRAR') }
-        if (!b.length) { await react('❌'); return m.reply(head+`\n⚠️ No hay stickers guardados`) }
-        await react('🗑️'); return m.reply(head+`\n🗑️ Eliminado: ${b.join(', ')}`)
+        if (!b.length) { await react('❌'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ERROR ：✿ 。\n\n⚠️ No hay stickers guardados` + foot) }
+        await react('🗑️'); return m.reply(head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ STICKER ：✿ 。\n\n🗑️ Eliminado: ${b.join(', ')}` + foot)
     }
 }
 
@@ -36,8 +45,15 @@ handler.before = async function(m, { conn }) {
     let chat = global.db.data.chats[m.chat]; if (!chat) return
     if (!chat.stickerAbrir && !chat.stickerCerrar) return
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
+    const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
     try {
+        // 1 - Solo admins pueden usar el sticker para abrir/cerrar
+        let metadata = await conn.groupMetadata(m.chat).catch(() => null)
+        let participant = metadata?.participants?.find(p => (p.id || p.jid) === m.sender)
+        let isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
+        if (!isAdmin) return
+
         let fileSha256 = m.msg?.fileSha256; if (!fileSha256) return
         let hash = Buffer.from(fileSha256).toString('base64')
         let isClose, estado
@@ -45,13 +61,13 @@ handler.before = async function(m, { conn }) {
         else if (hash===chat.stickerCerrar) { isClose='announcement'; estado='CERRADO 🔴❄️' }
         else return
         await conn.groupSettingUpdate(m.chat, isClose)
-        await conn.sendMessage(m.chat, { text: head+`\n${estado}\n👑 Por: @${m.sender.split('@')[0]} 👻`, mentions:[m.sender] }, { quoted:m })
+        await conn.sendMessage(m.chat, { text: head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ${isClose==='not_announcement'?'ABRIR':'CERRAR'} ：✿ 。\n\n${estado}\n👑 Por: @${m.sender.split('@')[0]} 👻` + foot, mentions:[m.sender] }, { quoted:m })
     } catch {}
 }
 
-handler.help = ['setabrir','setcerrar','resetsticker']
+handler.help = ['setabrir','setcerrar','resetsticker','verstickers']
 handler.tags = ['grupo']
-handler.command = ['setabrir','setcerrar','resetsticker','delsticker','clearsticker','delabrir','delcerrar']
+handler.command = ['setabrir','setcerrar','resetsticker','delsticker','clearsticker','delabrir','delcerrar','verstickers','versticker','verabrir','vercerrar']
 handler.group = true
 handler.admin = true
 handler.botAdmin = true
