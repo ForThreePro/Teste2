@@ -14,7 +14,7 @@ var handler = async (m, { conn }) => {
     if (!sessionPath) return m.reply('🧐 *No encontré la carpeta de sesión*')
 
     await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
-    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡\n\n⛓️ Limpiando sesión...`)
+    await m.reply(`❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n⛓️ Limpiando sesión...`)
 
     let files = await fs.readdir(sessionPath)
     let filesDeleted = 0
@@ -35,7 +35,7 @@ var handler = async (m, { conn }) => {
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const ownerNum = global.owner?.[0]?.[0] || '51927174369'
 
-    let menu = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗜𝗔 𓆪 ⚡
+    let menu = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡
 
 ⛓️ ┇ 𝐒𝐈𝐒𝐓𝐄𝐌𝐀 ﹒ 𝐅𝐑𝐎𝐒𝐓 𝐅𝐈𝐗
 ꒰ ◞⁺⊹ ．${fecha}
@@ -59,8 +59,9 @@ var handler = async (m, { conn }) => {
 ⚡ ➛ Estado: *${filesDeleted === 0? 'Todo limpio - Sistema frío ❄️' : 'Limpieza completada ⚡'}*
 
 ━━━━━━━━━━━
-⛓️ *PHANTOM IA - VENTAS* ⚡
+⛓️ *PHANTOM PLUS - VENTAS* ⚡
 🦂 *Contacto:* +51 927 174 369
+📸 *Ig:* @whois.yallico
 *Owner*: @${ownerNum}
 ━━━━━━━━━━━`
 
