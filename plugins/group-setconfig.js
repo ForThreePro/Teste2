@@ -42,18 +42,13 @@ let handler = async (m, { conn, command }) => {
 
 handler.before = async function(m, { conn }) {
     if (m.mtype!=='stickerMessage' || !m.isGroup) return
+    if (!m.isAdmin) return
     let chat = global.db.data.chats[m.chat]; if (!chat) return
     if (!chat.stickerAbrir && !chat.stickerCerrar) return
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
     const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
     const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
     try {
-        // 1 - Solo admins pueden usar el sticker para abrir/cerrar
-        let metadata = await conn.groupMetadata(m.chat).catch(() => null)
-        let participant = metadata?.participants?.find(p => (p.id || p.jid) === m.sender)
-        let isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
-        if (!isAdmin) return
-
         let fileSha256 = m.msg?.fileSha256; if (!fileSha256) return
         let hash = Buffer.from(fileSha256).toString('base64')
         let isClose, estado
