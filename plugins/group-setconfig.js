@@ -62,6 +62,6 @@ handler.help = ['setabrir','setcerrar','resetsticker','verstickers']
 handler.tags = ['grupo']
 handler.command = ['setabrir','setcerrar','resetsticker','delsticker','clearsticker','delabrir','delcerrar','verstickers','versticker','verabrir','vercerrar']
 handler.group = true
-handler.admin = false
+handler.admin = true
 handler.botAdmin = true
 export default handler
