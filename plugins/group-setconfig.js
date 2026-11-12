@@ -39,25 +39,6 @@ let handler = async (m, { conn, command }) => {
     }
 }
 
-handler.before = async function(m, { conn }) {
-    if (m.mtype!=='stickerMessage' || !m.isGroup) return
-    let chat = global.db.data.chats[m.chat]; if (!chat) return
-    if (!chat.stickerAbrir && !chat.stickerCerrar) return
-    const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
-    const head = `❄️ 𓆩 𝗣𝗛𝗔𝗡𝗧𝗢𝗠 𝗣𝗟𝗨𝗦 𓆪 ⚡\n\n꒰ ◞⁺⊹ ．${fecha}\n`
-    const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
-    try {
-        let fileSha256 = m.msg?.fileSha256; if (!fileSha256) return
-        let hash = Buffer.from(fileSha256).toString('base64')
-        let isClose, estado
-        if (hash===chat.stickerAbrir) { isClose='not_announcement'; estado='ABIERTO 🟢❄️' }
-        else if (hash===chat.stickerCerrar) { isClose='announcement'; estado='CERRADO 🔴❄️' }
-        else return
-        await conn.groupSettingUpdate(m.chat, isClose)
-        await conn.sendMessage(m.chat, { text: head+`\n⤷ ┇ 𝐆𝐑𝐔𝐏𝐎 ﹒ ${isClose==='not_announcement'?'ABRIR':'CERRAR'} ：✿ 。\n\n${estado}\n👑 Por: @${m.sender.split('@')[0]} 👻` + foot, mentions:[m.sender] }, { quoted:m })
-    } catch {}
-}
-
 handler.help = ['setabrir','setcerrar','resetsticker','verstickers']
 handler.tags = ['grupo']
 handler.command = ['setabrir','setcerrar','resetsticker','delsticker','clearsticker','delabrir','delcerrar','verstickers','versticker','verabrir','vercerrar']
