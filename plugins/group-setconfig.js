@@ -42,7 +42,6 @@ let handler = async (m, { conn, command }) => {
 
 handler.before = async function(m, { conn }) {
     if (m.mtype!=='stickerMessage' || !m.isGroup) return
-    if (!m.isAdmin) return
     let chat = global.db.data.chats[m.chat]; if (!chat) return
     if (!chat.stickerAbrir && !chat.stickerCerrar) return
     const fecha = moment.tz('America/Lima').format('DD/MM/YYYY hh:mm:ss a')
