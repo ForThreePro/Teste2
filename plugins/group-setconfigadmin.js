@@ -42,7 +42,6 @@ handler.before = async function(m, { conn }) {
     const foot = `\n\n━━━━━━━━━━━\n⛓️ *PHANTOM PLUS - VENTAS* ⚡\n🦂 *Contacto:* +51 927 174 369\n📸 *Ig:* @whois.yallico\n━━━━━━━━━━━`
 
     try {
-        // Solo admins pueden abrir/cerrar con sticker
         if (!(await isAdminReal(conn, m))) return
 
         let fileSha256 = m.msg?.fileSha256
@@ -65,6 +64,6 @@ handler.before = async function(m, { conn }) {
 handler.help = ['abrir-cerrar-sticker']
 handler.tags = ['grupo']
 handler.group = true
-handler.admin = false
+handler.admin = true
 handler.botAdmin = true
 export default handler
