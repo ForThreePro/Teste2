@@ -16,27 +16,23 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     let videoUrl = text?.trim()
 
     if (!isVideo && (!videoUrl || !videoUrl.includes('http'))) {
-        return conn.reply(m.chat, head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ USO ：✿ 。\n\n❌ Responde a un video o manda un link\n\n💡 Forma 1:\nResponde a un video con *${usedPrefix + command}*\n\n💡 Forma 2:\n*${usedPrefix + command} https://files.evogb.win/EMbm6N.mp4*` + foot, m)
+        return conn.reply(m.chat, head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ USO ：✿ 。\n\nResponde a un video con *${usedPrefix + command}* o manda un link` + foot, m)
     }
 
     try {
         await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-        // 1. Si es video de WhatsApp, subirlo con TU uploader evogb.win
         if (isVideo) {
             await conn.reply(m.chat, head + `\n📥 Descargando video...` + foot, m)
             let media = await q.download()
-            if (!media || !media.length) throw new Error('No se pudo descargar el video')
+            if (!media?.length) throw new Error('No se pudo descargar el video')
             if (media.length > 100 * 1024 * 1024) throw new Error(`Video muy pesado (${(media.length/1024/1024).toFixed(1)}MB), máximo 100MB`)
-
             await conn.reply(m.chat, head + `\n📤 Subiendo video a evogb.win...` + foot, m)
             let link = await myCloud(media)
             if (!link.url) throw new Error('Sin URL de evogb')
             videoUrl = link.url
-            await conn.reply(m.chat, head + `\n✅ Subido: ${videoUrl}` + foot, m)
         }
 
-        // 2. Crear job en Faa
         let api = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(videoUrl)}`
         let res = await fetch(api)
         let json = await res.json()
@@ -44,11 +40,12 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
         let jobId = json.job_id
         let resultUrl = json.result
-        await conn.reply(m.chat, head + `\n🎬 Procesando tu video a HD...\n🆔 Job: ${jobId}\n⏳ Te lo mando en 30-60s` + foot, m)
+        await conn.reply(m.chat, head + `\n🎬 Procesando tu video a HD...\n🆔 Job: ${jobId}\n\n⏳ *Puede demorar 2-5 minutos*\nNo es error, el HD tarda. Te lo mando cuando esté listo.\n\n🔗 Puedes verlo aquí:\n${resultUrl}` + foot, m)
 
-        // 3. Polling
+        // AHORA: 60 intentos x 5s = 300s = 5 MINUTOS
         let videoBuffer = null
-        for (let i = 0; i < 18; i++) {
+        let lastState = ''
+        for (let i = 0; i < 60; i++) {
             await new Promise(r => setTimeout(r, 5000))
             let check = await fetch(resultUrl)
             let ct = check.headers.get('content-type') || ''
@@ -59,9 +56,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             let t = await check.text()
             try {
                 let j = JSON.parse(t)
-                if (j.state === 'failed' || (j.status === false && j.state)) {
-                    throw new Error(`La API falló: ${j.error || '500'}`)
-                }
+                lastState = j.state || j.status || ''
+                console.log(`Intento ${i} - ${(i+1)*5}s -`, t.slice(0, 200))
+                // Solo cortar si dice failed de verdad
+                if (j.state === 'failed') throw new Error(`La API falló: ${j.error || '500'}`)
                 let finalUrl = j.url || j.result_url || j.download || j.data?.url
                 if (finalUrl && typeof finalUrl === 'string' && finalUrl.includes('http') && finalUrl !== resultUrl) {
                     let v = await fetch(finalUrl)
@@ -69,15 +67,20 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                     break
                 }
             } catch (e) { if (e.message.includes('La API falló')) throw e }
+
+            // Aviso cada 30s para que no se vea colgado
+            if ((i+1) % 6 === 0) {
+                await conn.reply(m.chat, head + `\n⏳ Sigue procesando... ${(i+1)*5}s / 300s\nEstado: ${lastState || 'processing'}` + foot, m)
+            }
         }
 
-        if (!videoBuffer) throw new Error('Timeout 90s, la API demoró mucho')
+        if (!videoBuffer) throw new Error(`Timeout 5 minutos. El job sigue en la API, revisa aquí:\n${resultUrl}\n\nEl video es muy largo o la API está lenta, intenta con uno más corto.`)
 
         await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
         await conn.sendMessage(m.chat, {
             video: videoBuffer,
             mimetype: 'video/mp4',
-            caption: head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ LISTO ：✿ 。\n\n✅ *Video mejorado a HD*\n🆔 Job: ${jobId}\n📥 Formato: MP4` + foot
+            caption: head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ LISTO ：✿ 。\n\n✅ *Video mejorado a HD*\n🆔 Job: ${jobId}` + foot
         }, { quoted: m })
 
     } catch (e) {
@@ -87,7 +90,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 }
 
-// TU MISMO UPLOADER - evogb.win
 async function myCloud(content) {
     const fileType = await fileTypeFromBuffer(content)
     const ext = fileType ? fileType.ext : 'mp4'
