@@ -22,31 +22,32 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
+        // 1. Subir si es video - SIN mensajes de más, todo silencioso
         if (isVideo) {
-            await conn.reply(m.chat, head + `\n📥 Descargando video...` + foot, m)
             let media = await q.download()
             if (!media?.length) throw new Error('No se pudo descargar el video')
-            if (media.length > 100 * 1024 * 1024) throw new Error(`Video muy pesado (${(media.length/1024/1024).toFixed(1)}MB), máximo 100MB`)
-            await conn.reply(m.chat, head + `\n📤 Subiendo video a evogb.win...` + foot, m)
+            if (media.length > 100 * 1024 * 1024) throw new Error(`Video muy pesado (${(media.length/1024/1024).toFixed(1)}MB)`)
             let link = await myCloud(media)
             if (!link.url) throw new Error('Sin URL de evogb')
             videoUrl = link.url
         }
 
+        // 2. Crear job
         let api = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(videoUrl)}`
         let res = await fetch(api)
         let json = await res.json()
-        if (!json.job_id) throw new Error('La API no creó el job: ' + JSON.stringify(json).slice(0, 300))
+        if (!json.job_id) throw new Error('La API no creó el job')
 
         let jobId = json.job_id
         let resultUrl = json.result
-        await conn.reply(m.chat, head + `\n🎬 Procesando tu video a HD...\n🆔 Job: ${jobId}\n\n⏳ *Puede demorar 2-5 minutos*\nNo es error, el HD tarda. Te lo mando cuando esté listo.\n\n🔗 Puedes verlo aquí:\n${resultUrl}` + foot, m)
 
-        // AHORA: 60 intentos x 5s = 300s = 5 MINUTOS
+        // ÚNICO MENSAJE DE PROCESANDO
+        await conn.reply(m.chat, head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ PROCESANDO ：✿ 。\n\n🎬 Mejorando tu video a HD...\n⏳ Puede demorar 1-3 minutos` + foot, m)
+
+        // 3. Polling silencioso cada 3s, sin mandar mensajes, max 5 min
         let videoBuffer = null
-        let lastState = ''
-        for (let i = 0; i < 60; i++) {
-            await new Promise(r => setTimeout(r, 5000))
+        for (let i = 0; i < 100; i++) {
+            await new Promise(r => setTimeout(r, 3000))
             let check = await fetch(resultUrl)
             let ct = check.headers.get('content-type') || ''
             if (ct.includes('video') || ct.includes('octet')) {
@@ -56,9 +57,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             let t = await check.text()
             try {
                 let j = JSON.parse(t)
-                lastState = j.state || j.status || ''
-                console.log(`Intento ${i} - ${(i+1)*5}s -`, t.slice(0, 200))
-                // Solo cortar si dice failed de verdad
                 if (j.state === 'failed') throw new Error(`La API falló: ${j.error || '500'}`)
                 let finalUrl = j.url || j.result_url || j.download || j.data?.url
                 if (finalUrl && typeof finalUrl === 'string' && finalUrl.includes('http') && finalUrl !== resultUrl) {
@@ -67,24 +65,19 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                     break
                 }
             } catch (e) { if (e.message.includes('La API falló')) throw e }
-
-            // Aviso cada 30s para que no se vea colgado
-            if ((i+1) % 6 === 0) {
-                await conn.reply(m.chat, head + `\n⏳ Sigue procesando... ${(i+1)*5}s / 300s\nEstado: ${lastState || 'processing'}` + foot, m)
-            }
         }
 
-        if (!videoBuffer) throw new Error(`Timeout 5 minutos. El job sigue en la API, revisa aquí:\n${resultUrl}\n\nEl video es muy largo o la API está lenta, intenta con uno más corto.`)
+        if (!videoBuffer) throw new Error('La API demoró más de 5 min, intenta con un video más corto')
 
+        // ÚNICO MENSAJE FINAL: EL VIDEO
         await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
         await conn.sendMessage(m.chat, {
             video: videoBuffer,
             mimetype: 'video/mp4',
-            caption: head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ LISTO ：✿ 。\n\n✅ *Video mejorado a HD*\n🆔 Job: ${jobId}` + foot
+            caption: head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ LISTO ：✿ 。\n\n✅ *Video mejorado a HD*` + foot
         }, { quoted: m })
 
     } catch (e) {
-        console.log('ERROR HDVID:', e.message)
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
         return conn.reply(m.chat, head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ ERROR ：✿ 。\n\n❌ ${e.message}` + foot, m)
     }
