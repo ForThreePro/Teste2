@@ -4,26 +4,36 @@ import FormData from 'form-data'
 moment.locale('es')
 
 async function uploadVideo(buffer) {
-    // Intento 1: Catbox
+    // 1. Catbox - el que mejor lee la API de Faa
     try {
         let form = new FormData()
         form.append('reqtype', 'fileupload')
         form.append('fileToUpload', buffer, { filename: 'phantom.mp4', contentType: 'video/mp4' })
-        let res = await fetch('https://catbox.moe/user/api.php', { method: 'POST', body: form })
+        let res = await fetch('https://catbox.moe/user/api.php', { method: 'POST', body: form, headers: form.getHeaders() })
         let url = (await res.text()).trim()
-        if (url.includes('http')) return url
+        console.log('Catbox:', url)
+        if (url.includes('http') && url.includes('catbox')) return url
     } catch (e) { console.log('Catbox falló:', e.message) }
 
-    // Intento 2: TmpFiles - si Catbox falla
+    // 2. 0x0.st - directo y sin bloqueo
     try {
-        let form2 = new FormData()
-        form2.append('file', buffer, { filename: 'phantom.mp4', contentType: 'video/mp4' })
-        let res2 = await fetch('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: form2 })
-        let j2 = await res2.json()
-        if (j2.data?.url) return j2.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/')
-    } catch (e) { console.log('TmpFiles falló:', e.message) }
+        let form = new FormData()
+        form.append('file', buffer, { filename: 'phantom.mp4', contentType: 'video/mp4' })
+        let res = await fetch('https://0x0.st', { method: 'POST', body: form, headers: form.getHeaders() })
+        let url = (await res.text()).trim()
+        console.log('0x0:', url)
+        if (url.includes('http')) return url
+    } catch (e) { console.log('0x0 falló:', e.message) }
 
-    throw new Error('No se pudo subir el video a ningún host')
+    // 3. Transfer.sh - último intento bueno
+    try {
+        let res = await fetch('https://transfer.sh/phantom.mp4', { method: 'PUT', body: buffer, headers: { 'Content-Type': 'video/mp4' } })
+        let url = (await res.text()).trim()
+        console.log('Transfer:', url)
+        if (url.includes('http')) return url
+    } catch (e) { console.log('Transfer falló:', e.message) }
+
+    throw new Error('No se pudo subir a un host compatible con la API')
 }
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
@@ -43,60 +53,51 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     try {
         await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-        // PASO 1: Subir si es video de WhatsApp
         if (isVideo) {
             await m.reply(head + `\n📤 Subiendo video...` + foot)
             let buffer = await q.download()
-            console.log('Video descargado:', buffer.length, 'bytes')
             videoUrl = await uploadVideo(buffer)
-            console.log('Video subido a:', videoUrl)
-            await m.reply(head + `\n✅ Subido: ${videoUrl}` + foot)
+            console.log('URL final para API:', videoUrl)
         }
 
-        // PASO 2: Crear job
-        await m.reply(head + `\n🎬 Creando job con:\n${videoUrl}` + foot)
         let api = `https://api-faa.my.id/faa/hdvid?url=${encodeURIComponent(videoUrl)}`
         let res = await fetch(api)
-        let txt = await res.text()
-        console.log('Respuesta hdvid:', txt)
-        let json
-        try { json = JSON.parse(txt) } catch { throw new Error('La API no devolvió JSON: ' + txt.slice(0, 200)) }
+        let json = await res.json()
+        if (!json.job_id) throw new Error('La API no creó el job. Respuesta: ' + JSON.stringify(json).slice(0, 300))
 
-        if (!json.job_id) throw new Error('Sin job_id. Respuesta: ' + txt.slice(0, 300))
         let jobId = json.job_id
         let resultUrl = json.result
-        await m.reply(head + `\n🆔 Job creado: ${jobId}\n🔗 ${resultUrl}` + foot)
+        await m.reply(head + `\n🎬 Procesando tu video a HD...\n🆔 Job: ${jobId}\n⏳ Espera 30-60s, te lo mando cuando esté listo` + foot)
 
-        // PASO 3: Polling
         let videoBuffer = null
-        let lastResp = ''
         for (let i = 0; i < 18; i++) {
             await new Promise(r => setTimeout(r, 5000))
             let check = await fetch(resultUrl)
             let ct = check.headers.get('content-type') || ''
-            console.log(`Intento ${i} - Content-Type:`, ct)
 
             if (ct.includes('video') || ct.includes('octet')) {
                 videoBuffer = Buffer.from(await check.arrayBuffer())
                 break
             }
+
             let t = await check.text()
-            lastResp = t.slice(0, 500)
-            console.log(`Intento ${i} - Body:`, lastResp)
+            console.log(`Intento ${i}:`, t.slice(0, 300))
             try {
                 let j = JSON.parse(t)
-                let finalUrl = j.url || j.result_url || j.result || j.download || j.data?.url || j.data
+                // Si la API dice failed, cortar de una vez, no esperar 90s
+                if (j.state === 'failed' || j.status === false && j.state) {
+                    throw new Error(`La API no pudo procesar el video.\nHost usado: ${videoUrl}\nError API: ${j.error || '500'}\n\nIntenta de nuevo, a veces TmpFiles falla. Con Catbox / 0x0 sí funciona.`)
+                }
+                let finalUrl = j.url || j.result_url || j.download || j.data?.url
                 if (finalUrl && typeof finalUrl === 'string' && finalUrl.includes('http') && finalUrl !== resultUrl) {
                     let v = await fetch(finalUrl)
                     videoBuffer = Buffer.from(await v.arrayBuffer())
                     break
                 }
-                if (j.status === 'failed' || j.status === 'error') throw new Error('Job falló en API: ' + t.slice(0, 300))
-            } catch (e) { if (e.message.includes('Job falló')) throw e }
-            await m.reply(head + `\n⏳ Procesando... (${(i+1)*5}s)\nÚltima respuesta: ${lastResp}` + foot)
+            } catch (e) { if (e.message.includes('La API no pudo')) throw e }
         }
 
-        if (!videoBuffer) throw new Error('Timeout 90s. Última respuesta: ' + lastResp)
+        if (!videoBuffer) throw new Error('Timeout, la API demoró más de 90s')
 
         await conn.sendMessage(m.chat, { react: { text: '❄️', key: m.key } })
         await conn.sendMessage(m.chat, {
@@ -106,9 +107,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         }, { quoted: m })
 
     } catch (e) {
-        console.log('ERROR HDVID:', e)
+        console.log('ERROR HDVID:', e.message)
         await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-        return m.reply(head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ ERROR DETALLADO ：✿ 。\n\n❌ *Paso donde falló:*\n${e.message}` + foot)
+        return m.reply(head + `\n⤷ ┇ 𝐇𝐃 𝐕𝐈𝐃𝐄𝐎 ﹒ ERROR ：✿ 。\n\n❌ ${e.message}` + foot)
     }
 }
 
